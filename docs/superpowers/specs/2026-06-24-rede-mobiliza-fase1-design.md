@@ -39,6 +39,8 @@ Uma aplicação Next.js única com rotas de API integradas. Supabase provê banc
 
 A aplicação requer um `Dockerfile` para build e deploy no EasyPanel.
 
+> **Configuração obrigatória do Supabase Auth:** o Supabase valida o parâmetro `redirectTo` dos magic links contra uma allowlist de URLs configurada em Authentication → URL Configuration → Redirect URLs. **A URL `/auth/callback` da aplicação (ex: `https://redemobiliza.com.br/auth/callback`) deve ser adicionada à allowlist antes do primeiro deploy.** Se não configurada, o Supabase ignora o `redirectTo` silenciosamente e o callback não recebe os parâmetros `gabineteId` e `token`, quebrando o fluxo de onboarding de mobilizadores.
+
 ### Row-Level Security (RLS)
 
 O isolamento multi-tenant é garantido em duas camadas:
@@ -50,7 +52,7 @@ A tabela `PessoaSegmento` não possui `gabineteId` direto e é protegida via pol
 
 > **Integridade de `PessoaSegmento`:** a política OR pressupõe que `pessoaId` e `segmentoId` de uma mesma linha pertencem ao mesmo gabinete. Para garantir isso, a camada de aplicação deve sempre validar que `Pessoa.gabineteId == Segmento.gabineteId` antes de criar um `PessoaSegmento`. Um bug que crie uma linha com `pessoaId` de gabinete A e `segmentoId` de gabinete B não é bloqueado pelo RLS — a validação é responsabilidade da aplicação, não do banco.
 >
-> **Segmentos e papel do mobilizador:** a política RLS de `PessoaSegmento` garante **isolamento de tenant** (mobilizador não acessa dados de outro gabinete), mas **não** restringe acesso dentro do gabinete por papel. Um mobilizador com JWT válido pode ler `PessoaSegmento` de qualquer pessoa do gabinete via acesso direto ao banco (PostgREST/anon key). A restrição "mobilizador vê apenas segmentos dos seus convidados diretos" é imposta exclusivamente pela **camada de aplicação** — toda query da API do mobilizador que envolva `PessoaSegmento` deve filtrar por `VinculoRede.indicadoPorId = mobilizadorPessoaId`.
+> **Segmentos e papel do mobilizador:** a política RLS de `PessoaSegmento` garante **isolamento de tenant** (mobilizador não acessa dados de outro gabinete), mas **não** restringe acesso dentro do gabinete por papel. Um mobilizador com JWT válido pode ler `PessoaSegmento` de qualquer pessoa do gabinete via acesso direto ao banco (PostgREST com JWT autenticado, role=`authenticated` — distinto da anon key, que usa role `anon`). A restrição "mobilizador vê apenas segmentos dos seus convidados diretos" é imposta exclusivamente pela **camada de aplicação** — toda query da API do mobilizador que envolva `PessoaSegmento` deve filtrar por `VinculoRede.indicadoPorId = mobilizadorPessoaId`.
 
 ### Estrutura de URLs
 
@@ -351,10 +353,10 @@ model LogSuporte {
 2. Clica em "Tornar Mobilizador"
 3. **Validação pré-promoção:** sistema verifica `Pessoa.email != null` — se ausente, exibe erro "Informe o e-mail da pessoa antes de tornar mobilizador" e bloqueia a ação
 4. Sistema gera `tokenMobilizador` único (cuid) e define `isMobilizador = true`
-5. Sistema envia magic link por e-mail via `supabase.auth.signInWithOtp({ email, options: { redirectTo: '/auth/callback?gabineteId=GABINETE_ID&token=TOKEN_MOBILIZADOR' } })` — **`UsuarioGabinete` ainda não é criado neste momento**
+5. Sistema envia magic link por e-mail via `supabase.auth.signInWithOtp({ email, options: { redirectTo: '/auth/callback?gabineteId=GABINETE_ID&token=TOKEN_MOBILIZADOR' } })` — **`UsuarioGabinete` ainda não é criado neste momento**. **Nota de segurança:** o `token` presente na URL do redirectTo é o `tokenMobilizador` — ele aparece no link enviado por e-mail (exposição necessária, diferente de "retornar em resposta de API"). Essa exposição é aceita porque (a) o e-mail é enviado apenas para o próprio mobilizador e (b) o callback valida que o e-mail autenticado corresponde ao da Pessoa (passo 7), impedindo uso do token por terceiros.
 6. Mobilizador clica no link → Supabase cria `auth.users` e dispara o callback de autenticação com os parâmetros do `redirectTo`
-7. Callback lê `gabineteId` e `token` dos parâmetros do `redirectTo`. Busca `Pessoa WHERE gabineteId = gabineteId AND tokenMobilizador = token` — lookup determinístico, sem ambiguidade multi-gabinete. Se não encontrar resultado (token expirado ou inválido), mobilizador vê mensagem "Link inválido ou expirado — peça ao administrador para reenviar o convite". Cria `UsuarioGabinete` via **upsert** com `userId = auth.users.id` e `papel = "mobilizador"` (upsert garante idempotência em double-click ou retry do browser)
-8. Callback redireciona para `/g/[slug]/mobilizador/` usando o `Gabinete.slug` correspondente ao `gabineteId` recebido
+7. Callback lê `gabineteId` e `token` dos parâmetros do `redirectTo`. Busca `Pessoa WHERE gabineteId = gabineteId AND tokenMobilizador = token` — lookup determinístico, sem ambiguidade multi-gabinete. **Validação de e-mail:** compara `session.user.email == Pessoa.email`; se divergir, rejeita com "Link inválido ou expirado — peça ao administrador para reenviar o convite" (impede que um usuário com JWT próprio use token de outra pessoa). Se não encontrar resultado (token não existe), mesma mensagem de erro. Cria `UsuarioGabinete` via **upsert** com `userId = auth.users.id` e `papel = "mobilizador"`, chave de conflito `[userId, gabineteId]` (upsert garante idempotência em double-click ou retry do browser)
+8. Callback busca `Gabinete.slug` pelo `gabineteId` recebido. Se `gabineteId` não existir no banco (URL manipulada ou gabinete excluído), exibe "Link inválido ou expirado". Caso contrário, redireciona para `/g/[slug]/mobilizador/`
 
 > Mobilizadores autenticam exclusivamente via magic link por e-mail (Supabase `signInWithOtp`).
 > `UsuarioGabinete` é criado no callback de autenticação (após primeiro uso do magic link), não no momento da promoção — isso garante que `userId` sempre tenha um UUID válido de `auth.users`.
@@ -388,8 +390,8 @@ model LogSuporte {
 - Admin revoga a permissão
 - **Antes de iniciar a transação:** verifique se existe entrada em `UsuarioGabinete` para o mobilizador e guarde o `userId` em memória (pode não existir se o mobilizador nunca clicou no magic link)
 - As operações de banco são executadas em **uma única transação Prisma:** `Pessoa.isMobilizador = false`, `Pessoa.tokenMobilizador = null` e remoção da entrada em `UsuarioGabinete` (se existir)
-- Após commit da transação, se `userId` foi encontrado, chama `supabase.auth.admin.signOut(userId)` — essa chamada é **melhor esforço**: se falhar, o JWT permanece válido até expiração, mas o middleware barra o mobilizador em cada request (sem acesso funcional ao painel)
-- O JWT do projeto Supabase deve ser configurado com **expiração máxima de 1 hora** (Auth → Settings → JWT expiry) para limitar a janela de acesso residual em caso de falha do `signOut`
+- Após commit da transação, se `userId` foi encontrado, chama `supabase.auth.admin.signOut(userId)` — essa chamada é **melhor esforço**: se falhar, o JWT permanece válido até expiração, mas o middleware Next.js barra o mobilizador em cada request ao painel (sem acesso funcional às rotas Next.js). **Nota:** requests diretas ao PostgREST com o JWT ainda válido não passam pelo middleware Next.js — o acesso residual a dados via PostgREST está limitado ao TTL do JWT (máximo 1 hora, ver configuração abaixo)
+- O JWT do projeto Supabase deve ser configurado com **expiração máxima de 1 hora** (Auth → Settings → JWT expiry) para limitar a janela de acesso residual em caso de falha do `signOut`. **Nota de UX:** essa configuração afeta o access token (curta duração), não a sessão do browser — o Supabase JS Client renova o access token silenciosamente via refresh token (prazo mais longo). Admins e mobilizadores ativos **não precisam re-autenticar manualmente** a cada hora; o impacto é apenas na janela de acesso residual pós-revogação.
 - Links e QR Codes antigos do mobilizador param de funcionar imediatamente (token não existe mais)
 - Histórico de indicações é mantido (vínculos em `VinculoRede` não são apagados)
 - Se a pessoa for re-promovida no futuro, um novo `tokenMobilizador` é gerado e um novo magic link é enviado
