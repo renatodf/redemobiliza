@@ -361,6 +361,8 @@ model LogSuporte {
 - Contador total de pessoas que trouxe
 
 > A API que popula essa lista usa `select` explícito — retorna apenas os campos acima. Campos como `isEquipe`, `isMobilizador`, `tokenMobilizador`, `email` e `origem` **não são retornados** para o mobilizador.
+>
+> **Sobre `tokenMobilizador`:** esse campo é interno ao servidor e nunca é exposto em nenhuma resposta de API — nem para o mobilizador, nem para o admin. Quando o admin precisa ver o link de um mobilizador, o sistema monta a URL server-side a partir do token sem retorná-lo ao cliente.
 
 ### Regras de privacidade
 
@@ -368,8 +370,8 @@ model LogSuporte {
 |---|---|
 | Mobilizador | Apenas seus convidados diretos (nome, WhatsApp, região, segmentos) |
 | Mobilizador | NÃO vê a rede dos seus convidados |
-| Mobilizador | NÃO vê `isEquipe`, `isMobilizador`, `email`, `origem` dos convidados |
-| Admin | Toda a árvore completa + todos os campos de cada pessoa |
+| Mobilizador | NÃO vê `isEquipe`, `isMobilizador`, `tokenMobilizador`, `email`, `origem` dos convidados |
+| Admin | Toda a árvore completa + todos os campos de cada pessoa, **exceto** `tokenMobilizador` |
 
 ### Duplicidade controlada
 - Pessoa existe uma única vez no banco (tabela `Pessoa`)
@@ -441,9 +443,9 @@ O admin pode marcar qualquer pessoa cadastrada como membro da equipe interna do 
 - Não tem relação com mobilizador — uma pessoa pode ser membro da equipe, mobilizador, ambos ou nenhum
 
 ### Listagem de membros
-- O painel admin possui uma seção dedicada **"Equipe"** (ou filtro na lista de pessoas) que exibe apenas pessoas com `isEquipe = true`
-- Campos exibidos na listagem: nome, WhatsApp, região, profissão, se é mobilizador
-- Admin pode desmarcar diretamente da listagem (sem precisar abrir a ficha individual)
+- A lista geral de pessoas no painel admin possui um filtro **"Somente equipe"** que exibe apenas pessoas com `isEquipe = true` (não é uma rota separada — é um estado de filtro na mesma tela de pessoas)
+- Campos exibidos com o filtro ativo: nome, WhatsApp, região, profissão (ou "—" se vazia), se é mobilizador
+- Admin pode desmarcar `isEquipe` diretamente na listagem (sem precisar abrir a ficha individual)
 
 ---
 
@@ -467,7 +469,7 @@ Cards e tabelas filtráveis por período (hoje / 7 dias / 30 dias / personalizad
 - Total de pessoas cadastradas
 - Novas pessoas no período selecionado
 - Total de mobilizadores ativos
-- Total de membros da equipe (`isEquipe = true`)
+- Total de membros da equipe (`isEquipe = true`) — **estado atual, não filtrado por período**
 - Pessoas por segmento (tabela ordenável)
 - Ranking de mobilizadores por convidados
 - Pessoas por origem (tabela e eventual gráfico)
@@ -499,4 +501,4 @@ Cards e tabelas filtráveis por período (hoje / 7 dias / 30 dias / personalizad
 - Planos e limites por gabinete (billing)
 - Módulos: Tarefas, Demandas, Agenda, Comunicação
 
-> **Nota para os módulos de Tarefas e Demandas (Fase 2):** o campo `Pessoa.isEquipe` foi criado na Fase 1 especificamente para suportar esses módulos. O seletor de "Responsável" deve filtrar `WHERE isEquipe = true AND gabineteId = <gabinete autenticado>`. Qualquer alteração no modelo de membros da equipe na Fase 2 deve considerar a compatibilidade com esse campo.
+> **Nota para os módulos de Tarefas e Demandas (Fase 2):** o campo `Pessoa.isEquipe` foi criado na Fase 1 especificamente para suportar esses módulos. O seletor de "Responsável" deve filtrar `WHERE isEquipe = true AND gabineteId = <gabinete autenticado>`. Mobilizadores com `isMobilizador = true` mas `isEquipe = false` **não aparecem** no seletor — se o admin quiser atribuir responsabilidade a um mobilizador, deve primeiro marcá-lo como membro da equipe via toggle. Qualquer alteração no modelo de membros da equipe na Fase 2 deve considerar a compatibilidade com esse campo.
