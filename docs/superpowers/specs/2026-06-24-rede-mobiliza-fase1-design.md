@@ -50,7 +50,7 @@ A tabela `PessoaSegmento` não possui `gabineteId` direto e é protegida via pol
 
 > **Integridade de `PessoaSegmento`:** a política OR pressupõe que `pessoaId` e `segmentoId` de uma mesma linha pertencem ao mesmo gabinete. Para garantir isso, a camada de aplicação deve sempre validar que `Pessoa.gabineteId == Segmento.gabineteId` antes de criar um `PessoaSegmento`. Um bug que crie uma linha com `pessoaId` de gabinete A e `segmentoId` de gabinete B não é bloqueado pelo RLS — a validação é responsabilidade da aplicação, não do banco.
 >
-> **Segmentos visíveis ao mobilizador:** a política RLS de `PessoaSegmento` é aplicada com o `gabineteId` do usuário autenticado (incluindo mobilizadores). O mobilizador só consegue ler registros de `PessoaSegmento` cujo `pessoaId` ou `segmentoId` pertença ao seu gabinete — o isolamento multi-tenant está garantido. A visibilidade dos segmentos dos convidados diretos (campo `segmentos` listado no painel do mobilizador) é intencional e coberta por essa política.
+> **Segmentos e papel do mobilizador:** a política RLS de `PessoaSegmento` garante **isolamento de tenant** (mobilizador não acessa dados de outro gabinete), mas **não** restringe acesso dentro do gabinete por papel. Um mobilizador com JWT válido pode ler `PessoaSegmento` de qualquer pessoa do gabinete via acesso direto ao banco (PostgREST/anon key). A restrição "mobilizador vê apenas segmentos dos seus convidados diretos" é imposta exclusivamente pela **camada de aplicação** — toda query da API do mobilizador que envolva `PessoaSegmento` deve filtrar por `VinculoRede.indicadoPorId = mobilizadorPessoaId`.
 
 ### Estrutura de URLs
 
@@ -303,7 +303,7 @@ model LogSuporte {
 
 ### Verificações nas rotas autenticadas (admin e mobilizador)
 - `/g/[slug]/admin/` e `/g/[slug]/mobilizador/` verificam `Gabinete.ativo = true` em cada request — se false, retornam HTTP 403 com mensagem "Este gabinete foi desativado. Entre em contato com o suporte."
-- `/g/[slug]/mobilizador/` verifica a existência de entrada ativa em `UsuarioGabinete` com `papel = "mobilizador"` a cada request — não apenas o JWT Supabase. Se a entrada foi removida (mobilizador revogado), a sessão é invalidada imediatamente e o usuário é redirecionado para a página de login.
+- `/g/[slug]/mobilizador/` verifica a existência de entrada ativa em `UsuarioGabinete` com `papel = "mobilizador"` a cada request — não apenas o JWT Supabase. Se a entrada foi removida (mobilizador revogado), o middleware rejeita o acesso e redireciona para a página de login. O `signOut` tenta invalidar o JWT imediatamente; se falhar, o JWT pode permanecer válido até expiração natural, mas o middleware barra a cada request — sem acesso funcional ao painel.
 
 ### Rastreamento de origem
 
@@ -351,10 +351,10 @@ model LogSuporte {
 2. Clica em "Tornar Mobilizador"
 3. **Validação pré-promoção:** sistema verifica `Pessoa.email != null` — se ausente, exibe erro "Informe o e-mail da pessoa antes de tornar mobilizador" e bloqueia a ação
 4. Sistema gera `tokenMobilizador` único (cuid) e define `isMobilizador = true`
-5. Sistema envia magic link por e-mail via `supabase.auth.signInWithOtp({ email })` — **`UsuarioGabinete` ainda não é criado neste momento**
-6. Mobilizador clica no link → Supabase cria `auth.users` e dispara callback de autenticação na aplicação
-7. Callback busca `Pessoa WHERE email = session.user.email AND tokenMobilizador IS NOT NULL` — filtra por ambas as condições para garantir que é um mobilizador legítimo. Se houver múltiplos resultados (mesmo email em gabinetes distintos), cria `UsuarioGabinete` para cada gabinete correspondente. Se não encontrar resultado (email divergiu por atualização após envio do magic link), o callback não cria `UsuarioGabinete` e o mobilizador vê mensagem "Link inválido ou expirado — peça ao administrador para reenviar o convite"
-8. Mobilizador é redirecionado para `/g/[slug]/mobilizador/`
+5. Sistema envia magic link por e-mail via `supabase.auth.signInWithOtp({ email, options: { redirectTo: '/auth/callback?gabineteId=GABINETE_ID&token=TOKEN_MOBILIZADOR' } })` — **`UsuarioGabinete` ainda não é criado neste momento**
+6. Mobilizador clica no link → Supabase cria `auth.users` e dispara o callback de autenticação com os parâmetros do `redirectTo`
+7. Callback lê `gabineteId` e `token` dos parâmetros do `redirectTo`. Busca `Pessoa WHERE gabineteId = gabineteId AND tokenMobilizador = token` — lookup determinístico, sem ambiguidade multi-gabinete. Se não encontrar resultado (token expirado ou inválido), mobilizador vê mensagem "Link inválido ou expirado — peça ao administrador para reenviar o convite". Cria `UsuarioGabinete` via **upsert** com `userId = auth.users.id` e `papel = "mobilizador"` (upsert garante idempotência em double-click ou retry do browser)
+8. Callback redireciona para `/g/[slug]/mobilizador/` usando o `Gabinete.slug` correspondente ao `gabineteId` recebido
 
 > Mobilizadores autenticam exclusivamente via magic link por e-mail (Supabase `signInWithOtp`).
 > `UsuarioGabinete` é criado no callback de autenticação (após primeiro uso do magic link), não no momento da promoção — isso garante que `userId` sempre tenha um UUID válido de `auth.users`.
@@ -374,7 +374,7 @@ model LogSuporte {
 |---|---|
 | Mobilizador | Apenas seus convidados diretos (nome, WhatsApp, região, segmentos) |
 | Mobilizador | NÃO vê a rede dos seus convidados |
-| Mobilizador | NÃO vê `isEquipe`, `isMobilizador`, `tokenMobilizador`, `email`, `origem`, `profissaoId`, `nascimento` dos convidados |
+| Mobilizador | NÃO vê `isEquipe`, `isMobilizador`, `tokenMobilizador`, `email`, `origem`, `profissaoId`, `nascimento` dos convidados — nem o objeto relacionado `profissao { id, nome }` via include |
 | Admin | Toda a árvore completa + todos os campos de cada pessoa, **exceto** `tokenMobilizador` |
 
 ### Duplicidade controlada
@@ -386,8 +386,10 @@ model LogSuporte {
 
 ### Remoção de mobilizador
 - Admin revoga a permissão
-- As operações de banco são executadas em **uma única transação Prisma:** `Pessoa.isMobilizador = false`, `Pessoa.tokenMobilizador = null` e remoção da entrada em `UsuarioGabinete`
-- Após commit da transação, o sistema chama `supabase.auth.admin.signOut(userId)` para invalidar as sessões JWT — essa chamada é **melhor esforço**: se falhar (timeout, erro de rede), o mobilizador continuará com JWT válido até expiração natural, mas já sem entrada em `UsuarioGabinete` — o middleware o rejeita na próxima request autenticada
+- **Antes de iniciar a transação:** verifique se existe entrada em `UsuarioGabinete` para o mobilizador e guarde o `userId` em memória (pode não existir se o mobilizador nunca clicou no magic link)
+- As operações de banco são executadas em **uma única transação Prisma:** `Pessoa.isMobilizador = false`, `Pessoa.tokenMobilizador = null` e remoção da entrada em `UsuarioGabinete` (se existir)
+- Após commit da transação, se `userId` foi encontrado, chama `supabase.auth.admin.signOut(userId)` — essa chamada é **melhor esforço**: se falhar, o JWT permanece válido até expiração, mas o middleware barra o mobilizador em cada request (sem acesso funcional ao painel)
+- O JWT do projeto Supabase deve ser configurado com **expiração máxima de 1 hora** (Auth → Settings → JWT expiry) para limitar a janela de acesso residual em caso de falha do `signOut`
 - Links e QR Codes antigos do mobilizador param de funcionar imediatamente (token não existe mais)
 - Histórico de indicações é mantido (vínculos em `VinculoRede` não são apagados)
 - Se a pessoa for re-promovida no futuro, um novo `tokenMobilizador` é gerado e um novo magic link é enviado
@@ -399,7 +401,7 @@ model LogSuporte {
 ### Acesso
 - URL exclusiva: `/super-admin/`
 - Login separado (e-mail e senha) — **não usa a rota `/login` dos admins de gabinete**
-- Existe apenas um super-admin (o dono do sistema)
+- Existe apenas um super-admin (o dono do sistema) — unicidade não é imposta pelo mecanismo de `app_metadata`; deve ser verificada no provisionamento e auditada periodicamente via Supabase Auth dashboard (listar usuários com `app_metadata.role = "super-admin"`)
 - **Identificação:** o super-admin é identificado pelo campo `app_metadata.role = "super-admin"` no Supabase Auth, configurado via service role key no provisionamento inicial (nunca via dashboard de usuário). O middleware de `/super-admin/` verifica `session.user.app_metadata.role === "super-admin"` em cada request — qualquer outro valor resulta em HTTP 403. **Importante:** usar `app_metadata` (não `user_metadata`) — `app_metadata` só pode ser escrito via service role key, enquanto `user_metadata` pode ser sobrescrito pelo próprio usuário autenticado, o que abriria vetor de escalada de privilégio.
 
 ### Google OAuth para admins de gabinete
