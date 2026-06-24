@@ -360,9 +360,9 @@ model LogSuporte {
 - Lista dos seus convidados diretos (nome, WhatsApp, região, segmentos)
 - Contador total de pessoas que trouxe
 
-> A API que popula essa lista usa `select` explícito — retorna apenas os campos acima. Campos como `isEquipe`, `isMobilizador`, `tokenMobilizador`, `email` e `origem` **não são retornados** para o mobilizador.
+> A API que popula essa lista usa `select` explícito — retorna apenas os campos acima. Campos como `isEquipe`, `isMobilizador`, `tokenMobilizador`, `email` e `origem` **não são retornados como campos JSON brutos**. O painel do mobilizador recebe seu link pessoal já montado server-side (ex: `{ linkPessoal: "/g/slug/cadastro?mobilizador=TOKEN" }`) — o campo raw `tokenMobilizador` nunca aparece em nenhuma resposta de API.
 >
-> **Sobre `tokenMobilizador`:** esse campo é interno ao servidor e nunca é exposto em nenhuma resposta de API — nem para o mobilizador, nem para o admin. Quando o admin precisa ver o link de um mobilizador, o sistema monta a URL server-side a partir do token sem retorná-lo ao cliente.
+> **Sobre `tokenMobilizador`:** campo interno ao servidor. Regra: o raw `tokenMobilizador` nunca é retornado em nenhuma resposta de API — nem para o mobilizador, nem para o admin. A URL completa é sempre montada server-side e retornada como string pronta (`linkPessoal`). **No painel admin,** a ficha de cada mobilizador exibe um botão **"Copiar link"** que aciona um endpoint `GET /api/g/[slug]/admin/mobilizadores/[id]/link` — o servidor monta e retorna `{ url: "..." }` sem expor o token raw.
 
 ### Regras de privacidade
 
@@ -444,8 +444,8 @@ O admin pode marcar qualquer pessoa cadastrada como membro da equipe interna do 
 
 ### Listagem de membros
 - A lista geral de pessoas no painel admin possui um filtro **"Somente equipe"** que exibe apenas pessoas com `isEquipe = true` (não é uma rota separada — é um estado de filtro na mesma tela de pessoas)
-- Campos exibidos com o filtro ativo: nome, WhatsApp, região, profissão (ou "—" se vazia), se é mobilizador
-- Admin pode desmarcar `isEquipe` diretamente na listagem (sem precisar abrir a ficha individual)
+- Campos exibidos com o filtro ativo: nome, WhatsApp, região (ou "—" se vazia), profissão (ou "—" se vazia), se é mobilizador
+- Admin pode desmarcar `isEquipe` diretamente na listagem (sem precisar abrir a ficha individual); ao desmarcar, o sistema exibe confirmação **"Remover [nome] da equipe?"** antes de executar a ação
 
 ---
 
@@ -468,7 +468,7 @@ Cards e tabelas filtráveis por período (hoje / 7 dias / 30 dias / personalizad
 
 - Total de pessoas cadastradas
 - Novas pessoas no período selecionado
-- Total de mobilizadores ativos
+- Total de mobilizadores ativos — **estado atual, não filtrado por período**
 - Total de membros da equipe (`isEquipe = true`) — **estado atual, não filtrado por período**
 - Pessoas por segmento (tabela ordenável)
 - Ranking de mobilizadores por convidados
