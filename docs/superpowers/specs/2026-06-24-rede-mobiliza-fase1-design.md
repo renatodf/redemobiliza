@@ -246,7 +246,11 @@ model VinculoRede {
 // Regra de cálculo de nivel (aplicada na camada de aplicação ao criar o vínculo):
 // - indicadoPorId == null  → nivel = 0  (pessoa entrou diretamente, sem mobilizador)
 // - indicadoPorId != null  → nivel = MIN(VinculoRede.nivel WHERE pessoaId=indicadoPorId AND gabineteId=gabineteId) + 1
-//   Quando o indicador pertence a múltiplas redes, usa-se o menor nivel encontrado.
+//   "Quando o indicador pertence a múltiplas redes" significa: pessoaId=indicadoPorId pode ter
+//   múltiplos registros VinculoRede no mesmo gabinete (um por cada mobilizador que a convidou).
+//   Usa-se o MENOR desses niveis como base — ex: se o indicador tem niveis [2, 4], o indicado
+//   recebe nivel = 2 + 1 = 3. Essa fórmula é aplicada independente de quantos vínculos o
+//   indicado já possui no gabinete.
 // O campo é gravado no INSERT para evitar recálculo em queries de leitura.
 
 model LogSuporte {
@@ -261,6 +265,9 @@ model LogSuporte {
 
   gabinete   Gabinete @relation(fields: [gabineteId], references: [id])
 }
+// sessaoId é gerado pelo servidor no início de cada sessão de suporte (cuid() ou UUID v4)
+// e incluído em todos os registros da mesma sessão. É responsabilidade da camada de aplicação
+// gerar e propagar o sessaoId — não é gerado pelo banco.
 // Uma sessão de suporte gera ao menos dois registros com o mesmo sessaoId:
 // acao="acesso_inicio" (saidoEm=null) e acao="acesso_fim" (saidoEm=timestamp de saída).
 // Ações intermediárias (ex: "editou_pessoa") usam o mesmo sessaoId e têm saidoEm=null.
@@ -305,7 +312,7 @@ model LogSuporte {
 
 ### Verificações nas rotas autenticadas (admin e mobilizador)
 - `/g/[slug]/admin/` e `/g/[slug]/mobilizador/` verificam `Gabinete.ativo = true` em cada request — se false, retornam HTTP 403 com mensagem "Este gabinete foi desativado. Entre em contato com o suporte."
-- `/g/[slug]/mobilizador/` verifica a existência de entrada ativa em `UsuarioGabinete` com `papel = "mobilizador"` a cada request — não apenas o JWT Supabase. Se a entrada foi removida (mobilizador revogado), o middleware rejeita o acesso e redireciona para a página de login. O `signOut` tenta invalidar o JWT imediatamente; se falhar, o JWT pode permanecer válido até expiração natural, mas o middleware barra a cada request — sem acesso funcional ao painel.
+- `/g/[slug]/mobilizador/` verifica se existe uma entrada em `UsuarioGabinete` com `papel = "mobilizador"` para o `userId` da sessão a cada request — não apenas o JWT Supabase. ("Existência" é o único critério — o registro ou existe ou foi deletado na remoção; não há campo `ativo`.) Se a entrada foi removida (mobilizador revogado), o middleware rejeita o acesso e redireciona para a página de login. O `signOut` tenta invalidar o JWT imediatamente; se falhar, o JWT pode permanecer válido até expiração natural, mas o middleware barra a cada request — sem acesso funcional ao painel.
 
 ### Rastreamento de origem
 
@@ -351,11 +358,11 @@ model LogSuporte {
 ### Como uma pessoa vira mobilizador
 1. Admin localiza a pessoa no sistema
 2. Clica em "Tornar Mobilizador"
-3. **Validação pré-promoção:** sistema verifica `Pessoa.email != null` — se ausente, exibe erro "Informe o e-mail da pessoa antes de tornar mobilizador" e bloqueia a ação
+3. **Validação pré-promoção:** sistema verifica (a) `Pessoa.email != null` — se ausente, exibe erro "Informe o e-mail da pessoa antes de tornar mobilizador" e bloqueia; (b) Pessoa não possui `UsuarioGabinete` com `papel = "admin"` no mesmo gabinete — se tiver, exibe erro "Um administrador do gabinete não pode ser promovido a mobilizador por este fluxo" e bloqueia
 4. Sistema gera `tokenMobilizador` único (cuid) e define `isMobilizador = true`
 5. Sistema envia magic link por e-mail via `supabase.auth.signInWithOtp({ email, options: { redirectTo: '/auth/callback?gabineteId=GABINETE_ID&token=TOKEN_MOBILIZADOR' } })` — **`UsuarioGabinete` ainda não é criado neste momento**. **Nota de segurança:** o `token` presente na URL do redirectTo é o `tokenMobilizador` — ele aparece no link enviado por e-mail (exposição necessária, diferente de "retornar em resposta de API"). Essa exposição é aceita porque (a) o e-mail é enviado apenas para o próprio mobilizador e (b) o callback valida que o e-mail autenticado corresponde ao da Pessoa (passo 7), impedindo uso do token por terceiros.
 6. Mobilizador clica no link → Supabase cria `auth.users` e dispara o callback de autenticação com os parâmetros do `redirectTo`
-7. Callback lê `gabineteId` e `token` dos parâmetros do `redirectTo`. Busca `Pessoa WHERE gabineteId = gabineteId AND tokenMobilizador = token` — lookup determinístico, sem ambiguidade multi-gabinete. **Validação de e-mail:** compara `session.user.email == Pessoa.email`; se divergir, rejeita com "Link inválido ou expirado — peça ao administrador para reenviar o convite" (impede que um usuário com JWT próprio use token de outra pessoa). Se não encontrar resultado (token não existe), mesma mensagem de erro. Cria `UsuarioGabinete` via **upsert** com `userId = auth.users.id` e `papel = "mobilizador"`, chave de conflito `[userId, gabineteId]` (upsert garante idempotência em double-click ou retry do browser)
+7. Callback lê `gabineteId` e `token` dos parâmetros do `redirectTo`. Busca `Pessoa WHERE gabineteId = gabineteId AND tokenMobilizador = token` — lookup determinístico, sem ambiguidade multi-gabinete. **Validação de e-mail:** compara `session.user.email.toLowerCase() == Pessoa.email?.toLowerCase()` (case-insensitive — Supabase normaliza emails para lowercase em `auth.users`); se divergir, rejeita com "Link inválido ou expirado — peça ao administrador para reenviar o convite" (impede que um usuário com JWT próprio use token de outra pessoa). Se não encontrar resultado (token não existe), mesma mensagem de erro. Cria `UsuarioGabinete` via **upsert** com `userId = auth.users.id` e `papel = "mobilizador"`, chave de conflito `[userId, gabineteId]` (upsert garante idempotência em double-click ou retry do browser)
 8. Callback busca `Gabinete.slug` pelo `gabineteId` recebido. Se `gabineteId` não existir no banco (URL manipulada ou gabinete excluído), exibe "Link inválido ou expirado". Caso contrário, redireciona para `/g/[slug]/mobilizador/`
 
 > Mobilizadores autenticam exclusivamente via magic link por e-mail (Supabase `signInWithOtp`).
@@ -368,7 +375,7 @@ model LogSuporte {
 
 > A API que popula essa lista usa `select` explícito — retorna apenas os campos acima. Campos como `isEquipe`, `isMobilizador`, `tokenMobilizador`, `email` e `origem` **não são retornados como campos JSON brutos**. O painel do mobilizador recebe seu link pessoal já montado server-side (ex: `{ linkPessoal: "/g/slug/cadastro?mobilizador=TOKEN" }`) — o campo raw `tokenMobilizador` nunca aparece em nenhuma resposta de API.
 >
-> **Sobre `tokenMobilizador`:** campo interno ao servidor. Regra: o raw `tokenMobilizador` nunca é retornado em nenhuma resposta de API — nem para o mobilizador, nem para o admin. A URL completa é sempre montada server-side e retornada como string pronta (`linkPessoal`). **No painel admin,** a ficha de cada mobilizador exibe um botão **"Copiar link"** que aciona um endpoint `GET /api/g/[slug]/admin/mobilizadores/[id]/link` — o servidor monta e retorna `{ url: "..." }` sem expor o token raw.
+> **Sobre `tokenMobilizador`:** campo interno ao servidor. Regra: o `tokenMobilizador` **nunca é retornado como campo JSON isolado** em nenhuma resposta de API. O valor é exposto de duas formas **intencionais e controladas**: (1) embutido na URL de cadastro (`/g/slug/cadastro?mobilizador=TOKEN`) retornada como string pronta (`linkPessoal`) para o mobilizador usar seu link; (2) embutido na URL retornada pelo endpoint "Copiar link" do admin. Qualquer cliente que analise essas strings pode extrair o token — isso é aceito pelo design, pois o link de cadastro é publicamente compartilhável pelo mobilizador. O que **nunca deve acontecer** é retornar o token como campo direto em um objeto JSON de Pessoa ou listagem.
 
 ### Regras de privacidade
 
@@ -391,7 +398,7 @@ model LogSuporte {
 - **Antes de iniciar a transação:** verifique se existe entrada em `UsuarioGabinete` para o mobilizador e guarde o `userId` em memória (pode não existir se o mobilizador nunca clicou no magic link)
 - As operações de banco são executadas em **uma única transação Prisma:** `Pessoa.isMobilizador = false`, `Pessoa.tokenMobilizador = null` e remoção da entrada em `UsuarioGabinete` (se existir)
 - Após commit da transação, se `userId` foi encontrado, chama `supabase.auth.admin.signOut(userId)` — essa chamada é **melhor esforço**: se falhar, o JWT permanece válido até expiração, mas o middleware Next.js barra o mobilizador em cada request ao painel (sem acesso funcional às rotas Next.js). **Nota:** requests diretas ao PostgREST com o JWT ainda válido não passam pelo middleware Next.js — o acesso residual a dados via PostgREST está limitado ao TTL do JWT (máximo 1 hora, ver configuração abaixo)
-- O JWT do projeto Supabase deve ser configurado com **expiração máxima de 1 hora** (Auth → Settings → JWT expiry) para limitar a janela de acesso residual em caso de falha do `signOut`. **Nota de UX:** essa configuração afeta o access token (curta duração), não a sessão do browser — o Supabase JS Client renova o access token silenciosamente via refresh token (prazo mais longo). Admins e mobilizadores ativos **não precisam re-autenticar manualmente** a cada hora; o impacto é apenas na janela de acesso residual pós-revogação.
+- O JWT do projeto Supabase deve ser configurado com **expiração máxima de 1 hora** (Auth → Settings → JWT expiry). Quando `signOut` **tem sucesso**, ambos o access token e o refresh token são invalidados imediatamente — sem acesso residual. Quando `signOut` **falha** (melhor esforço), o refresh token permanece válido e o JS Client o usa para renovar silenciosamente o access token por até o TTL do refresh token. Para limitar esse risco, configure também o **Refresh Token expiry** (Auth → Settings → Refresh Token expiry) para no máximo **1 dia** — isso restringe o pior caso de acesso pós-revogação por falha de `signOut`. Para sessões ativas legítimas, o Supabase renova o access token silenciosamente; admins e mobilizadores ativos **não precisam re-autenticar manualmente**.
 - Links e QR Codes antigos do mobilizador param de funcionar imediatamente (token não existe mais)
 - Histórico de indicações é mantido (vínculos em `VinculoRede` não são apagados)
 - Se a pessoa for re-promovida no futuro, um novo `tokenMobilizador` é gerado e um novo magic link é enviado
@@ -408,8 +415,9 @@ model LogSuporte {
 
 ### Google OAuth para admins de gabinete
 - Google OAuth disponível como alternativa de login para admins de gabinete (não para mobilizadores nem super-admin)
-- Após autenticação via Google, o sistema verifica se o email tem entrada ativa em `UsuarioGabinete` com `papel = "admin"` — caso contrário, acesso é negado com mensagem "Seu e-mail não está autorizado. Entre em contato com o administrador."
-- Admins que usam Google OAuth não precisam definir senha — o convite por e-mail (Supabase `inviteUserByEmail`) redireciona para configuração de senha, mas se o admin optar por Google, o fluxo de senha é ignorado
+- **Fluxo obrigatório:** o admin deve primeiramente aceitar o convite por e-mail (`inviteUserByEmail`) — essa etapa cria o `auth.users` e o `UsuarioGabinete(userId, gabineteId, papel="admin")` via callback de aceitação do invite. Somente após isso o Google pode ser adicionado como segundo método de autenticação (o Supabase vincula o provider Google ao mesmo `auth.users` já existente). Admins que ignoram o invite e tentam acessar diretamente via Google terão acesso negado, pois o `auth.users` do Google terá um `userId` diferente sem entrada em `UsuarioGabinete`.
+- Após autenticação (por qualquer provider), o sistema verifica se o `userId` da sessão tem entrada em `UsuarioGabinete` com `papel = "admin"` — caso contrário, acesso é negado com mensagem "Seu e-mail não está autorizado. Entre em contato com o administrador."
+- O callback de aceitação do invite (`/auth/confirm`) cria o `UsuarioGabinete` com `userId = auth.users.id` e `papel = "admin"` usando o `gabineteId` armazenado nos metadados do invite
 
 ### Capacidades
 
