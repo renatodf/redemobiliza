@@ -72,7 +72,7 @@ Slugs identificam o gabinete e os segmentos nas URLs. Regras:
 | Perfil | Acesso |
 |---|---|
 | Super-admin | Gerencia todos os gabinetes + modo suporte com log |
-| Admin do gabinete | Gerencia seu gabinete: pessoas, segmentos, mobilizadores, regiões, profissões |
+| Admin do gabinete | Gerencia seu gabinete: pessoas, segmentos, mobilizadores, membros da equipe, regiões, profissões |
 | Mobilizador | Vê seus convidados diretos e seu link/QR Code pessoal |
 
 ### Fluxo de criação de gabinete
@@ -360,13 +360,16 @@ model LogSuporte {
 - Lista dos seus convidados diretos (nome, WhatsApp, região, segmentos)
 - Contador total de pessoas que trouxe
 
+> A API que popula essa lista usa `select` explícito — retorna apenas os campos acima. Campos como `isEquipe`, `isMobilizador`, `tokenMobilizador`, `email` e `origem` **não são retornados** para o mobilizador.
+
 ### Regras de privacidade
 
 | Quem | Vê |
 |---|---|
-| Mobilizador | Apenas seus convidados diretos |
+| Mobilizador | Apenas seus convidados diretos (nome, WhatsApp, região, segmentos) |
 | Mobilizador | NÃO vê a rede dos seus convidados |
-| Admin | Toda a árvore completa |
+| Mobilizador | NÃO vê `isEquipe`, `isMobilizador`, `email`, `origem` dos convidados |
+| Admin | Toda a árvore completa + todos os campos de cada pessoa |
 
 ### Duplicidade controlada
 - Pessoa existe uma única vez no banco (tabela `Pessoa`)
@@ -432,11 +435,15 @@ Essas configurações são exibidas na página pública de cadastro.
 
 O admin pode marcar qualquer pessoa cadastrada como membro da equipe interna do gabinete.
 
-- Checkbox "Membro da equipe" disponível na ficha de qualquer pessoa no painel admin
-- `Pessoa.isEquipe` é alternado diretamente pelo admin (toggle simples)
+### Gerenciamento
+- Toggle "Membro da equipe" disponível na ficha de qualquer pessoa no painel admin
+- `Pessoa.isEquipe` é alternado diretamente pelo admin (ação imediata, sem etapas adicionais)
 - Não tem relação com mobilizador — uma pessoa pode ser membro da equipe, mobilizador, ambos ou nenhum
 
-**Uso em módulos futuros:** nos módulos de Tarefas, Demandas e similares, o campo "Responsável" exibirá apenas pessoas com `isEquipe = true`. Isso evita selecionar cadastros externos por engano.
+### Listagem de membros
+- O painel admin possui uma seção dedicada **"Equipe"** (ou filtro na lista de pessoas) que exibe apenas pessoas com `isEquipe = true`
+- Campos exibidos na listagem: nome, WhatsApp, região, profissão, se é mobilizador
+- Admin pode desmarcar diretamente da listagem (sem precisar abrir a ficha individual)
 
 ---
 
@@ -460,6 +467,7 @@ Cards e tabelas filtráveis por período (hoje / 7 dias / 30 dias / personalizad
 - Total de pessoas cadastradas
 - Novas pessoas no período selecionado
 - Total de mobilizadores ativos
+- Total de membros da equipe (`isEquipe = true`)
 - Pessoas por segmento (tabela ordenável)
 - Ranking de mobilizadores por convidados
 - Pessoas por origem (tabela e eventual gráfico)
@@ -490,3 +498,5 @@ Cards e tabelas filtráveis por período (hoje / 7 dias / 30 dias / personalizad
 - Gráficos visuais no dashboard (barras, linhas, pizza)
 - Planos e limites por gabinete (billing)
 - Módulos: Tarefas, Demandas, Agenda, Comunicação
+
+> **Nota para os módulos de Tarefas e Demandas (Fase 2):** o campo `Pessoa.isEquipe` foi criado na Fase 1 especificamente para suportar esses módulos. O seletor de "Responsável" deve filtrar `WHERE isEquipe = true AND gabineteId = <gabinete autenticado>`. Qualquer alteração no modelo de membros da equipe na Fase 2 deve considerar a compatibilidade com esse campo.
