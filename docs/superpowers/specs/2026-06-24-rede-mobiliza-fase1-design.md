@@ -48,6 +48,10 @@ O isolamento multi-tenant é garantido em duas camadas:
 
 A tabela `PessoaSegmento` não possui `gabineteId` direto e é protegida via política RLS baseada em join: `pessoaId IN (SELECT id FROM Pessoa WHERE gabineteId = auth.uid_gabinete())` ou `segmentoId IN (SELECT id FROM Segmento WHERE gabineteId = auth.uid_gabinete())`. A tabela `VinculoRede` possui `gabineteId` próprio e segue a regra geral de RLS direta.
 
+> **Integridade de `PessoaSegmento`:** a política OR pressupõe que `pessoaId` e `segmentoId` de uma mesma linha pertencem ao mesmo gabinete. Para garantir isso, a camada de aplicação deve sempre validar que `Pessoa.gabineteId == Segmento.gabineteId` antes de criar um `PessoaSegmento`. Um bug que crie uma linha com `pessoaId` de gabinete A e `segmentoId` de gabinete B não é bloqueado pelo RLS — a validação é responsabilidade da aplicação, não do banco.
+>
+> **Segmentos visíveis ao mobilizador:** a política RLS de `PessoaSegmento` é aplicada com o `gabineteId` do usuário autenticado (incluindo mobilizadores). O mobilizador só consegue ler registros de `PessoaSegmento` cujo `pessoaId` ou `segmentoId` pertença ao seu gabinete — o isolamento multi-tenant está garantido. A visibilidade dos segmentos dos convidados diretos (campo `segmentos` listado no painel do mobilizador) é intencional e coberta por essa política.
+
 ### Estrutura de URLs
 
 ```
@@ -349,7 +353,7 @@ model LogSuporte {
 4. Sistema gera `tokenMobilizador` único (cuid) e define `isMobilizador = true`
 5. Sistema envia magic link por e-mail via `supabase.auth.signInWithOtp({ email })` — **`UsuarioGabinete` ainda não é criado neste momento**
 6. Mobilizador clica no link → Supabase cria `auth.users` e dispara callback de autenticação na aplicação
-7. Callback verifica `Pessoa.tokenMobilizador != null` para o email autenticado → cria `UsuarioGabinete` com `userId = auth.users.id` e `papel = "mobilizador"`
+7. Callback busca `Pessoa WHERE email = session.user.email AND tokenMobilizador IS NOT NULL` — filtra por ambas as condições para garantir que é um mobilizador legítimo. Se houver múltiplos resultados (mesmo email em gabinetes distintos), cria `UsuarioGabinete` para cada gabinete correspondente. Se não encontrar resultado (email divergiu por atualização após envio do magic link), o callback não cria `UsuarioGabinete` e o mobilizador vê mensagem "Link inválido ou expirado — peça ao administrador para reenviar o convite"
 8. Mobilizador é redirecionado para `/g/[slug]/mobilizador/`
 
 > Mobilizadores autenticam exclusivamente via magic link por e-mail (Supabase `signInWithOtp`).
@@ -370,7 +374,7 @@ model LogSuporte {
 |---|---|
 | Mobilizador | Apenas seus convidados diretos (nome, WhatsApp, região, segmentos) |
 | Mobilizador | NÃO vê a rede dos seus convidados |
-| Mobilizador | NÃO vê `isEquipe`, `isMobilizador`, `tokenMobilizador`, `email`, `origem` dos convidados |
+| Mobilizador | NÃO vê `isEquipe`, `isMobilizador`, `tokenMobilizador`, `email`, `origem`, `profissaoId`, `nascimento` dos convidados |
 | Admin | Toda a árvore completa + todos os campos de cada pessoa, **exceto** `tokenMobilizador` |
 
 ### Duplicidade controlada
@@ -382,9 +386,8 @@ model LogSuporte {
 
 ### Remoção de mobilizador
 - Admin revoga a permissão
-- Sistema define `Pessoa.isMobilizador = false` e `Pessoa.tokenMobilizador = null`
-- A entrada correspondente em `UsuarioGabinete` (papel = "mobilizador") é removida
-- Sistema chama `supabase.auth.admin.signOut(userId)` para invalidar imediatamente todas as sessões JWT ativas do mobilizador — sem esperar expiração natural do token
+- As operações de banco são executadas em **uma única transação Prisma:** `Pessoa.isMobilizador = false`, `Pessoa.tokenMobilizador = null` e remoção da entrada em `UsuarioGabinete`
+- Após commit da transação, o sistema chama `supabase.auth.admin.signOut(userId)` para invalidar as sessões JWT — essa chamada é **melhor esforço**: se falhar (timeout, erro de rede), o mobilizador continuará com JWT válido até expiração natural, mas já sem entrada em `UsuarioGabinete` — o middleware o rejeita na próxima request autenticada
 - Links e QR Codes antigos do mobilizador param de funcionar imediatamente (token não existe mais)
 - Histórico de indicações é mantido (vínculos em `VinculoRede` não são apagados)
 - Se a pessoa for re-promovida no futuro, um novo `tokenMobilizador` é gerado e um novo magic link é enviado
@@ -397,7 +400,7 @@ model LogSuporte {
 - URL exclusiva: `/super-admin/`
 - Login separado (e-mail e senha) — **não usa a rota `/login` dos admins de gabinete**
 - Existe apenas um super-admin (o dono do sistema)
-- **Identificação:** o super-admin é identificado pelo campo `user_metadata.role = "super-admin"` no Supabase Auth, configurado manualmente via Supabase Dashboard no provisionamento inicial. O middleware de `/super-admin/` verifica `session.user.user_metadata.role === "super-admin"` em cada request — qualquer outro valor resulta em HTTP 403.
+- **Identificação:** o super-admin é identificado pelo campo `app_metadata.role = "super-admin"` no Supabase Auth, configurado via service role key no provisionamento inicial (nunca via dashboard de usuário). O middleware de `/super-admin/` verifica `session.user.app_metadata.role === "super-admin"` em cada request — qualquer outro valor resulta em HTTP 403. **Importante:** usar `app_metadata` (não `user_metadata`) — `app_metadata` só pode ser escrito via service role key, enquanto `user_metadata` pode ser sobrescrito pelo próprio usuário autenticado, o que abriria vetor de escalada de privilégio.
 
 ### Google OAuth para admins de gabinete
 - Google OAuth disponível como alternativa de login para admins de gabinete (não para mobilizadores nem super-admin)
@@ -439,13 +442,13 @@ O admin pode marcar qualquer pessoa cadastrada como membro da equipe interna do 
 
 ### Gerenciamento
 - Toggle "Membro da equipe" disponível na ficha de qualquer pessoa no painel admin
-- `Pessoa.isEquipe` é alternado diretamente pelo admin (ação imediata, sem etapas adicionais)
+- `Pessoa.isEquipe` é alternado na ficha da pessoa: **marcar é imediato** (sem confirmação); **desmarcar exige confirmação** "Remover [nome] da equipe?" antes de executar — tanto na ficha quanto na listagem
 - Não tem relação com mobilizador — uma pessoa pode ser membro da equipe, mobilizador, ambos ou nenhum
 
 ### Listagem de membros
 - A lista geral de pessoas no painel admin possui um filtro **"Somente equipe"** que exibe apenas pessoas com `isEquipe = true` (não é uma rota separada — é um estado de filtro na mesma tela de pessoas)
 - Campos exibidos com o filtro ativo: nome, WhatsApp, região (ou "—" se vazia), profissão (ou "—" se vazia), se é mobilizador
-- Admin pode desmarcar `isEquipe` diretamente na listagem (sem precisar abrir a ficha individual); ao desmarcar, o sistema exibe confirmação **"Remover [nome] da equipe?"** antes de executar a ação
+- Admin pode desmarcar `isEquipe` diretamente na listagem (sem precisar abrir a ficha individual); a confirmação **"Remover [nome] da equipe?"** é exibida antes de executar — consistente com o comportamento da ficha
 
 ---
 
@@ -466,9 +469,9 @@ O admin pode marcar qualquer pessoa cadastrada como membro da equipe interna do 
 
 Cards e tabelas filtráveis por período (hoje / 7 dias / 30 dias / personalizado):
 
-- Total de pessoas cadastradas
+- Total de pessoas cadastradas — **estado atual, não filtrado por período**
 - Novas pessoas no período selecionado
-- Total de mobilizadores ativos — **estado atual, não filtrado por período**
+- Total de mobilizadores ativos — **estado atual, não filtrado por período** (critério: `isMobilizador = true`, independente de ter `UsuarioGabinete` criado)
 - Total de membros da equipe (`isEquipe = true`) — **estado atual, não filtrado por período**
 - Pessoas por segmento (tabela ordenável)
 - Ranking de mobilizadores por convidados
