@@ -17,7 +17,7 @@ Plataforma SaaS multi-tenant de mobilização territorial e segmentação inteli
 - **TypeScript** (strict mode)
 - **Prisma** (ORM)
 - **PostgreSQL** via Supabase
-- **Supabase Auth** (email/senha + Google)
+- **Supabase Auth** (email/senha para admins e super-admin; Google OAuth para admins; magic link para mobilizadores)
 - **Tailwind CSS**
 - **EasyPanel** (hospedagem da aplicação via Docker)
 - **Supabase** (banco de dados + autenticação, serviço externo)
@@ -46,7 +46,7 @@ O isolamento multi-tenant é garantido em duas camadas:
 1. **Aplicação (Prisma):** toda query inclui `WHERE gabineteId = <id do gabinete autenticado>`. APIs de gabinete extraem `gabineteId` da sessão Supabase Auth — nunca de parâmetros de URL.
 2. **Banco de dados (Supabase RLS):** RLS habilitado em todas as tabelas com coluna `gabineteId`. Políticas garantem que um usuário autenticado só leia/escreva linhas do próprio gabinete. Super-admin usa service role key (bypass de RLS) apenas para operações de suporte.
 
-Tabelas sem `gabineteId` (`PessoaSegmento`, `VinculoRede`) são protegidas via joins com tabelas pai que já possuem RLS ativo.
+A tabela `PessoaSegmento` não possui `gabineteId` direto e é protegida via política RLS baseada em join: `pessoaId IN (SELECT id FROM Pessoa WHERE gabineteId = auth.uid_gabinete())` ou `segmentoId IN (SELECT id FROM Segmento WHERE gabineteId = auth.uid_gabinete())`. A tabela `VinculoRede` possui `gabineteId` próprio e segue a regra geral de RLS direta.
 
 ### Estrutura de URLs
 
@@ -233,10 +233,13 @@ model VinculoRede {
   gabinete      Gabinete @relation(fields: [gabineteId], references: [id])
   pessoa        Pessoa   @relation("Indicado", fields: [pessoaId], references: [id])
   indicadoPor   Pessoa?  @relation("Indicador", fields: [indicadoPorId], references: [id])
+
+  @@unique([gabineteId, pessoaId, indicadoPorId])
 }
 // Regra de cálculo de nivel (aplicada na camada de aplicação ao criar o vínculo):
 // - indicadoPorId == null  → nivel = 0  (pessoa entrou diretamente, sem mobilizador)
-// - indicadoPorId != null  → nivel = VinculoRede do indicador.nivel + 1
+// - indicadoPorId != null  → nivel = MIN(VinculoRede.nivel WHERE pessoaId=indicadoPorId AND gabineteId=gabineteId) + 1
+//   Quando o indicador pertence a múltiplas redes, usa-se o menor nivel encontrado.
 // O campo é gravado no INSERT para evitar recálculo em queries de leitura.
 
 model LogSuporte {
@@ -252,8 +255,12 @@ model LogSuporte {
   gabinete   Gabinete @relation(fields: [gabineteId], references: [id])
 }
 // Uma sessão de suporte gera ao menos dois registros com o mesmo sessaoId:
-// acao="acesso_inicio" (saidoEm=null) e acao="acesso_fim" (saidoEm=timestamp).
-// Ações intermediárias (ex: "editou_pessoa") usam o mesmo sessaoId.
+// acao="acesso_inicio" (saidoEm=null) e acao="acesso_fim" (saidoEm=timestamp de saída).
+// Ações intermediárias (ex: "editou_pessoa") usam o mesmo sessaoId e têm saidoEm=null.
+// IMPORTANTE: saidoEm só é preenchido no registro acao="acesso_fim" — nos demais é sempre null.
+// Para identificar sessões abertas (sem saída registrada):
+//   SELECT DISTINCT sessaoId FROM LogSuporte
+//   WHERE sessaoId NOT IN (SELECT sessaoId FROM LogSuporte WHERE acao = 'acesso_fim')
 ```
 
 ---
@@ -289,6 +296,10 @@ model LogSuporte {
 - Se segmento informado no link tiver `status != "ativo"`: cadastro prossegue normalmente, mas o vínculo ao segmento **não** é criado; sistema exibe aviso discreto "Este grupo não está mais disponível, mas seu cadastro foi realizado com sucesso"
 - Se token de mobilizador não existir (tokenMobilizador null ou pessoa não é mobilizador): parâmetro `?mobilizador=` é ignorado silenciosamente; vínculo de rede não é criado
 
+### Verificações nas rotas autenticadas (admin e mobilizador)
+- `/g/[slug]/admin/` e `/g/[slug]/mobilizador/` verificam `Gabinete.ativo = true` em cada request — se false, retornam HTTP 403 com mensagem "Este gabinete foi desativado. Entre em contato com o suporte."
+- `/g/[slug]/mobilizador/` verifica a existência de entrada ativa em `UsuarioGabinete` com `papel = "mobilizador"` a cada request — não apenas o JWT Supabase. Se a entrada foi removida (mobilizador revogado), a sessão é invalidada imediatamente e o usuário é redirecionado para a página de login.
+
 ### Rastreamento de origem
 
 | Origem | Como é capturada |
@@ -298,6 +309,7 @@ model LogSuporte {
 | indicacao | Link com `?mobilizador=TOKEN` |
 | manual | Cadastro feito pelo admin no painel |
 | instagram / facebook / whatsapp | Parâmetros UTM no link |
+| importacao | Definido automaticamente no módulo de importação de planilhas (funcionalidade futura) |
 
 ---
 
@@ -334,11 +346,13 @@ model LogSuporte {
 2. Clica em "Tornar Mobilizador"
 3. **Validação pré-promoção:** sistema verifica `Pessoa.email != null` — se ausente, exibe erro "Informe o e-mail da pessoa antes de tornar mobilizador" e bloqueia a ação
 4. Sistema gera `tokenMobilizador` único (cuid) e define `isMobilizador = true`
-5. Sistema cria entrada em `UsuarioGabinete` com `papel = "mobilizador"` e envia magic link por e-mail via `supabase.auth.signInWithOtp({ email })`
-6. Mobilizador clica no link e acessa seu painel em `/g/[slug]/mobilizador/`
+5. Sistema envia magic link por e-mail via `supabase.auth.signInWithOtp({ email })` — **`UsuarioGabinete` ainda não é criado neste momento**
+6. Mobilizador clica no link → Supabase cria `auth.users` e dispara callback de autenticação na aplicação
+7. Callback verifica `Pessoa.tokenMobilizador != null` para o email autenticado → cria `UsuarioGabinete` com `userId = auth.users.id` e `papel = "mobilizador"`
+8. Mobilizador é redirecionado para `/g/[slug]/mobilizador/`
 
 > Mobilizadores autenticam exclusivamente via magic link por e-mail (Supabase `signInWithOtp`).
-> O Supabase cria um registro em `auth.users` quando o magic link é usado pela primeira vez.
+> `UsuarioGabinete` é criado no callback de autenticação (após primeiro uso do magic link), não no momento da promoção — isso garante que `userId` sempre tenha um UUID válido de `auth.users`.
 
 ### Painel do mobilizador
 - Seu link e QR Code pessoal (`/g/[slug]/cadastro?mobilizador=TOKEN`)
@@ -364,6 +378,7 @@ model LogSuporte {
 - Admin revoga a permissão
 - Sistema define `Pessoa.isMobilizador = false` e `Pessoa.tokenMobilizador = null`
 - A entrada correspondente em `UsuarioGabinete` (papel = "mobilizador") é removida
+- Sistema chama `supabase.auth.admin.signOut(userId)` para invalidar imediatamente todas as sessões JWT ativas do mobilizador — sem esperar expiração natural do token
 - Links e QR Codes antigos do mobilizador param de funcionar imediatamente (token não existe mais)
 - Histórico de indicações é mantido (vínculos em `VinculoRede` não são apagados)
 - Se a pessoa for re-promovida no futuro, um novo `tokenMobilizador` é gerado e um novo magic link é enviado
@@ -374,8 +389,14 @@ model LogSuporte {
 
 ### Acesso
 - URL exclusiva: `/super-admin/`
-- Login separado (e-mail e senha)
+- Login separado (e-mail e senha) — **não usa a rota `/login` dos admins de gabinete**
 - Existe apenas um super-admin (o dono do sistema)
+- **Identificação:** o super-admin é identificado pelo campo `user_metadata.role = "super-admin"` no Supabase Auth, configurado manualmente via Supabase Dashboard no provisionamento inicial. O middleware de `/super-admin/` verifica `session.user.user_metadata.role === "super-admin"` em cada request — qualquer outro valor resulta em HTTP 403.
+
+### Google OAuth para admins de gabinete
+- Google OAuth disponível como alternativa de login para admins de gabinete (não para mobilizadores nem super-admin)
+- Após autenticação via Google, o sistema verifica se o email tem entrada ativa em `UsuarioGabinete` com `papel = "admin"` — caso contrário, acesso é negado com mensagem "Seu e-mail não está autorizado. Entre em contato com o administrador."
+- Admins que usam Google OAuth não precisam definir senha — o convite por e-mail (Supabase `inviteUserByEmail`) redireciona para configuração de senha, mas se o admin optar por Google, o fluxo de senha é ignorado
 
 ### Capacidades
 
@@ -442,6 +463,7 @@ Cards e tabelas filtráveis por período (hoje / 7 dias / 30 dias / personalizad
 | `instagram` | Instagram |
 | `facebook` | Facebook |
 | `whatsapp` | WhatsApp |
+| `importacao` | Importação |
 | `null` | Não informado |
 
 > Dashboard será expandido conforme novos módulos forem adicionados ao sistema.
