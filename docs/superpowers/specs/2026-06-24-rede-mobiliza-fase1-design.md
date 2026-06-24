@@ -39,6 +39,15 @@ Uma aplicação Next.js única com rotas de API integradas. Supabase provê banc
 
 A aplicação requer um `Dockerfile` para build e deploy no EasyPanel.
 
+### Row-Level Security (RLS)
+
+O isolamento multi-tenant é garantido em duas camadas:
+
+1. **Aplicação (Prisma):** toda query inclui `WHERE gabineteId = <id do gabinete autenticado>`. APIs de gabinete extraem `gabineteId` da sessão Supabase Auth — nunca de parâmetros de URL.
+2. **Banco de dados (Supabase RLS):** RLS habilitado em todas as tabelas com coluna `gabineteId`. Políticas garantem que um usuário autenticado só leia/escreva linhas do próprio gabinete. Super-admin usa service role key (bypass de RLS) apenas para operações de suporte.
+
+Tabelas sem `gabineteId` (`PessoaSegmento`, `VinculoRede`) são protegidas via joins com tabelas pai que já possuem RLS ativo.
+
 ### Estrutura de URLs
 
 ```
@@ -103,15 +112,19 @@ model Gabinete {
 
 model UsuarioGabinete {
   id         String   @id @default(cuid())
-  userId     String   // Supabase auth user id (apenas admins têm conta Supabase)
+  userId     String   // Supabase auth user id
   gabineteId String
-  papel      String   // admin (mobilizadores NÃO entram aqui — identificados por Pessoa.isMobilizador)
+  papel      String   // admin | mobilizador
   criadoEm  DateTime @default(now())
 
   gabinete   Gabinete @relation(fields: [gabineteId], references: [id])
 
   @@unique([userId, gabineteId])
 }
+// Nota: admins autenticam via email/senha (Supabase inviteUserByEmail).
+// Mobilizadores autenticam via magic link (Supabase signInWithOtp) — o Supabase
+// cria um usuário em auth.users em ambos os casos. A diferença está no papel e
+// nas rotas permitidas, não no tipo de conta Supabase.
 
 model LinkComposto {
   id            String   @id @default(cuid())
@@ -214,23 +227,33 @@ model VinculoRede {
   gabineteId    String
   pessoaId      String
   indicadoPorId String?
-  nivel         Int      @default(0)
+  nivel         Int
   criadoEm     DateTime  @default(now())
 
   gabinete      Gabinete @relation(fields: [gabineteId], references: [id])
   pessoa        Pessoa   @relation("Indicado", fields: [pessoaId], references: [id])
   indicadoPor   Pessoa?  @relation("Indicador", fields: [indicadoPorId], references: [id])
 }
+// Regra de cálculo de nivel (aplicada na camada de aplicação ao criar o vínculo):
+// - indicadoPorId == null  → nivel = 0  (pessoa entrou diretamente, sem mobilizador)
+// - indicadoPorId != null  → nivel = VinculoRede do indicador.nivel + 1
+// O campo é gravado no INSERT para evitar recálculo em queries de leitura.
 
 model LogSuporte {
-  id         String   @id @default(cuid())
-  gabineteId String
-  acao       String
-  detalhes   String?
-  criadoEm  DateTime @default(now())
+  id                String   @id @default(cuid())
+  gabineteId        String
+  superAdminUserId  String   // userId do super-admin (Supabase auth.users)
+  acao              String   // "acesso_inicio" | "acesso_fim" | descricao livre de ação
+  detalhes          String?
+  sessaoId          String   // agrupa eventos de uma mesma sessão de suporte
+  criadoEm         DateTime @default(now())
+  saidoEm          DateTime? // preenchido ao sair do modo suporte
 
   gabinete   Gabinete @relation(fields: [gabineteId], references: [id])
 }
+// Uma sessão de suporte gera ao menos dois registros com o mesmo sessaoId:
+// acao="acesso_inicio" (saidoEm=null) e acao="acesso_fim" (saidoEm=timestamp).
+// Ações intermediárias (ex: "editou_pessoa") usam o mesmo sessaoId.
 ```
 
 ---
@@ -260,6 +283,11 @@ model LogSuporte {
 - Vincula à rede do mobilizador (se `?mobilizador=TOKEN` presente)
 - Registra origem (qrcode, link, indicacao conforme parâmetros UTM)
 - Página exibe identidade visual do gabinete (nome, cores, logo)
+
+### Verificações na rota pública
+- Se `Gabinete.ativo == false`: rota `/g/[slug]/cadastro` exibe página de erro "Este gabinete não está disponível no momento" (HTTP 403) — não processa cadastros
+- Se segmento informado no link tiver `status != "ativo"`: cadastro prossegue normalmente, mas o vínculo ao segmento **não** é criado; sistema exibe aviso discreto "Este grupo não está mais disponível, mas seu cadastro foi realizado com sucesso"
+- Se token de mobilizador não existir (tokenMobilizador null ou pessoa não é mobilizador): parâmetro `?mobilizador=` é ignorado silenciosamente; vínculo de rede não é criado
 
 ### Rastreamento de origem
 
@@ -303,13 +331,14 @@ model LogSuporte {
 
 ### Como uma pessoa vira mobilizador
 1. Admin localiza a pessoa no sistema
-2. Clica em "Tornar Mobilizador" (pessoa deve ter e-mail cadastrado)
-3. Sistema gera token único automaticamente
-4. Sistema envia magic link por e-mail via Supabase Auth
-5. Mobilizador clica no link e acessa seu painel diretamente (sem senha)
+2. Clica em "Tornar Mobilizador"
+3. **Validação pré-promoção:** sistema verifica `Pessoa.email != null` — se ausente, exibe erro "Informe o e-mail da pessoa antes de tornar mobilizador" e bloqueia a ação
+4. Sistema gera `tokenMobilizador` único (cuid) e define `isMobilizador = true`
+5. Sistema cria entrada em `UsuarioGabinete` com `papel = "mobilizador"` e envia magic link por e-mail via `supabase.auth.signInWithOtp({ email })`
+6. Mobilizador clica no link e acessa seu painel em `/g/[slug]/mobilizador/`
 
-> Mobilizadores autenticam exclusivamente via magic link por e-mail.
-> Eles NÃO têm conta Supabase convencional — são identificados pelo token na tabela `Pessoa`.
+> Mobilizadores autenticam exclusivamente via magic link por e-mail (Supabase `signInWithOtp`).
+> O Supabase cria um registro em `auth.users` quando o magic link é usado pela primeira vez.
 
 ### Painel do mobilizador
 - Seu link e QR Code pessoal (`/g/[slug]/cadastro?mobilizador=TOKEN`)
@@ -333,7 +362,11 @@ model LogSuporte {
 
 ### Remoção de mobilizador
 - Admin revoga a permissão
-- Histórico de indicações é mantido (vínculos não são apagados)
+- Sistema define `Pessoa.isMobilizador = false` e `Pessoa.tokenMobilizador = null`
+- A entrada correspondente em `UsuarioGabinete` (papel = "mobilizador") é removida
+- Links e QR Codes antigos do mobilizador param de funcionar imediatamente (token não existe mais)
+- Histórico de indicações é mantido (vínculos em `VinculoRede` não são apagados)
+- Se a pessoa for re-promovida no futuro, um novo `tokenMobilizador` é gerado e um novo magic link é enviado
 
 ---
 
@@ -395,8 +428,21 @@ Cards e tabelas filtráveis por período (hoje / 7 dias / 30 dias / personalizad
 - Total de mobilizadores ativos
 - Pessoas por segmento (tabela ordenável)
 - Ranking de mobilizadores por convidados
-- Pessoas por origem (QR Code, Link, Manual, Indicação)
+- Pessoas por origem (tabela e eventual gráfico)
 - Pessoas por região administrativa
+
+### Mapeamento de origens (valor gravado → label exibido)
+
+| Valor em `Pessoa.origem` | Label no dashboard |
+|---|---|
+| `qrcode` | QR Code |
+| `link` | Link |
+| `manual` | Manual |
+| `indicacao` | Indicação |
+| `instagram` | Instagram |
+| `facebook` | Facebook |
+| `whatsapp` | WhatsApp |
+| `null` | Não informado |
 
 > Dashboard será expandido conforme novos módulos forem adicionados ao sistema.
 
