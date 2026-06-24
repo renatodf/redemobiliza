@@ -174,6 +174,7 @@ model Pessoa {
   profissaoId      String?
   nascimento       DateTime?
   origem           String?   // qrcode | link | manual | indicacao | importacao | instagram | facebook | whatsapp
+  isEquipe         Boolean   @default(false)
   isMobilizador    Boolean   @default(false)
   tokenMobilizador String?
   criadoEm         DateTime  @default(now())
@@ -427,7 +428,19 @@ Essas configurações são exibidas na página pública de cadastro.
 
 ---
 
-## Módulo 6 — Listas Gerenciáveis pelo Admin
+## Módulo 6 — Membros da Equipe
+
+O admin pode marcar qualquer pessoa cadastrada como membro da equipe interna do gabinete.
+
+- Checkbox "Membro da equipe" disponível na ficha de qualquer pessoa no painel admin
+- `Pessoa.isEquipe` é alternado diretamente pelo admin (toggle simples)
+- Não tem relação com mobilizador — uma pessoa pode ser membro da equipe, mobilizador, ambos ou nenhum
+
+**Uso em módulos futuros:** nos módulos de Tarefas, Demandas e similares, o campo "Responsável" exibirá apenas pessoas com `isEquipe = true`. Isso evita selecionar cadastros externos por engano.
+
+---
+
+## Módulo 7 — Listas Gerenciáveis pelo Admin
 
 ### Regiões Administrativas
 - Pré-cadastradas com as 35 regiões administrativas do DF
