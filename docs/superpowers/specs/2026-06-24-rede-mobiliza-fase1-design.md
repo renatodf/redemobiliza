@@ -68,7 +68,7 @@ $$;
 
 Esta função retorna o `gabineteId` do usuário autenticado via lookup em `UsuarioGabinete`. Super-admin (que não tem linha em `UsuarioGabinete`) acessa dados de gabinetes via **service role key** (bypass de RLS), não via esta função — o middleware do super-admin usa o service role client do Prisma em vez do client autenticado.
 
-**Modo suporte do super-admin:** quando o super-admin clica em "Entrar em modo suporte" para um gabinete específico, o servidor define o cookie `suporteGabineteId` com atributos `httpOnly=true, sameSite='strict', path='/super-admin'` contendo o `gabineteId` do gabinete-alvo. As queries Prisma dentro do modo suporte leem `gabineteId` desse cookie — não de `UsuarioGabinete`. A regra "nunca de parâmetros de URL" (linha acima) aplica-se a admins e mobilizadores; o super-admin em modo suporte usa o mecanismo de cookie descrito aqui. **Entrada no modo suporte:** o servidor gera um `sessaoId` (cuid), cria `LogSuporte` com `acao="acesso_inicio"` e define o cookie. **Saída do modo suporte:** quando o super-admin clica em "Sair do modo suporte", o servidor remove o cookie, cria `LogSuporte` com `acao="acesso_fim"` preenchendo `saidoEm`, e invalida o `sessaoId`. Se o browser fechar sem logout explícito, o cookie expira com a sessão do browser (cookie de sessão, sem `max-age`); a ausência do cookie no próximo acesso a `/super-admin/` indica que não há sessão de suporte ativa — o `LogSuporte` ficará com `saidoEm=null` (sessão "aberta"), detectável via a query descrita abaixo no modelo `LogSuporte`.
+**Modo suporte do super-admin:** quando o super-admin clica em "Entrar em modo suporte" para um gabinete específico, o servidor define o cookie `suporteGabineteId` com atributos `httpOnly=true, secure=true, sameSite='strict', path='/'` contendo o `gabineteId` do gabinete-alvo. **`path='/'` é obrigatório** — com `path='/super-admin'` o browser não enviaria o cookie para rotas `/api/...` usadas pelas queries Prisma de dados do gabinete. `secure=true` garante transmissão apenas via HTTPS. As queries Prisma dentro do modo suporte leem `gabineteId` desse cookie — não de `UsuarioGabinete`. A regra "nunca de parâmetros de URL" (linha acima) aplica-se a admins e mobilizadores; o super-admin em modo suporte usa o mecanismo de cookie descrito aqui. **Entrada no modo suporte:** o servidor gera um `sessaoId` (cuid), cria `LogSuporte` com `acao="acesso_inicio"` e define o cookie. **Saída do modo suporte:** quando o super-admin clica em "Sair do modo suporte", o servidor remove o cookie, cria `LogSuporte` com `acao="acesso_fim"` preenchendo `saidoEm`, e invalida o `sessaoId`. Se o browser fechar sem logout explícito, o cookie expira com a sessão do browser (cookie de sessão, sem `max-age`); a ausência do cookie no próximo acesso a `/super-admin/` indica que não há sessão de suporte ativa — o `LogSuporte` ficará com `saidoEm=null` (sessão "aberta"), detectável via a query descrita abaixo no modelo `LogSuporte`.
 
 > **Integridade de `PessoaSegmento`:** a política OR pressupõe que `pessoaId` e `segmentoId` de uma mesma linha pertencem ao mesmo gabinete. Para garantir isso, a camada de aplicação deve sempre validar que `Pessoa.gabineteId == Segmento.gabineteId` antes de criar um `PessoaSegmento`. Um bug que crie uma linha com `pessoaId` de gabinete A e `segmentoId` de gabinete B não é bloqueado pelo RLS — a validação é responsabilidade da aplicação, não do banco.
 >
@@ -176,7 +176,11 @@ model Regiao {
   gabinete   Gabinete  @relation(fields: [gabineteId], references: [id])
   pessoas    Pessoa[]
 
-  @@unique([gabineteId, nome])
+  // Nota: @@unique([gabineteId, nome]) foi removido propositalmente.
+  // Regiões usam soft delete (ativa=false) — a constraint de banco bloquearia recriação de
+  // região com mesmo nome após desativação. Unicidade de nome (entre ativa=true) é garantida
+  // na camada de aplicação: verificar WHERE gabineteId=X AND nome=Y AND ativa=true
+  // antes de criar ou editar. Ao editar, excluir o próprio id: AND id != <id_atual>.
 }
 
 model Profissao {
@@ -189,7 +193,11 @@ model Profissao {
   gabinete   Gabinete  @relation(fields: [gabineteId], references: [id])
   pessoas    Pessoa[]
 
-  @@unique([gabineteId, nome])
+  // Nota: @@unique([gabineteId, nome]) foi removido propositalmente.
+  // Profissões usam soft delete (ativa=false) — a constraint de banco bloquearia recriação de
+  // profissão com mesmo nome após desativação. Unicidade de nome (entre ativa=true) é garantida
+  // na camada de aplicação: verificar WHERE gabineteId=X AND nome=Y AND ativa=true
+  // antes de criar ou editar. Ao editar, excluir o próprio id: AND id != <id_atual>.
 }
 
 model Pessoa {
@@ -238,12 +246,18 @@ model Segmento {
   linksCompostos LinkComposto[]
 
   // Nota: @@unique([gabineteId, slug]) e @@unique([gabineteId, nome]) foram removidos
-  // propositalmente. Segmentos usam soft delete (status='inativo') — constraints de banco
-  // sem WHERE clause bloqueariam recriação de segmentos com mesmo nome/slug após desativação
-  // (Prisma não suporta unique parcial). Unicidade de nome e slug (entre status='ativo')
-  // é garantida na camada de aplicação: verificar
-  //   WHERE gabineteId=X AND (nome=Y OR slug=Z) AND status='ativo'
-  // antes de criar ou editar um segmento. Se existir resultado, retornar erro de conflito.
+  // propositalmente. Segmentos usam soft delete (status='inativo') — constraints sem WHERE
+  // bloqueariam recriação de segmentos com mesmo nome/slug após desativação (Prisma não
+  // suporta unique parcial). Em substituição, criar dois índices parciais via migration SQL:
+  //   CREATE UNIQUE INDEX ON "Segmento"("gabineteId", "nome") WHERE status = 'ativo';
+  //   CREATE UNIQUE INDEX ON "Segmento"("gabineteId", "slug") WHERE status = 'ativo';
+  // Esses índices garantem unicidade atômica no banco — dois INSERTs simultâneos com mesmo
+  // nome/slug e status='ativo' resultam em erro de constraint no segundo, eliminando race
+  // conditions. A verificação na app ainda é feita para retornar erro amigável antes do INSERT:
+  //   - Criação: WHERE gabineteId=X AND (nome=Y OR slug=Z) AND status='ativo'
+  //   - Edição:  WHERE gabineteId=X AND (nome=Y OR slug=Z) AND status='ativo' AND id != <id_atual>
+  // (a cláusula `AND id != <id_atual>` é obrigatória na edição — sem ela, o próprio segmento
+  // seria detectado como conflito e qualquer edição sem mudar nome/slug seria bloqueada).
 }
 
 model PessoaSegmento {
@@ -322,7 +336,7 @@ model LogSuporte {
 **Passo 1 — WhatsApp (obrigatório — identificação única):**
 - Pessoa digita o número
 - Sistema normaliza antes de salvar e comparar em três passos: (1) remove **todos** os caracteres não numéricos, inclusive o sinal `+`; (2) prefixa `55` se o resultado tiver 10 dígitos (fixo local: DDD + 8) → 12 dígitos, ou se tiver 11 dígitos (celular local: DDD + 9) → 13 dígitos; (3) mantém sem alteração se já tiver 12 ou 13 dígitos (DDI + número completo). Qualquer outro comprimento é rejeitado como inválido antes de salvar. Resultado final: 12 ou 13 dígitos. Exemplos: `(61) 3333-3333` (fixo) → strip → `6133333333` (10 dígitos) → prefixar `55` → `556133333333`; `+55 (61) 3333-3333` → strip → `556133333333` (12 dígitos) → sem alteração; `(61) 99999-9999` (celular) → strip → `61999999999` (11 dígitos) → prefixar `55` → `5561999999999`; `+55 (61) 99999-9999` → strip → `5561999999999` (13 dígitos) → sem alteração. Ambas as formas de entrada para o mesmo número físico produzem o mesmo valor normalizado — garantindo que a constraint `@@unique([gabineteId, whatsapp])` detecte duplicatas. O sistema aplica a mesma função de normalização tanto no cadastro quanto na verificação de duplicidade.
-- Sistema verifica se já existe no gabinete (usando o número normalizado)
+- Sistema verifica se já existe no gabinete (usando o número normalizado com `WHERE gabineteId=X AND whatsapp=NORMALIZADO`)
 - **Novo:** avança para preenchimento de dados
 - **Já cadastrado:** exibe nome para confirmação → entra no segmento/rede sem repetir dados
 
@@ -344,7 +358,7 @@ model LogSuporte {
 
 ### Verificações na rota pública
 - Se `Gabinete.ativo == false`: rota `/g/[slug]/cadastro` exibe página de erro "Este gabinete não está disponível no momento" (HTTP 403) — não processa cadastros
-- Se segmento informado no link tiver `status != "ativo"`: cadastro prossegue normalmente, mas o vínculo ao segmento **não** é criado; sistema exibe aviso discreto "Este grupo não está mais disponível, mas seu cadastro foi realizado com sucesso"
+- Se segmento informado no link (`?segmento=slug`): o lookup deve usar `WHERE gabineteId=X AND slug='slug' AND status='ativo'` — o filtro `status='ativo'` é obrigatório na query porque pode existir múltiplos segmentos com o mesmo slug (um ativo, outros inativos após soft delete). Se a query não retornar resultado (segmento não existe ou está inativo), cadastro prossegue normalmente mas o vínculo ao segmento **não** é criado; sistema exibe aviso discreto "Este grupo não está mais disponível, mas seu cadastro foi realizado com sucesso"
 - O parâmetro `?mobilizador=TOKEN` é válido se e somente se existir `Pessoa WHERE tokenMobilizador = TOKEN AND isMobilizador = true` no gabinete. Se qualquer condição falhar (token não existe, `tokenMobilizador=null`, `isMobilizador=false`), o parâmetro é ignorado silenciosamente e o vínculo de rede não é criado
 
 ### Verificações nas rotas autenticadas (admin e mobilizador)
@@ -434,7 +448,7 @@ model LogSuporte {
 ### Remoção de mobilizador
 - Admin revoga a permissão
 - **Antes de iniciar a transação:** verifique se existe entrada em `UsuarioGabinete` para o mobilizador e guarde o `userId` em memória (pode não existir se o mobilizador nunca clicou no magic link)
-- As operações de banco são executadas em **uma única transação Prisma** com as seguintes quatro operações: (1) `Pessoa.isMobilizador = false`, (2) `Pessoa.tokenMobilizador = null`, (3) remoção da entrada em `UsuarioGabinete` (se existir), e (4) `deleteMany({ where: { mobilizadorId: pessoaId, gabineteId } })` em `LinkComposto`. Os `LinkComposto` são apagados pois a FK `mobilizadorId` apontaria para uma `Pessoa` com `isMobilizador = false`, tornando os links permanentemente inúteis e confusos para o admin. **Todas as quatro operações devem estar dentro do mesmo bloco `prisma.$transaction([...])` — nenhuma delas pode ficar fora da transação.**
+- As operações de banco são executadas em **uma única transação Prisma** com as seguintes operações: (1) `Pessoa.isMobilizador = false`, (2) `Pessoa.tokenMobilizador = null`, (3) remoção condicional da entrada em `UsuarioGabinete` — **inclua esta operação no array `prisma.$transaction([...])` somente se `userId` for não-nulo**; use `deleteMany({ where: { userId: userId, gabineteId } })` (nunca `delete`, que lança erro se o registro não existe); **nunca passe `userId: undefined` ao `deleteMany` — no Prisma, `where: { userId: undefined }` equivale a WHERE omitido e apagaria todos os `UsuarioGabinete` do gabinete**, e (4) `deleteMany({ where: { mobilizadorId: pessoaId, gabineteId } })` em `LinkComposto`. Os `LinkComposto` são apagados pois a FK `mobilizadorId` apontaria para uma `Pessoa` com `isMobilizador = false`, tornando os links permanentemente inúteis e confusos para o admin.
 - Após commit da transação, se `userId` foi encontrado, chama `supabase.auth.admin.signOut(userId)` — essa chamada é **melhor esforço**: se **tiver sucesso**, ambos access token e refresh token são invalidados imediatamente (sem acesso residual). Se **falhar**, o refresh token permanece válido e o middleware Next.js barra o mobilizador em cada request ao painel; requests diretas ao PostgREST com JWT ainda válido contornam o middleware — acesso residual limitado ao TTL do refresh token (máximo 1 dia, ver configuração abaixo).
 - O JWT do projeto Supabase deve ser configurado com **expiração máxima de 1 hora** (Auth → Settings → JWT expiry). Quando `signOut` **falha** (melhor esforço), o refresh token permanece válido e o JS Client o usa para renovar silenciosamente o access token por até o TTL do refresh token. Para limitar esse risco, configure também o **Refresh Token expiry** (Auth → Settings → Refresh Token expiry) para no máximo **1 dia** — isso restringe o pior caso de acesso pós-revogação por falha de `signOut`. Para sessões ativas legítimas, o Supabase renova o access token silenciosamente; admins e mobilizadores ativos **não precisam re-autenticar manualmente**.
 - Links e QR Codes antigos do mobilizador param de funcionar imediatamente (token não existe mais — a rota pública valida `tokenMobilizador = TOKEN AND isMobilizador = true` e ambos estão nulos/falsos após a transação)
@@ -458,7 +472,7 @@ model LogSuporte {
 - **Fluxo de envio do convite (super-admin):**
   1. `supabase.auth.admin.inviteUserByEmail(email)` — cria o usuário em `auth.users` e **envia imediatamente** o e-mail de convite
   2. `supabase.auth.admin.updateUserById(userId, { app_metadata: { gabineteId, papel: 'admin' } })` — armazena `gabineteId` em `app_metadata` via service role key (não em `user_metadata`, que pode ser sobrescrito pelo próprio usuário — mesma razão pela qual `app_metadata` é usado para o super-admin)
-  - **Race condition:** o e-mail é enviado no passo 1, antes de `app_metadata` ser gravado no passo 2. Se o admin clicar no link antes de o passo 2 completar, `session.user.app_metadata.gabineteId` estará `null` no callback `/auth/confirm`. **Mitigação:** o callback deve verificar explicitamente se `app_metadata.gabineteId` está presente; caso esteja `null` ou ausente, exibir erro "Convite inválido — solicite ao administrador do sistema o reenvio do convite" e abortar sem criar `UsuarioGabinete`. **Importante:** o link de convite do Supabase é de uso único — após o primeiro clique (mesmo que resulte em erro no callback), o token é consumido e o link não pode ser reutilizado. Não oriente o admin a "tentar abrir o link novamente". **Para reenviar o convite:** se o usuário ainda não existe em `auth.users` (ex: primeiro envio falhou antes de criar o registro), use novamente `inviteUserByEmail`. Se o usuário já existe em `auth.users` (convite anterior foi enviado mas o link foi consumido com erro), `inviteUserByEmail` retornará erro "User already registered" — nesse caso use `supabase.auth.admin.generateLink({ type: 'invite', email })` para gerar um novo token de convite sem criar novo usuário, depois reenvie o link por e-mail (ou via outra API transacional). Na prática, o passo 2 completa em milissegundos após o passo 1 — a janela de race é mínima, mas deve ser tratada defensivamente com a mensagem acima.
+  - **Race condition:** o e-mail é enviado no passo 1, antes de `app_metadata` ser gravado no passo 2. Se o admin clicar no link antes de o passo 2 completar, `session.user.app_metadata.gabineteId` estará `null` no callback `/auth/confirm`. **Mitigação:** o callback deve verificar explicitamente se `app_metadata.gabineteId` está presente; caso esteja `null` ou ausente, exibir erro "Convite inválido — solicite ao administrador do sistema o reenvio do convite" e abortar sem criar `UsuarioGabinete`. **Importante:** o link de convite do Supabase é de uso único — após o primeiro clique (mesmo que resulte em erro no callback), o token é consumido e o link não pode ser reutilizado. Não oriente o admin a "tentar abrir o link novamente". **Para reenviar o convite:** se o usuário ainda não existe em `auth.users` (ex: primeiro envio falhou antes de criar o registro), use novamente `inviteUserByEmail`. Se o usuário já existe em `auth.users` (convite anterior foi enviado mas o link foi consumido com erro), `inviteUserByEmail` retornará erro "User already registered" — nesse caso use `supabase.auth.admin.generateLink({ type: 'magiclink', email, options: { redirectTo: 'https://<APP_URL>/auth/confirm' } })` para gerar um novo link de autenticação sem criar novo usuário — o `redirectTo` **deve apontar para `/auth/confirm`** (não para `/auth/callback`) para que o callback correto crie o `UsuarioGabinete`. Antes de chamar `generateLink`, verifique que `app_metadata.gabineteId` já foi gravado para este usuário (chame `updateUserById` se necessário). O link gerado deve ser enviado manualmente por e-mail (ou via outra API transacional) — `generateLink` não envia o e-mail automaticamente, diferente de `inviteUserByEmail`. **Nota:** `type: 'invite'` não é um tipo válido no `generateLink` da Supabase Admin SDK — use `type: 'magiclink'`. Na prática, o passo 2 completa em milissegundos após o passo 1 — a janela de race é mínima, mas deve ser tratada defensivamente com a mensagem acima.
 - **Fluxo do callback `/auth/confirm`:**
   1. Lê `gabineteId` de `session.user.app_metadata.gabineteId` (somente leitura pelo usuário — seguro)
   2. Verifica que o `gabineteId` existe no banco; se não existir, exibe erro e aborta
