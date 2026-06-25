@@ -45,7 +45,7 @@ A aplicação requer um `Dockerfile` para build e deploy no EasyPanel.
 
 O isolamento multi-tenant é garantido em duas camadas:
 
-1. **Aplicação (Prisma):** toda query inclui `WHERE gabineteId = <id do gabinete autenticado>`. APIs de gabinete extraem `gabineteId` da sessão Supabase Auth — nunca de parâmetros de URL.
+1. **Aplicação (Prisma):** toda query inclui `WHERE gabineteId = <id do gabinete autenticado>`. APIs de gabinete extraem `gabineteId` a partir do `userId` da sessão Supabase Auth via lookup em `UsuarioGabinete WHERE userId = auth.uid` — o JWT Supabase padrão não inclui `gabineteId` como claim; o campo deve ser obtido do banco, nunca de parâmetros de URL.
 2. **Banco de dados (Supabase RLS):** RLS habilitado em todas as tabelas com coluna `gabineteId`. Políticas garantem que um usuário autenticado só leia/escreva linhas do próprio gabinete. Super-admin usa service role key (bypass de RLS) apenas para operações de suporte.
 
 A tabela `PessoaSegmento` não possui `gabineteId` direto e é protegida via política RLS baseada em join: `pessoaId IN (SELECT id FROM Pessoa WHERE gabineteId = auth.uid_gabinete())` ou `segmentoId IN (SELECT id FROM Segmento WHERE gabineteId = auth.uid_gabinete())`. A tabela `VinculoRede` possui `gabineteId` próprio e segue a regra geral de RLS direta.
@@ -85,7 +85,7 @@ Slugs identificam o gabinete e os segmentos nas URLs. Regras:
 
 1. Super-admin cria o gabinete (nome, slug, cores, logo)
 2. Super-admin define o e-mail do admin do gabinete
-3. Admin recebe convite por e-mail (Supabase Auth) e cria sua senha
+3. Admin recebe convite por e-mail (Supabase Auth), clica no link, cria sua senha — o callback `/auth/confirm` lê `app_metadata.gabineteId` e cria automaticamente o `UsuarioGabinete` com `papel = "admin"`
 4. Admin entra no sistema já configurado
 
 ---
@@ -285,7 +285,7 @@ model LogSuporte {
 
 **Passo 1 — WhatsApp (obrigatório — identificação única):**
 - Pessoa digita o número
-- Sistema normaliza antes de salvar e comparar: remove todos os caracteres não numéricos exceto `+` inicial, sem espaços ou hífen (ex: `(61) 99999-9999` → `6199999999`, `+55 61 99999-9999` → `+5561999999999`). O sistema deve aplicar normalização consistente tanto no cadastro quanto na verificação de duplicidade.
+- Sistema normaliza antes de salvar e comparar: remove **todos** os caracteres não numéricos (inclusive o sinal `+`); o valor armazenado contém apenas dígitos. Exemplos: `(61) 99999-9999` → `61999999999`, `+55 (61) 99999-9999` → `5561999999999`, `5561999999999` → `5561999999999` (sem alteração). O sistema aplica a mesma função de normalização tanto no cadastro quanto na verificação de duplicidade, garantindo que o mesmo número físico sempre produza o mesmo valor na constraint `@@unique([whatsapp, gabineteId])`.
 - Sistema verifica se já existe no gabinete (usando o número normalizado)
 - **Novo:** avança para preenchimento de dados
 - **Já cadastrado:** exibe nome para confirmação → entra no segmento/rede sem repetir dados
@@ -331,9 +331,10 @@ model LogSuporte {
 ## Módulo 2 — Segmentos
 
 ### Gerenciamento pelo admin
-- Criar, editar e excluir segmentos
+- Criar, editar e desativar segmentos
 - Campos: nome, descrição, cor, ícone, tipo, status
 - Tipos: `interesse` | `grupo` | `evento` | `campanha`
+- **Exclusão de segmento é sempre soft delete:** o admin define `status = "inativo"` (não apaga o registro). Segmentos com `status != "ativo"` não aparecem nos selects nem na rota pública. Os registros em `PessoaSegmento` e `LinkComposto` vinculados ao segmento são mantidos para fins de histórico; novos vínculos ao segmento inativo não podem ser criados. Hard delete não é suportado — a existência de FKs em `PessoaSegmento` e `LinkComposto` impediria a exclusão enquanto houver vínculos ativos.
 
 ### Links e QR Codes
 
@@ -385,7 +386,7 @@ model LogSuporte {
 | Mobilizador | Apenas seus convidados diretos (nome, WhatsApp, região, segmentos) |
 | Mobilizador | NÃO vê a rede dos seus convidados |
 | Mobilizador | NÃO vê `isEquipe`, `isMobilizador`, `tokenMobilizador`, `email`, `origem`, `profissaoId`, `nascimento` dos convidados — nem o objeto relacionado `profissao { id, nome }` via include |
-| Admin | Toda a árvore completa + todos os campos de cada pessoa, **exceto** `tokenMobilizador` |
+| Admin | Toda a árvore completa + todos os campos de cada pessoa, **exceto** `tokenMobilizador` como campo direto na ficha da pessoa (o valor pode ser obtido via endpoint dedicado "Copiar link de mobilizador", que retorna apenas o URL completo — nunca o token isolado) |
 
 ### Duplicidade controlada
 - Pessoa existe uma única vez no banco (tabela `Pessoa`)
@@ -398,8 +399,8 @@ model LogSuporte {
 - Admin revoga a permissão
 - **Antes de iniciar a transação:** verifique se existe entrada em `UsuarioGabinete` para o mobilizador e guarde o `userId` em memória (pode não existir se o mobilizador nunca clicou no magic link)
 - As operações de banco são executadas em **uma única transação Prisma:** `Pessoa.isMobilizador = false`, `Pessoa.tokenMobilizador = null` e remoção da entrada em `UsuarioGabinete` (se existir)
-- Após commit da transação, se `userId` foi encontrado, chama `supabase.auth.admin.signOut(userId)` — essa chamada é **melhor esforço**: se **tiver sucesso**, ambos access token e refresh token são invalidados imediatamente (sem acesso residual). Se **falhar**, o refresh token permanece válido e o middleware Next.js barra o mobilizador em cada request ao painel; requests diretas ao PostgREST com JWT ainda válido contornam o middleware — acesso residual limitado ao TTL do refresh token (máximo 1 dia, ver configuração abaixo)
-- O JWT do projeto Supabase deve ser configurado com **expiração máxima de 1 hora** (Auth → Settings → JWT expiry). Quando `signOut` **tem sucesso**, ambos o access token e o refresh token são invalidados imediatamente — sem acesso residual. Quando `signOut` **falha** (melhor esforço), o refresh token permanece válido e o JS Client o usa para renovar silenciosamente o access token por até o TTL do refresh token. Para limitar esse risco, configure também o **Refresh Token expiry** (Auth → Settings → Refresh Token expiry) para no máximo **1 dia** — isso restringe o pior caso de acesso pós-revogação por falha de `signOut`. Para sessões ativas legítimas, o Supabase renova o access token silenciosamente; admins e mobilizadores ativos **não precisam re-autenticar manualmente**.
+- Após commit da transação, se `userId` foi encontrado, chama `supabase.auth.admin.signOut(userId)` — essa chamada é **melhor esforço**: se **tiver sucesso**, ambos access token e refresh token são invalidados imediatamente (sem acesso residual). Se **falhar**, o refresh token permanece válido e o middleware Next.js barra o mobilizador em cada request ao painel; requests diretas ao PostgREST com JWT ainda válido contornam o middleware — acesso residual limitado ao TTL do refresh token (máximo 1 dia, ver configuração abaixo).
+- O JWT do projeto Supabase deve ser configurado com **expiração máxima de 1 hora** (Auth → Settings → JWT expiry). Quando `signOut` **falha** (melhor esforço), o refresh token permanece válido e o JS Client o usa para renovar silenciosamente o access token por até o TTL do refresh token. Para limitar esse risco, configure também o **Refresh Token expiry** (Auth → Settings → Refresh Token expiry) para no máximo **1 dia** — isso restringe o pior caso de acesso pós-revogação por falha de `signOut`. Para sessões ativas legítimas, o Supabase renova o access token silenciosamente; admins e mobilizadores ativos **não precisam re-autenticar manualmente**.
 - Links e QR Codes antigos do mobilizador param de funcionar imediatamente (token não existe mais)
 - Histórico de indicações é mantido (vínculos em `VinculoRede` não são apagados)
 - Se a pessoa for re-promovida no futuro, um novo `tokenMobilizador` é gerado e um novo magic link é enviado
@@ -419,8 +420,9 @@ model LogSuporte {
 - **Fluxo obrigatório:** o admin deve primeiramente aceitar o convite por e-mail (`inviteUserByEmail`) — essa etapa cria o `auth.users` e o `UsuarioGabinete` via callback `/auth/confirm`. Somente após isso o Google pode ser adicionado como segundo método de autenticação (o Supabase vincula o provider Google ao mesmo `auth.users` já existente). Admins que ignoram o invite e tentam acessar diretamente via Google terão acesso negado.
 - Após autenticação (por qualquer provider), o sistema verifica se o `userId` da sessão tem entrada em `UsuarioGabinete` com `papel = "admin"` — caso contrário, acesso é negado com mensagem "Seu e-mail não está autorizado. Entre em contato com o administrador."
 - **Fluxo de envio do convite (super-admin):**
-  1. `supabase.auth.admin.inviteUserByEmail(email)` — cria o usuário em `auth.users` e envia o e-mail de convite
+  1. `supabase.auth.admin.inviteUserByEmail(email)` — cria o usuário em `auth.users` e **envia imediatamente** o e-mail de convite
   2. `supabase.auth.admin.updateUserById(userId, { app_metadata: { gabineteId, papel: 'admin' } })` — armazena `gabineteId` em `app_metadata` via service role key (não em `user_metadata`, que pode ser sobrescrito pelo próprio usuário — mesma razão pela qual `app_metadata` é usado para o super-admin)
+  - **Race condition:** o e-mail é enviado no passo 1, antes de `app_metadata` ser gravado no passo 2. Se o admin clicar no link antes de o passo 2 completar, `session.user.app_metadata.gabineteId` estará `null` no callback `/auth/confirm`. **Mitigação:** o callback deve verificar explicitamente se `app_metadata.gabineteId` está presente; caso esteja `null` ou ausente, exibir erro "Convite inválido — aguarde alguns segundos e tente abrir o link novamente, ou solicite ao administrador do sistema o reenvio do convite" e abortar sem criar `UsuarioGabinete`. Na prática, o passo 2 completa em milissegundos após o passo 1 — a janela de race é mínima, mas deve ser tratada defensivamente.
 - **Fluxo do callback `/auth/confirm`:**
   1. Lê `gabineteId` de `session.user.app_metadata.gabineteId` (somente leitura pelo usuário — seguro)
   2. Verifica que o `gabineteId` existe no banco; se não existir, exibe erro e aborta
@@ -496,7 +498,7 @@ Cards e tabelas filtráveis por período (hoje / 7 dias / 30 dias / personalizad
 - Total de mobilizadores ativos — **estado atual, não filtrado por período** (critério: `isMobilizador = true`, independente de ter `UsuarioGabinete` criado)
 - Total de membros da equipe (`isEquipe = true`) — **estado atual, não filtrado por período**
 - Pessoas por segmento (tabela ordenável)
-- Ranking de mobilizadores por convidados
+- Ranking de mobilizadores por convidados — conta `VinculoRede WHERE indicadoPorId = Pessoa.id` para o período selecionado, filtrando apenas pessoas com `isMobilizador = true` no momento da consulta. Mobilizadores com zero convidados no período aparecem no final da lista com contagem 0. Ex-mobilizadores (`isMobilizador = false`) não aparecem no ranking, mesmo que possuam `VinculoRede` histórico.
 - Pessoas por origem (tabela e eventual gráfico)
 - Pessoas por região administrativa
 
