@@ -54,17 +54,21 @@ A função `auth.uid_gabinete()` deve ser criada no banco Supabase como custom f
 
 ```sql
 CREATE OR REPLACE FUNCTION auth.uid_gabinete()
-RETURNS text LANGUAGE sql STABLE SECURITY DEFINER AS $$
+RETURNS text LANGUAGE sql STABLE SECURITY DEFINER
+SET search_path = ''
+AS $$
   SELECT "gabineteId"
   FROM public."UsuarioGabinete"
   WHERE "userId" = auth.uid()::text
+  ORDER BY "gabineteId"
   LIMIT 1;
 $$;
 ```
+> **Segurança:** `SET search_path = ''` é obrigatório em funções `SECURITY DEFINER` para evitar search_path injection — sem ele, um schema interposto antes de `public` poderia substituir `public."UsuarioGabinete"` silenciosamente. `ORDER BY "gabineteId"` garante resultado determinístico para usuários em múltiplos gabinetes (permitido pelo `@@unique([userId, gabineteId])` em `UsuarioGabinete`).
 
 Esta função retorna o `gabineteId` do usuário autenticado via lookup em `UsuarioGabinete`. Super-admin (que não tem linha em `UsuarioGabinete`) acessa dados de gabinetes via **service role key** (bypass de RLS), não via esta função — o middleware do super-admin usa o service role client do Prisma em vez do client autenticado.
 
-**Modo suporte do super-admin:** quando o super-admin entra em modo suporte em um gabinete específico, o `gabineteId` do gabinete-alvo é armazenado em um cookie de sessão server-side (`suporteGabineteId`) pelo middleware da rota `/super-admin/`. As queries Prisma dentro do modo suporte leem `gabineteId` desse cookie — não de `UsuarioGabinete`. A regra "nunca de parâmetros de URL" (linha acima) aplica-se a admins e mobilizadores; o super-admin em modo suporte usa o mecanismo de cookie de sessão descrito aqui.
+**Modo suporte do super-admin:** quando o super-admin clica em "Entrar em modo suporte" para um gabinete específico, o servidor define o cookie `suporteGabineteId` com atributos `httpOnly=true, sameSite='strict', path='/super-admin'` contendo o `gabineteId` do gabinete-alvo. As queries Prisma dentro do modo suporte leem `gabineteId` desse cookie — não de `UsuarioGabinete`. A regra "nunca de parâmetros de URL" (linha acima) aplica-se a admins e mobilizadores; o super-admin em modo suporte usa o mecanismo de cookie descrito aqui. **Entrada no modo suporte:** o servidor gera um `sessaoId` (cuid), cria `LogSuporte` com `acao="acesso_inicio"` e define o cookie. **Saída do modo suporte:** quando o super-admin clica em "Sair do modo suporte", o servidor remove o cookie, cria `LogSuporte` com `acao="acesso_fim"` preenchendo `saidoEm`, e invalida o `sessaoId`. Se o browser fechar sem logout explícito, o cookie expira com a sessão do browser (cookie de sessão, sem `max-age`); a ausência do cookie no próximo acesso a `/super-admin/` indica que não há sessão de suporte ativa — o `LogSuporte` ficará com `saidoEm=null` (sessão "aberta"), detectável via a query descrita abaixo no modelo `LogSuporte`.
 
 > **Integridade de `PessoaSegmento`:** a política OR pressupõe que `pessoaId` e `segmentoId` de uma mesma linha pertencem ao mesmo gabinete. Para garantir isso, a camada de aplicação deve sempre validar que `Pessoa.gabineteId == Segmento.gabineteId` antes de criar um `PessoaSegmento`. Um bug que crie uma linha com `pessoaId` de gabinete A e `segmentoId` de gabinete B não é bloqueado pelo RLS — a validação é responsabilidade da aplicação, não do banco.
 >
@@ -233,8 +237,13 @@ model Segmento {
   pessoas        PessoaSegmento[]
   linksCompostos LinkComposto[]
 
-  @@unique([gabineteId, slug])
-  @@unique([gabineteId, nome])
+  // Nota: @@unique([gabineteId, slug]) e @@unique([gabineteId, nome]) foram removidos
+  // propositalmente. Segmentos usam soft delete (status='inativo') — constraints de banco
+  // sem WHERE clause bloqueariam recriação de segmentos com mesmo nome/slug após desativação
+  // (Prisma não suporta unique parcial). Unicidade de nome e slug (entre status='ativo')
+  // é garantida na camada de aplicação: verificar
+  //   WHERE gabineteId=X AND (nome=Y OR slug=Z) AND status='ativo'
+  // antes de criar ou editar um segmento. Se existir resultado, retornar erro de conflito.
 }
 
 model PessoaSegmento {
@@ -312,7 +321,7 @@ model LogSuporte {
 
 **Passo 1 — WhatsApp (obrigatório — identificação única):**
 - Pessoa digita o número
-- Sistema normaliza antes de salvar e comparar em dois passos: (1) remove **todos** os caracteres não numéricos, inclusive o sinal `+`; (2) se o resultado tiver 11 dígitos (formato local brasileiro: DDD + 9 dígitos), prefixa `55` para obter o formato E.164 sem `+` (13 dígitos). Resultado final: sempre 13 dígitos. Exemplos: `(61) 99999-9999` → strip → `61999999999` (11 dígitos) → prefixar `55` → `5561999999999`; `+55 (61) 99999-9999` → strip → `5561999999999` (13 dígitos) → sem alteração; `5561999999999` → sem alteração. Ambas as formas de entrada produzem `5561999999999` — mesmo número físico, mesmo valor na constraint `@@unique([gabineteId, whatsapp])`. O sistema aplica a mesma função de normalização tanto no cadastro quanto na verificação de duplicidade.
+- Sistema normaliza antes de salvar e comparar em três passos: (1) remove **todos** os caracteres não numéricos, inclusive o sinal `+`; (2) prefixa `55` se o resultado tiver 10 dígitos (fixo local: DDD + 8) → 12 dígitos, ou se tiver 11 dígitos (celular local: DDD + 9) → 13 dígitos; (3) mantém sem alteração se já tiver 12 ou 13 dígitos (DDI + número completo). Qualquer outro comprimento é rejeitado como inválido antes de salvar. Resultado final: 12 ou 13 dígitos. Exemplos: `(61) 3333-3333` (fixo) → strip → `6133333333` (10 dígitos) → prefixar `55` → `556133333333`; `+55 (61) 3333-3333` → strip → `556133333333` (12 dígitos) → sem alteração; `(61) 99999-9999` (celular) → strip → `61999999999` (11 dígitos) → prefixar `55` → `5561999999999`; `+55 (61) 99999-9999` → strip → `5561999999999` (13 dígitos) → sem alteração. Ambas as formas de entrada para o mesmo número físico produzem o mesmo valor normalizado — garantindo que a constraint `@@unique([gabineteId, whatsapp])` detecte duplicatas. O sistema aplica a mesma função de normalização tanto no cadastro quanto na verificação de duplicidade.
 - Sistema verifica se já existe no gabinete (usando o número normalizado)
 - **Novo:** avança para preenchimento de dados
 - **Já cadastrado:** exibe nome para confirmação → entra no segmento/rede sem repetir dados
@@ -387,7 +396,7 @@ model LogSuporte {
 ### Como uma pessoa vira mobilizador
 1. Admin localiza a pessoa no sistema
 2. Clica em "Tornar Mobilizador"
-3. **Validação pré-promoção:** sistema verifica (a) `Pessoa.email != null` — se ausente, exibe erro "Informe o e-mail da pessoa antes de tornar mobilizador" e bloqueia; (b) Pessoa não possui `UsuarioGabinete` com `papel = "admin"` no mesmo gabinete — verificação via service role key: query SQL direta em `auth.users` (`SELECT id FROM auth.users WHERE email = $1 LIMIT 1` via `prisma.$queryRaw`) → se retornar um usuário, checar `UsuarioGabinete WHERE userId = userId_encontrado AND gabineteId = X AND papel = "admin"`; se não existir linha em `auth.users` para este e-mail, verificação passa trivialmente; se existir usuário e ele for admin do mesmo gabinete, exibe erro "Um administrador do gabinete não pode ser promovido a mobilizador por este fluxo" e bloqueia. **Nota:** `supabase.auth.admin.getUserByEmail()` não existe na Admin JS SDK; a única forma de buscar por email é via SQL direto na tabela `auth.users` usando service role key.
+3. **Validação pré-promoção:** sistema verifica (a) `Pessoa.email != null` — se ausente, exibe erro "Informe o e-mail da pessoa antes de tornar mobilizador" e bloqueia; (b) Pessoa não possui `UsuarioGabinete` com `papel = "admin"` no mesmo gabinete — verificação via service role key: query SQL direta em `auth.users` (`SELECT id FROM auth.users WHERE email = $1 LIMIT 1` via `prisma.$queryRaw` **usando o Prisma client configurado com service role key** — o Prisma client padrão não tem acesso ao schema `auth`) → se retornar um usuário, checar `UsuarioGabinete WHERE userId = userId_encontrado AND gabineteId = X AND papel = "admin"`; se não existir linha em `auth.users` para este e-mail, verificação passa trivialmente; se existir usuário e ele for admin do mesmo gabinete, exibe erro "Um administrador do gabinete não pode ser promovido a mobilizador por este fluxo" e bloqueia. **Nota:** `supabase.auth.admin.getUserByEmail()` não existe na Admin JS SDK; a única forma de buscar por email é via SQL direto na tabela `auth.users` usando service role key.
 4. Sistema gera `tokenMobilizador` único (cuid) e define `isMobilizador = true`
 5. Sistema envia magic link por e-mail via `supabase.auth.signInWithOtp({ email, options: { redirectTo: 'https://<APP_URL>/auth/callback?gabineteId=GABINETE_ID&token=TOKEN_MOBILIZADOR' } })` — `<APP_URL>` deve ser lido de variável de ambiente (ex: `process.env.NEXT_PUBLIC_APP_URL`). O `redirectTo` **deve ser URL absoluta** — o Supabase valida o valor contra a allowlist de Redirect URLs (Authentication → URL Configuration) e silenciosamente descarta o `redirectTo` se for um path relativo, perdendo os parâmetros `gabineteId` e `token`. **`UsuarioGabinete` ainda não é criado neste momento**. **Nota de segurança:** o `token` presente na URL do redirectTo é o `tokenMobilizador` — ele aparece no link enviado por e-mail (exposição necessária, diferente de "retornar em resposta de API"). Essa exposição é aceita porque (a) o e-mail é enviado apenas para o próprio mobilizador e (b) o callback valida que o e-mail autenticado corresponde ao da Pessoa (passo 7), impedindo uso do token por terceiros.
 6. Mobilizador clica no link → Supabase cria `auth.users` e dispara o callback de autenticação com os parâmetros do `redirectTo`
@@ -425,13 +434,12 @@ model LogSuporte {
 ### Remoção de mobilizador
 - Admin revoga a permissão
 - **Antes de iniciar a transação:** verifique se existe entrada em `UsuarioGabinete` para o mobilizador e guarde o `userId` em memória (pode não existir se o mobilizador nunca clicou no magic link)
-- As operações de banco são executadas em **uma única transação Prisma:** `Pessoa.isMobilizador = false`, `Pessoa.tokenMobilizador = null` e remoção da entrada em `UsuarioGabinete` (se existir)
+- As operações de banco são executadas em **uma única transação Prisma** com as seguintes quatro operações: (1) `Pessoa.isMobilizador = false`, (2) `Pessoa.tokenMobilizador = null`, (3) remoção da entrada em `UsuarioGabinete` (se existir), e (4) `deleteMany({ where: { mobilizadorId: pessoaId, gabineteId } })` em `LinkComposto`. Os `LinkComposto` são apagados pois a FK `mobilizadorId` apontaria para uma `Pessoa` com `isMobilizador = false`, tornando os links permanentemente inúteis e confusos para o admin. **Todas as quatro operações devem estar dentro do mesmo bloco `prisma.$transaction([...])` — nenhuma delas pode ficar fora da transação.**
 - Após commit da transação, se `userId` foi encontrado, chama `supabase.auth.admin.signOut(userId)` — essa chamada é **melhor esforço**: se **tiver sucesso**, ambos access token e refresh token são invalidados imediatamente (sem acesso residual). Se **falhar**, o refresh token permanece válido e o middleware Next.js barra o mobilizador em cada request ao painel; requests diretas ao PostgREST com JWT ainda válido contornam o middleware — acesso residual limitado ao TTL do refresh token (máximo 1 dia, ver configuração abaixo).
 - O JWT do projeto Supabase deve ser configurado com **expiração máxima de 1 hora** (Auth → Settings → JWT expiry). Quando `signOut` **falha** (melhor esforço), o refresh token permanece válido e o JS Client o usa para renovar silenciosamente o access token por até o TTL do refresh token. Para limitar esse risco, configure também o **Refresh Token expiry** (Auth → Settings → Refresh Token expiry) para no máximo **1 dia** — isso restringe o pior caso de acesso pós-revogação por falha de `signOut`. Para sessões ativas legítimas, o Supabase renova o access token silenciosamente; admins e mobilizadores ativos **não precisam re-autenticar manualmente**.
 - Links e QR Codes antigos do mobilizador param de funcionar imediatamente (token não existe mais — a rota pública valida `tokenMobilizador = TOKEN AND isMobilizador = true` e ambos estão nulos/falsos após a transação)
-- Os registros em `LinkComposto` associados ao ex-mobilizador são **apagados** pela mesma transação Prisma (adicionado à lista de operações: `deleteMany({ where: { mobilizadorId: pessoaId, gabineteId } })`). Não é possível manter esses links pois a FK de `mobilizadorId` aponta para a `Pessoa` com `isMobilizador = false`, tornando o link permanentemente inútil e confuso para o admin.
 - Histórico de indicações é mantido (vínculos em `VinculoRede` não são apagados)
-- Se a pessoa for re-promovida no futuro, um novo `tokenMobilizador` é gerado e um novo magic link é enviado
+- Se a pessoa for re-promovida no futuro, um novo `tokenMobilizador` é gerado e um novo magic link é enviado. **Atenção:** os `LinkComposto` anteriores foram apagados na remoção — o admin precisará recriá-los manualmente se necessário.
 
 ---
 
@@ -450,7 +458,7 @@ model LogSuporte {
 - **Fluxo de envio do convite (super-admin):**
   1. `supabase.auth.admin.inviteUserByEmail(email)` — cria o usuário em `auth.users` e **envia imediatamente** o e-mail de convite
   2. `supabase.auth.admin.updateUserById(userId, { app_metadata: { gabineteId, papel: 'admin' } })` — armazena `gabineteId` em `app_metadata` via service role key (não em `user_metadata`, que pode ser sobrescrito pelo próprio usuário — mesma razão pela qual `app_metadata` é usado para o super-admin)
-  - **Race condition:** o e-mail é enviado no passo 1, antes de `app_metadata` ser gravado no passo 2. Se o admin clicar no link antes de o passo 2 completar, `session.user.app_metadata.gabineteId` estará `null` no callback `/auth/confirm`. **Mitigação:** o callback deve verificar explicitamente se `app_metadata.gabineteId` está presente; caso esteja `null` ou ausente, exibir erro "Convite inválido — solicite ao administrador do sistema o reenvio do convite" e abortar sem criar `UsuarioGabinete`. **Importante:** o link de convite do Supabase é de uso único — após o primeiro clique (mesmo que resulte em erro no callback), o token é consumido e o link não pode ser reutilizado. Não oriente o admin a "tentar abrir o link novamente": a única saída é o super-admin reenviar o convite. Na prática, o passo 2 completa em milissegundos após o passo 1 — a janela de race é mínima, mas deve ser tratada defensivamente com a mensagem acima.
+  - **Race condition:** o e-mail é enviado no passo 1, antes de `app_metadata` ser gravado no passo 2. Se o admin clicar no link antes de o passo 2 completar, `session.user.app_metadata.gabineteId` estará `null` no callback `/auth/confirm`. **Mitigação:** o callback deve verificar explicitamente se `app_metadata.gabineteId` está presente; caso esteja `null` ou ausente, exibir erro "Convite inválido — solicite ao administrador do sistema o reenvio do convite" e abortar sem criar `UsuarioGabinete`. **Importante:** o link de convite do Supabase é de uso único — após o primeiro clique (mesmo que resulte em erro no callback), o token é consumido e o link não pode ser reutilizado. Não oriente o admin a "tentar abrir o link novamente". **Para reenviar o convite:** se o usuário ainda não existe em `auth.users` (ex: primeiro envio falhou antes de criar o registro), use novamente `inviteUserByEmail`. Se o usuário já existe em `auth.users` (convite anterior foi enviado mas o link foi consumido com erro), `inviteUserByEmail` retornará erro "User already registered" — nesse caso use `supabase.auth.admin.generateLink({ type: 'invite', email })` para gerar um novo token de convite sem criar novo usuário, depois reenvie o link por e-mail (ou via outra API transacional). Na prática, o passo 2 completa em milissegundos após o passo 1 — a janela de race é mínima, mas deve ser tratada defensivamente com a mensagem acima.
 - **Fluxo do callback `/auth/confirm`:**
   1. Lê `gabineteId` de `session.user.app_metadata.gabineteId` (somente leitura pelo usuário — seguro)
   2. Verifica que o `gabineteId` existe no banco; se não existir, exibe erro e aborta
