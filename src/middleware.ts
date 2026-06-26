@@ -38,7 +38,7 @@ export async function middleware(request: NextRequest) {
     '/auth/confirm',
     '/auth/callback',
   ].some((p) => pathname.startsWith(p))
-  const isPublicCadastro = /^\/g\/[^/]+\/cadastro/.test(pathname)
+  const isPublicCadastro = /^\/[^/]+\/cadastro/.test(pathname)
 
   if (isPublicAuth || isPublicCadastro) return supabaseResponse
 
@@ -62,10 +62,11 @@ export async function middleware(request: NextRequest) {
     return supabaseResponse
   }
 
-  // Rotas legadas /g/[slug]/(admin|mobilizador) — papel verificado nas routes
-  if (/^\/g\/[^/]+\/(admin|mobilizador)/.test(pathname)) {
+  // Rotas de mobilizador (/:slug/mobilizador/...) — papel verificado no layout
+  if (/^\/(?!super-admin|login|auth|api|_next)[^/]+\/mobilizador/.test(pathname)) {
     if (!user) {
-      return NextResponse.redirect(new URL('/login', request.url))
+      const slug = pathname.split('/')[1]
+      return NextResponse.redirect(new URL(`/${slug}/login`, request.url))
     }
     return supabaseResponse
   }
