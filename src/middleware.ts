@@ -26,8 +26,8 @@ export async function middleware(request: NextRequest) {
   )
 
   const {
-    data: { session },
-  } = await supabase.auth.getSession()
+    data: { user },
+  } = await supabase.auth.getUser()
 
   const { pathname } = request.nextUrl
 
@@ -42,12 +42,12 @@ export async function middleware(request: NextRequest) {
 
   if (isPublicAuth || isPublicCadastro) return supabaseResponse
 
-  // Super-admin: exige session + role = super-admin em app_metadata
+  // Super-admin: exige user + role = super-admin em app_metadata
   if (pathname.startsWith('/super-admin')) {
-    if (!session) {
+    if (!user) {
       return NextResponse.redirect(new URL('/super-admin/login', request.url))
     }
-    if (session.user.app_metadata?.role !== 'super-admin') {
+    if (user.app_metadata?.role !== 'super-admin') {
       return new NextResponse('Acesso negado', { status: 403 })
     }
     return supabaseResponse
@@ -55,14 +55,14 @@ export async function middleware(request: NextRequest) {
 
   // Rotas de gabinete (admin e mobilizador) — papel verificado nas routes
   if (/^\/g\/[^/]+\/(admin|mobilizador)/.test(pathname)) {
-    if (!session) {
+    if (!user) {
       return NextResponse.redirect(new URL('/login', request.url))
     }
     return supabaseResponse
   }
 
   // Qualquer outra rota exige autenticação
-  if (!session) {
+  if (!user) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
