@@ -312,6 +312,7 @@ model Gabinete {
   vinculos             VinculoRede[]
   linksCompostos       LinkComposto[]
   logsSuporteAcessados LogSuporte[]
+  observacoesPessoas   ObservacaoPessoa[]
 }
 
 model UsuarioGabinete {
@@ -387,6 +388,7 @@ model Pessoa {
   redesComoIndicado  VinculoRede[]    @relation("Indicado")
   redesComoIndicador VinculoRede[]    @relation("Indicador")
   linksCompostos     LinkComposto[]   @relation("LinksMobilizador")
+  observacoes        ObservacaoPessoa[]
 
   @@unique([gabineteId, whatsapp])
   @@unique([gabineteId, tokenMobilizador])
@@ -448,6 +450,20 @@ model LogSuporte {
 
   gabinete Gabinete @relation(fields: [gabineteId], references: [id])
 }
+
+model ObservacaoPessoa {
+  id          String    @id @default(cuid())
+  gabineteId  String
+  pessoaId    String
+  autorUserId String
+  autorNome   String
+  texto       String
+  criadoEm   DateTime  @default(now())
+  editadoEm  DateTime?
+
+  gabinete Gabinete @relation(fields: [gabineteId], references: [id])
+  pessoa   Pessoa   @relation(fields: [pessoaId], references: [id])
+}
 ```
 
 - [ ] **Step 3: Executar a migration**
@@ -461,7 +477,7 @@ Esperado: migration criada em `prisma/migrations/TIMESTAMP_initial/migration.sql
 - [ ] **Step 4: Verificar no Supabase**
 
 No Supabase Dashboard → Table Editor, confirmar que todas as tabelas existem:
-`Gabinete`, `UsuarioGabinete`, `Pessoa`, `Segmento`, `Regiao`, `Profissao`, `PessoaSegmento`, `VinculoRede`, `LinkComposto`, `LogSuporte`
+`Gabinete`, `UsuarioGabinete`, `Pessoa`, `Segmento`, `Regiao`, `Profissao`, `PessoaSegmento`, `VinculoRede`, `LinkComposto`, `LogSuporte`, `ObservacaoPessoa`
 
 - [ ] **Step 5: Commit**
 
@@ -527,7 +543,8 @@ ALTER TABLE "Profissao"       ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "VinculoRede"     ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "PessoaSegmento"  ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "LinkComposto"    ENABLE ROW LEVEL SECURITY;
-ALTER TABLE "LogSuporte"      ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "LogSuporte"         ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "ObservacaoPessoa"   ENABLE ROW LEVEL SECURITY;
 
 -- ------------------------------------------------------------
 -- 3. Políticas RLS para role authenticated
@@ -599,6 +616,16 @@ CREATE POLICY "link_composto_all" ON "LinkComposto"
 -- LogSuporte: sem política para authenticated.
 -- Super-admin usa SUPABASE_SERVICE_ROLE_KEY (bypassa RLS).
 -- Nenhum usuário autenticado normal acessa esta tabela via PostgREST.
+
+-- ObservacaoPessoa: acesso restrito ao próprio gabinete
+CREATE POLICY "observacao_pessoa_select" ON "ObservacaoPessoa"
+  FOR SELECT TO authenticated
+  USING ("gabineteId" = auth.uid_gabinete());
+
+CREATE POLICY "observacao_pessoa_write" ON "ObservacaoPessoa"
+  FOR ALL TO authenticated
+  USING ("gabineteId" = auth.uid_gabinete())
+  WITH CHECK ("gabineteId" = auth.uid_gabinete());
 
 -- ------------------------------------------------------------
 -- 4. Índices parciais para unicidade com soft delete
@@ -672,11 +699,11 @@ WHERE schemaname = 'public'
   AND tablename IN (
     'Gabinete','UsuarioGabinete','Pessoa','Segmento',
     'Regiao','Profissao','VinculoRede','PessoaSegmento',
-    'LinkComposto','LogSuporte'
+    'LinkComposto','LogSuporte','ObservacaoPessoa'
   );
 ```
 
-Esperado: 10 linhas, todas com `rowsecurity = true`.
+Esperado: 11 linhas, todas com `rowsecurity = true`.
 
 - [ ] **Step 6: Commit**
 

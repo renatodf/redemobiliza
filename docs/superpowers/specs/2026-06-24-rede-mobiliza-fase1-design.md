@@ -133,14 +133,15 @@ model Gabinete {
   criadoEm       DateTime @default(now())
   atualizadoEm   DateTime @updatedAt
 
-  pessoas      Pessoa[]
-  segmentos    Segmento[]
-  regioes      Regiao[]
-  profissoes   Profissao[]
-  usuarios     UsuarioGabinete[]
-  vinculos     VinculoRede[]
-  linksCompostos LinkComposto[]
+  pessoas              Pessoa[]
+  segmentos            Segmento[]
+  regioes              Regiao[]
+  profissoes           Profissao[]
+  usuarios             UsuarioGabinete[]
+  vinculos             VinculoRede[]
+  linksCompostos       LinkComposto[]
   logsSuporteAcessados LogSuporte[]
+  observacoesPessoas   ObservacaoPessoa[]
 }
 
 model UsuarioGabinete {
@@ -241,6 +242,7 @@ model Pessoa {
   redesComoIndicado  VinculoRede[]    @relation("Indicado")
   redesComoIndicador VinculoRede[]    @relation("Indicador")
   linksCompostos     LinkComposto[]   @relation("LinksMobilizador")
+  observacoes        ObservacaoPessoa[]
 
   @@unique([gabineteId, whatsapp])
   @@unique([gabineteId, tokenMobilizador])
@@ -347,6 +349,20 @@ model LogSuporte {
 // Para identificar sessões abertas (sem saída registrada):
 //   SELECT DISTINCT sessaoId FROM LogSuporte
 //   WHERE sessaoId NOT IN (SELECT sessaoId FROM LogSuporte WHERE acao = 'acesso_fim')
+
+model ObservacaoPessoa {
+  id          String    @id @default(cuid())
+  gabineteId  String
+  pessoaId    String
+  autorUserId String    // auth.uid() de quem criou — não é FK (admins não têm registro em Pessoa)
+  autorNome   String    // nome denormalizado; copiado no momento da criação
+  texto       String
+  criadoEm   DateTime  @default(now())
+  editadoEm  DateTime? // null se nunca editado; preenchido manualmente na edição (não usa @updatedAt)
+
+  gabinete Gabinete @relation(fields: [gabineteId], references: [id])
+  pessoa   Pessoa   @relation(fields: [pessoaId], references: [id])
+}
 ```
 
 ---
@@ -559,6 +575,33 @@ O admin pode marcar qualquer pessoa cadastrada como membro da equipe interna do 
 - Admin pode adicionar, editar ou **desativar** (soft delete: `ativa = false`) — hard delete não é suportado pelo mesmo motivo
 - Profissões com `ativa = false` não aparecem no formulário de cadastro nem nos selects do painel; Pessoas que já possuem `profissaoId` apontando para profissão desativada mantêm o vínculo e a profissão é exibida como "(desativada)"
 - Campo aparece como select no formulário de cadastro
+
+---
+
+## Módulo 8 — Observações em Perfis de Pessoas
+
+Exibidas na página de perfil de cada pessoa no painel admin, abaixo dos dados pessoais e do toggle de Banco de Talentos.
+
+### Comportamento
+- Cada observação é um registro independente com texto, data, hora e autor
+- O histórico é cronológico, mais recente primeiro
+- Abaixo das observações, exibe o histórico de demandas da pessoa — **placeholder: implementado no módulo de Demandas (Fase 2)**
+
+### Permissões
+- **Membro da equipe (`isEquipe = true`):** pode criar observações; pode editar e excluir apenas as próprias (verificação: `ObservacaoPessoa.autorUserId === session.user.id`)
+- **Admin:** pode criar, editar e excluir qualquer observação do gabinete
+- **Mobilizador sem `isEquipe`:** sem acesso ao painel admin — não vê observações
+
+### Interface
+- Campo de texto + botão "Salvar" fixo no topo da seção
+- Cada observação exibe: texto, data e hora (`criadoEm`), nome do autor (`autorNome`), indicador "editado" se `editadoEm != null`
+- Ícone de lápis (editar) e lixeira (excluir) visíveis conforme permissão
+- Editar abre o texto inline; ao salvar, atualiza `texto` e define `editadoEm = now()`
+
+### Regras de isolamento
+- `gabineteId` sempre extraído da sessão autenticada — nunca de parâmetros de URL
+- Ao criar: `autorUserId = session.user.id`, `autorNome` copiado do nome do usuário autenticado no momento da criação (admin → nome da conta; membro equipe → `Pessoa.nome` correspondente ao `userId`)
+- Ao listar: `WHERE gabineteId = X AND pessoaId = Y ORDER BY criadoEm DESC`
 
 ---
 
