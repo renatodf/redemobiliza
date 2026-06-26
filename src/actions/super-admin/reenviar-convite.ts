@@ -1,5 +1,6 @@
 'use server'
 
+import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 
 interface ReenviarResult {
@@ -11,6 +12,11 @@ export async function reenviarConvite(
   gabineteId: string,
   email: string
 ): Promise<ReenviarResult> {
+  const supabase = createSupabaseServerClient()
+  const { data: { session } } = await supabase.auth.getSession()
+  if (!session || session.user.app_metadata?.role !== 'super-admin') {
+    return { erro: 'Não autorizado.' }
+  }
   const { data: users, error: listError } =
     await supabaseAdmin.auth.admin.listUsers()
 

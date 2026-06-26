@@ -56,7 +56,7 @@ export default async function GabineteDetalhePage({ params, searchParams }: Prop
   const emailReenvio = searchParams.email
 
   const convidarAction = convidarAdmin.bind(null, gabinete.id)
-  const toggleAction = toggleGabinete.bind(null, gabinete.id, gabinete.ativo)
+  const toggleAction = toggleGabinete.bind(null, gabinete.id)
   const entrarAction = entrarModoSuporte.bind(null, gabinete.id)
 
   return (

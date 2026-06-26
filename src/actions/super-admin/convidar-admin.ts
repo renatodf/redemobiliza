@@ -1,9 +1,19 @@
 'use server'
 
 import { redirect } from 'next/navigation'
+import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/supabase/admin'
 
+async function assertSuperAdmin() {
+  const supabase = createSupabaseServerClient()
+  const { data: { session } } = await supabase.auth.getSession()
+  if (!session || session.user.app_metadata?.role !== 'super-admin') {
+    redirect('/super-admin/login')
+  }
+}
+
 export async function convidarAdmin(gabineteId: string, formData: FormData) {
+  await assertSuperAdmin()
   const email = (formData.get('email') as string).trim().toLowerCase()
 
   if (!email) {

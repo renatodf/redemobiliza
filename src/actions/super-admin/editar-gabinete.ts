@@ -1,10 +1,20 @@
 'use server'
 
 import { redirect } from 'next/navigation'
+import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { prisma } from '@/lib/prisma'
 import { toSlug } from '@/lib/slug'
 
+async function assertSuperAdmin() {
+  const supabase = createSupabaseServerClient()
+  const { data: { session } } = await supabase.auth.getSession()
+  if (!session || session.user.app_metadata?.role !== 'super-admin') {
+    redirect('/super-admin/login')
+  }
+}
+
 export async function editarGabinete(id: string, formData: FormData) {
+  await assertSuperAdmin()
   const nome = (formData.get('nome') as string).trim()
   const corPrimaria = formData.get('corPrimaria') as string
   const corSecundaria = formData.get('corSecundaria') as string
