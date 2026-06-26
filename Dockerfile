@@ -37,13 +37,11 @@ COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# Prisma: schema + migrations (sem prisma.config.ts — usa DATABASE_URL do ambiente)
+# Prisma: schema + migrations
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
 
-# Prisma CLI e engines para rodar `prisma migrate deploy` no startup
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.bin/prisma ./node_modules/.bin/prisma
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/prisma ./node_modules/prisma
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/@prisma ./node_modules/@prisma
+# Prisma CLI com todas as dependências para rodar `prisma migrate deploy` no startup
+RUN npm install --no-save prisma@7.8.0
 
 # Entrypoint: roda migrations e inicia o servidor
 COPY entrypoint.sh ./entrypoint.sh
