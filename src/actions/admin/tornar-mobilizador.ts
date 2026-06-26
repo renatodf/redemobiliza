@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { prisma } from '@/lib/prisma'
-import { supabaseAdmin } from '@/lib/supabase/admin'
+import { getSupabaseAdmin } from '@/lib/supabase/admin'
 import { assertAdminAccess } from '@/lib/assert-admin-access'
 
 export async function tornarMobilizador(formData: FormData): Promise<{ erro?: string }> {
@@ -29,7 +29,7 @@ export async function tornarMobilizador(formData: FormData): Promise<{ erro?: st
 
     const redirectTo = `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback?token=${tokenMobilizador}&gabineteId=${gabinete.id}`
 
-    const { error: emailError } = await supabaseAdmin.auth.signInWithOtp({
+    const { error: emailError } = await getSupabaseAdmin().auth.signInWithOtp({
       email: pessoa.email,
       options: {
         emailRedirectTo: redirectTo,

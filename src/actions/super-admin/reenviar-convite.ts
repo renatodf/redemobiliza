@@ -1,7 +1,7 @@
 'use server'
 
 import { createSupabaseServerClient } from '@/lib/supabase/server'
-import { supabaseAdmin } from '@/lib/supabase/admin'
+import { getSupabaseAdmin } from '@/lib/supabase/admin'
 
 interface ReenviarResult {
   link?: string
@@ -18,7 +18,7 @@ export async function reenviarConvite(
     return { erro: 'Não autorizado.' }
   }
   const { data: users, error: listError } =
-    await supabaseAdmin.auth.admin.listUsers()
+    await getSupabaseAdmin().auth.admin.listUsers()
 
   if (listError) return { erro: 'Erro ao buscar usuário.' }
 
@@ -33,7 +33,7 @@ export async function reenviarConvite(
   const metaGabineteId = usuario.app_metadata?.gabineteId
   if (!metaGabineteId || metaGabineteId !== gabineteId) {
     const { error: updateError } =
-      await supabaseAdmin.auth.admin.updateUserById(usuario.id, {
+      await getSupabaseAdmin().auth.admin.updateUserById(usuario.id, {
         app_metadata: { gabineteId, papel: 'admin' },
       })
     if (updateError) {
@@ -44,7 +44,7 @@ export async function reenviarConvite(
   }
 
   const { data: linkData, error: linkError } =
-    await supabaseAdmin.auth.admin.generateLink({
+    await getSupabaseAdmin().auth.admin.generateLink({
       type: 'magiclink',
       email,
       options: {

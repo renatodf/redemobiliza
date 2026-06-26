@@ -2,7 +2,7 @@
 
 import { redirect } from 'next/navigation'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
-import { supabaseAdmin } from '@/lib/supabase/admin'
+import { getSupabaseAdmin } from '@/lib/supabase/admin'
 
 async function assertSuperAdmin() {
   const supabase = createSupabaseServerClient()
@@ -21,7 +21,7 @@ export async function convidarAdmin(gabineteId: string, formData: FormData) {
   }
 
   const { data: invite, error: inviteError } =
-    await supabaseAdmin.auth.admin.inviteUserByEmail(email, {
+    await getSupabaseAdmin().auth.admin.inviteUserByEmail(email, {
       redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/confirm`,
     })
 
@@ -37,7 +37,7 @@ export async function convidarAdmin(gabineteId: string, formData: FormData) {
   const userId = invite.user.id
 
   const { error: updateError } =
-    await supabaseAdmin.auth.admin.updateUserById(userId, {
+    await getSupabaseAdmin().auth.admin.updateUserById(userId, {
       app_metadata: { gabineteId, papel: 'admin' },
     })
 

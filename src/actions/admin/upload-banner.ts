@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { prisma } from '@/lib/prisma'
-import { supabaseAdmin } from '@/lib/supabase/admin'
+import { getSupabaseAdmin } from '@/lib/supabase/admin'
 import { assertAdminAccess } from '@/lib/assert-admin-access'
 
 export async function uploadBanner(formData: FormData) {
@@ -16,13 +16,13 @@ export async function uploadBanner(formData: FormData) {
   const path = `${gabinete.id}/banner.${ext}`
   const buffer = Buffer.from(await file.arrayBuffer())
 
-  const { error } = await supabaseAdmin.storage
+  const { error } = await getSupabaseAdmin().storage
     .from('gabinete-assets')
     .upload(path, buffer, { upsert: true, contentType: file.type })
 
   if (error) throw new Error(`Erro no upload: ${error.message}`)
 
-  const { data: { publicUrl } } = supabaseAdmin.storage
+  const { data: { publicUrl } } = getSupabaseAdmin().storage
     .from('gabinete-assets')
     .getPublicUrl(path)
 
