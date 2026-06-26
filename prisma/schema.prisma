@@ -1,0 +1,182 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Gabinete {
+  id              String   @id @default(cuid())
+  nome            String
+  slug            String   @unique
+  nomeSistema     String   @default("Rede Mobiliza")
+  corPrimaria     String   @default("#1D4ED8")
+  corSecundaria   String   @default("#3B82F6")
+  logoUrl         String?
+  imagemBannerUrl String?
+  ativo           Boolean  @default(true)
+  criadoEm       DateTime @default(now())
+  atualizadoEm   DateTime @updatedAt
+
+  pessoas              Pessoa[]
+  segmentos            Segmento[]
+  regioes              Regiao[]
+  profissoes           Profissao[]
+  usuarios             UsuarioGabinete[]
+  vinculos             VinculoRede[]
+  linksCompostos       LinkComposto[]
+  logsSuporteAcessados LogSuporte[]
+  observacoesPessoas   ObservacaoPessoa[]
+}
+
+model UsuarioGabinete {
+  id         String   @id @default(cuid())
+  userId     String
+  gabineteId String
+  papel      String
+  criadoEm  DateTime @default(now())
+
+  gabinete Gabinete @relation(fields: [gabineteId], references: [id])
+
+  @@unique([userId, gabineteId])
+}
+
+model LinkComposto {
+  id            String   @id @default(cuid())
+  gabineteId    String
+  mobilizadorId String
+  segmentoId    String
+  criadoEm     DateTime @default(now())
+
+  gabinete    Gabinete @relation(fields: [gabineteId], references: [id])
+  mobilizador Pessoa   @relation("LinksMobilizador", fields: [mobilizadorId], references: [id])
+  segmento    Segmento @relation(fields: [segmentoId], references: [id])
+
+  @@unique([gabineteId, mobilizadorId, segmentoId])
+}
+
+model Regiao {
+  id         String   @id @default(cuid())
+  gabineteId String
+  nome       String
+  ativa      Boolean  @default(true)
+  criadoEm  DateTime @default(now())
+
+  gabinete Gabinete @relation(fields: [gabineteId], references: [id])
+  pessoas  Pessoa[]
+}
+
+model Profissao {
+  id         String   @id @default(cuid())
+  gabineteId String
+  nome       String
+  ativa      Boolean  @default(true)
+  criadoEm  DateTime @default(now())
+
+  gabinete Gabinete @relation(fields: [gabineteId], references: [id])
+  pessoas  Pessoa[]
+}
+
+model Pessoa {
+  id               String    @id @default(cuid())
+  gabineteId       String
+  nome             String
+  whatsapp         String
+  email            String?
+  regiaoId         String?
+  profissaoId      String?
+  nascimento       DateTime?
+  origem           String?
+  genero           String?
+  isEquipe         Boolean   @default(false)
+  isMobilizador    Boolean   @default(false)
+  tokenMobilizador String?
+  userId           String?
+  criadoEm        DateTime  @default(now())
+  atualizadoEm    DateTime  @updatedAt
+
+  gabinete           Gabinete         @relation(fields: [gabineteId], references: [id])
+  regiao             Regiao?          @relation(fields: [regiaoId], references: [id])
+  profissao          Profissao?       @relation(fields: [profissaoId], references: [id])
+  segmentos          PessoaSegmento[]
+  redesComoIndicado  VinculoRede[]    @relation("Indicado")
+  redesComoIndicador VinculoRede[]    @relation("Indicador")
+  linksCompostos     LinkComposto[]   @relation("LinksMobilizador")
+  observacoes        ObservacaoPessoa[]
+
+  @@unique([gabineteId, whatsapp])
+  @@unique([gabineteId, tokenMobilizador])
+}
+
+model Segmento {
+  id           String   @id @default(cuid())
+  gabineteId   String
+  nome         String
+  descricao    String?
+  cor          String?
+  icone        String?
+  tipo         String
+  slug         String
+  status       String   @default("ativo")
+  criadoEm    DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
+
+  gabinete       Gabinete         @relation(fields: [gabineteId], references: [id])
+  pessoas        PessoaSegmento[]
+  linksCompostos LinkComposto[]
+}
+
+model PessoaSegmento {
+  pessoaId   String
+  segmentoId String
+  criadoEm  DateTime @default(now())
+
+  pessoa   Pessoa   @relation(fields: [pessoaId], references: [id])
+  segmento Segmento @relation(fields: [segmentoId], references: [id])
+
+  @@id([pessoaId, segmentoId])
+}
+
+model VinculoRede {
+  id            String   @id @default(cuid())
+  gabineteId    String
+  pessoaId      String
+  indicadoPorId String?
+  nivel         Int
+  criadoEm     DateTime @default(now())
+
+  gabinete    Gabinete @relation(fields: [gabineteId], references: [id])
+  pessoa      Pessoa   @relation("Indicado", fields: [pessoaId], references: [id])
+  indicadoPor Pessoa?  @relation("Indicador", fields: [indicadoPorId], references: [id])
+
+  @@unique([gabineteId, pessoaId, indicadoPorId])
+}
+
+model LogSuporte {
+  id               String    @id @default(cuid())
+  gabineteId       String
+  superAdminUserId String
+  acao             String
+  detalhes         String?
+  sessaoId         String
+  criadoEm        DateTime  @default(now())
+  saidoEm         DateTime?
+
+  gabinete Gabinete @relation(fields: [gabineteId], references: [id])
+}
+
+model ObservacaoPessoa {
+  id          String    @id @default(cuid())
+  gabineteId  String
+  pessoaId    String
+  autorUserId String
+  autorNome   String
+  texto       String
+  criadoEm   DateTime  @default(now())
+  editadoEm  DateTime?
+
+  gabinete Gabinete @relation(fields: [gabineteId], references: [id])
+  pessoa   Pessoa   @relation(fields: [pessoaId], references: [id])
+}
