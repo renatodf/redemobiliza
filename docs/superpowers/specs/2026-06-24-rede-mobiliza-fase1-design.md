@@ -227,6 +227,7 @@ model Pessoa {
   profissaoId      String?
   nascimento       DateTime?
   origem           String?   // qrcode | link | manual | indicacao | importacao | instagram | facebook | whatsapp
+  genero           String?   // masculino | feminino | outro | prefiro_nao_informar
   isEquipe         Boolean   @default(false)
   isMobilizador    Boolean   @default(false)
   tokenMobilizador String?
@@ -367,6 +368,7 @@ model LogSuporte {
 
 **Passo 3 — Dados complementares:**
 - Data de nascimento
+- Gênero — seleção única exibida como **botões de seleção** (não dropdown, mais rápido no celular): Masculino, Feminino, Outro, Prefiro não informar. Campo opcional — não bloqueia o envio. Valor salvo em snake_case: `masculino`, `feminino`, `outro`, `prefiro_nao_informar`
 - Profissão (select da lista editável do gabinete)
 - Interesses (multi-select de segmentos do tipo "interesse")
 - E-mail
@@ -572,6 +574,7 @@ Cards e tabelas filtráveis por período (hoje / 7 dias / 30 dias / personalizad
 - Ranking de mobilizadores por convidados — conta `VinculoRede WHERE indicadoPorId = Pessoa.id` para o período selecionado, filtrando apenas pessoas com `isMobilizador = true` no momento da consulta. Mobilizadores com zero convidados no período aparecem no final da lista com contagem 0. Ex-mobilizadores (`isMobilizador = false`) não aparecem no ranking, mesmo que possuam `VinculoRede` histórico.
 - Pessoas por origem (tabela e eventual gráfico)
 - Pessoas por região administrativa
+- Pessoas por gênero (tabela e eventual gráfico) — cadastros com `genero = null` aparecem como "Não informado" para não distorcer percentuais
 
 ### Mapeamento de origens (valor gravado → label exibido)
 
@@ -585,6 +588,16 @@ Cards e tabelas filtráveis por período (hoje / 7 dias / 30 dias / personalizad
 | `facebook` | Facebook |
 | `whatsapp` | WhatsApp |
 | `importacao` | Importação |
+| `null` | Não informado |
+
+### Mapeamento de gênero (valor gravado → label exibido)
+
+| Valor em `Pessoa.genero` | Label no dashboard |
+|---|---|
+| `masculino` | Masculino |
+| `feminino` | Feminino |
+| `outro` | Outro |
+| `prefiro_nao_informar` | Prefiro não informar |
 | `null` | Não informado |
 
 > Dashboard será expandido conforme novos módulos forem adicionados ao sistema.

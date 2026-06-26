@@ -372,6 +372,7 @@ model Pessoa {
   profissaoId      String?
   nascimento       DateTime?
   origem           String?
+  genero           String?
   isEquipe         Boolean   @default(false)
   isMobilizador    Boolean   @default(false)
   tokenMobilizador String?
