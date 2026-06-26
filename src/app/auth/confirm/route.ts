@@ -11,35 +11,31 @@ export async function GET(request: NextRequest) {
 
   const supabase = createSupabaseServerClient()
 
-  // Troca token ou code por sessão
+  // Troca token ou code por sessão e captura o user diretamente do retorno
+  let user: Awaited<ReturnType<typeof supabase.auth.exchangeCodeForSession>>['data']['user']
+
   if (code) {
-    const { error } = await supabase.auth.exchangeCodeForSession(code)
-    if (error) {
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code)
+    if (error || !data.user) {
       return NextResponse.redirect(
         new URL('/login?erro=invite_invalid', origin)
       )
     }
+    user = data.user
   } else if (token_hash && type) {
-    const { error } = await supabase.auth.verifyOtp({ token_hash, type })
-    if (error) {
+    const { data, error } = await supabase.auth.verifyOtp({ token_hash, type })
+    if (error || !data.user) {
       return NextResponse.redirect(
         new URL('/login?erro=invite_invalid', origin)
       )
     }
+    user = data.user
   } else {
     return NextResponse.redirect(new URL('/login?erro=invite_invalid', origin))
   }
 
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
-
-  if (!session) {
-    return NextResponse.redirect(new URL('/login?erro=invite_invalid', origin))
-  }
-
   // Verificar app_metadata.gabineteId — race condition ou acesso não autorizado
-  const gabineteId = session.user.app_metadata?.gabineteId as string | undefined
+  const gabineteId = user.app_metadata?.gabineteId as string | undefined
 
   if (!gabineteId) {
     await supabase.auth.signOut()
@@ -54,14 +50,7 @@ export async function GET(request: NextRequest) {
     select: { id: true, slug: true, ativo: true },
   })
 
-  if (!gabinete) {
-    await supabase.auth.signOut()
-    return NextResponse.redirect(
-      new URL('/login?erro=gabinete_not_found', origin)
-    )
-  }
-
-  if (!gabinete.ativo) {
+  if (!gabinete || !gabinete.ativo) {
     await supabase.auth.signOut()
     return NextResponse.redirect(
       new URL('/login?erro=gabinete_not_found', origin)
@@ -71,9 +60,9 @@ export async function GET(request: NextRequest) {
   // Upsert UsuarioGabinete — idempotente (double-click / retry seguro)
   await prisma.usuarioGabinete.upsert({
     where: {
-      userId_gabineteId: { userId: session.user.id, gabineteId },
+      userId_gabineteId: { userId: user.id, gabineteId },
     },
-    create: { userId: session.user.id, gabineteId, papel: 'admin' },
+    create: { userId: user.id, gabineteId, papel: 'admin' },
     update: {},
   })
 
