@@ -26,7 +26,6 @@ export default function CadastroForm({
 }: Props) {
   const [passo, setPasso] = useState<Passo>('whatsapp')
   const [whatsapp, setWhatsapp] = useState('')
-  const [pessoaExistente, setPessoaExistente] = useState<{ nome: string; pessoaId: string } | null>(null)
   const [erro, setErro] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
 
@@ -39,12 +38,7 @@ export default function CadastroForm({
         setErro(resultado.erro)
         return
       }
-      if (resultado.existe && resultado.nome && resultado.pessoaId) {
-        setPessoaExistente({ nome: resultado.nome, pessoaId: resultado.pessoaId })
-        setPasso('confirmacao')
-      } else {
-        setPasso('dados')
-      }
+      setPasso(resultado.existe ? 'confirmacao' : 'dados')
     })
   }
 
@@ -78,7 +72,7 @@ export default function CadastroForm({
         slug,
         segmentoSlug,
         whatsapp,
-        nome: pessoaExistente!.nome,
+        nome: '',
         mobilizadorToken,
       })
       if (resultado && 'erro' in resultado) {
@@ -200,11 +194,10 @@ export default function CadastroForm({
         </form>
       )}
 
-      {passo === 'confirmacao' && pessoaExistente && (
+      {passo === 'confirmacao' && (
         <form onSubmit={handleConfirmar} className="space-y-4">
           <p className="text-sm text-gray-700">
-            Olá, <strong>{pessoaExistente.nome}</strong>! Encontramos seu cadastro.
-            Clique em confirmar para registrar sua participação.
+            Este número já está cadastrado. Clique em confirmar para registrar sua participação neste evento.
           </p>
           <div className="flex gap-3">
             <button

@@ -61,17 +61,9 @@ export async function submeterCadastro(input: SubmeterCadastroInput): Promise<{ 
   let pessoaId: string
 
   if (pessoaExistente) {
+    // Pessoa já existe — apenas registra a participação, NÃO altera dados do perfil
+    // sem autenticação do titular
     pessoaId = pessoaExistente.id
-    await prisma.pessoa.update({
-      where: { id: pessoaId },
-      data: {
-        nome: nome.trim(),
-        ...(email?.trim() ? { email: email.trim() } : {}),
-        ...(genero ? { genero } : {}),
-        ...(regiaoId ? { regiaoId } : {}),
-        ...(profissaoId ? { profissaoId } : {}),
-      },
-    })
   } else {
     const criada = await prisma.pessoa.create({
       data: {

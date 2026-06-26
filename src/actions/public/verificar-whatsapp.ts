@@ -7,7 +7,7 @@ import { normalizeWhatsApp } from '@/lib/whatsapp'
 export async function verificarWhatsApp(
   slug: string,
   whatsappRaw: string
-): Promise<{ existe: boolean; nome?: string; pessoaId?: string; erro?: string }> {
+): Promise<{ existe: boolean; erro?: string }> {
   const gabinete = await getGabineteBySlug(slug)
   if (!gabinete || !gabinete.ativo) return { existe: false, erro: 'Gabinete não encontrado' }
 
@@ -16,9 +16,8 @@ export async function verificarWhatsApp(
 
   const pessoa = await prisma.pessoa.findUnique({
     where: { gabineteId_whatsapp: { gabineteId: gabinete.id, whatsapp } },
-    select: { id: true, nome: true },
+    select: { id: true },
   })
 
-  if (!pessoa) return { existe: false }
-  return { existe: true, nome: pessoa.nome, pessoaId: pessoa.id }
+  return { existe: !!pessoa }
 }
