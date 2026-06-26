@@ -1,4 +1,6 @@
 import 'server-only'
+
+export const dynamic = 'force-dynamic'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { cookies } from 'next/headers'
