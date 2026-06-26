@@ -4,6 +4,7 @@ import { createServerClient } from '@supabase/ssr'
 import QRCode from 'qrcode'
 import { prisma } from '@/lib/prisma'
 import { getGabineteBySlug } from '@/lib/gabinete'
+import { AtualizarSenhaForm } from './AtualizarSenhaForm'
 
 export default async function MobilizadorPage({
   params,
@@ -124,6 +125,11 @@ export default async function MobilizadorPage({
             ))}
           </ul>
         )}
+      </section>
+
+      <section className="bg-white rounded-lg p-6 shadow-sm space-y-4">
+        <h2 className="text-base font-semibold text-gray-800">Atualizar senha</h2>
+        <AtualizarSenhaForm />
       </section>
     </div>
   )

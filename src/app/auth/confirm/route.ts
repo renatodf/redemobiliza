@@ -34,6 +34,11 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(new URL('/login?erro=invite_invalid', origin))
   }
 
+  // Fluxo de recuperação de senha — não exige gabineteId
+  if (type === 'recovery') {
+    return NextResponse.redirect(new URL('/login/nova-senha', origin))
+  }
+
   // Verificar app_metadata.gabineteId — race condition ou acesso não autorizado
   const gabineteId = user.app_metadata?.gabineteId as string | undefined
 

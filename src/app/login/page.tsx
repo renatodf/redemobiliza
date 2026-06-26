@@ -1,7 +1,8 @@
+import Link from 'next/link'
 import { loginAdmin, loginAdminGoogle } from '@/actions/auth/login-admin'
 
 interface Props {
-  searchParams: { erro?: string }
+  searchParams: { erro?: string; senhaAtualizada?: string }
 }
 
 export default function LoginPage({ searchParams }: Props) {
@@ -18,6 +19,7 @@ export default function LoginPage({ searchParams }: Props) {
       'Gabinete não encontrado. Entre em contato com o suporte.',
   }
   const erro = searchParams.erro ? mensagens[searchParams.erro] : null
+  const senhaAtualizada = searchParams.senhaAtualizada === '1'
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -25,6 +27,12 @@ export default function LoginPage({ searchParams }: Props) {
         <h1 className="text-2xl font-bold text-gray-900 text-center">
           Rede Mobiliza
         </h1>
+
+        {senhaAtualizada && (
+          <div className="rounded-md bg-green-50 border border-green-200 p-3">
+            <p className="text-sm text-green-700">Senha atualizada! Faça login com a nova senha.</p>
+          </div>
+        )}
 
         {erro && (
           <div className="rounded-md bg-red-50 border border-red-200 p-3">
@@ -67,6 +75,15 @@ export default function LoginPage({ searchParams }: Props) {
           >
             Entrar
           </button>
+
+          <div className="text-center">
+            <Link
+              href="/login/recuperar-senha"
+              className="text-sm text-blue-600 underline hover:text-blue-800"
+            >
+              Esqueci minha senha
+            </Link>
+          </div>
         </form>
 
         <div className="relative">
