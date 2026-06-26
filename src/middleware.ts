@@ -53,7 +53,16 @@ export async function middleware(request: NextRequest) {
     return supabaseResponse
   }
 
-  // Rotas de gabinete (admin e mobilizador) — papel verificado nas routes
+  // Rotas de gabinete admin (/:slug/admin/...) — papel verificado no layout
+  if (/^\/(?!super-admin|login|auth|api|_next)[^/]+\/admin/.test(pathname)) {
+    if (!user) {
+      const slug = pathname.split('/')[1]
+      return NextResponse.redirect(new URL(`/${slug}/login`, request.url))
+    }
+    return supabaseResponse
+  }
+
+  // Rotas legadas /g/[slug]/(admin|mobilizador) — papel verificado nas routes
   if (/^\/g\/[^/]+\/(admin|mobilizador)/.test(pathname)) {
     if (!user) {
       return NextResponse.redirect(new URL('/login', request.url))
