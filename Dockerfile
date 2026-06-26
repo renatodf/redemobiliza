@@ -19,6 +19,8 @@ ARG NEXT_PUBLIC_APP_URL
 ENV NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
 ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
 ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
+# DATABASE_URL dummy — prisma generate não conecta, mas Prisma 7 valida que a var existe
+ENV DATABASE_URL="postgresql://build:build@localhost:5432/build"
 RUN mkdir -p public
 RUN npx prisma generate
 RUN npm run build
