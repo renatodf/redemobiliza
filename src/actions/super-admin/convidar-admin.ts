@@ -1,0 +1,39 @@
+'use server'
+
+import { redirect } from 'next/navigation'
+import { supabaseAdmin } from '@/lib/supabase/admin'
+
+export async function convidarAdmin(gabineteId: string, formData: FormData) {
+  const email = (formData.get('email') as string).trim().toLowerCase()
+
+  if (!email) {
+    redirect(`/super-admin/gabinetes/${gabineteId}?erro=email_obrigatorio`)
+  }
+
+  const { data: invite, error: inviteError } =
+    await supabaseAdmin.auth.admin.inviteUserByEmail(email, {
+      redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/confirm`,
+    })
+
+  if (inviteError) {
+    if (inviteError.message.includes('already registered')) {
+      redirect(
+        `/super-admin/gabinetes/${gabineteId}?erro=usuario_ja_existe&email=${encodeURIComponent(email)}`
+      )
+    }
+    redirect(`/super-admin/gabinetes/${gabineteId}?erro=convite_falhou`)
+  }
+
+  const userId = invite.user.id
+
+  const { error: updateError } =
+    await supabaseAdmin.auth.admin.updateUserById(userId, {
+      app_metadata: { gabineteId, papel: 'admin' },
+    })
+
+  if (updateError) {
+    redirect(`/super-admin/gabinetes/${gabineteId}?erro=metadata_falhou&userId=${userId}`)
+  }
+
+  redirect(`/super-admin/gabinetes/${gabineteId}?sucesso=convite_enviado`)
+}
