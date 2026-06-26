@@ -19,8 +19,6 @@ ARG NEXT_PUBLIC_APP_URL
 ENV NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
 ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
 ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
-# DATABASE_URL dummy — prisma generate não conecta, mas Prisma 7 valida que a var existe
-ENV DATABASE_URL="postgresql://build:build@localhost:5432/build"
 RUN mkdir -p public
 RUN npx prisma generate
 RUN npm run build
@@ -39,8 +37,9 @@ COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# Prisma: schema + migrations
+# Prisma: schema, migrations e config (prisma.config.ts fornece DATABASE_URL ao migrate)
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
+COPY --from=builder --chown=nextjs:nodejs /app/prisma.config.ts ./prisma.config.ts
 
 # Prisma CLI com todas as dependências para rodar `prisma migrate deploy` no startup
 RUN npm install --no-save prisma@7.8.0

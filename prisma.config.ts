@@ -1,8 +1,12 @@
-import { config } from 'dotenv'
 import { defineConfig } from 'prisma/config'
 
-// Carrega .env.local (o Next.js faz isso automaticamente, mas o CLI do Prisma não)
-config({ path: '.env.local' })
+// Em desenvolvimento, carrega .env.local (Next.js faz isso automaticamente, mas o CLI do Prisma não)
+// Em Docker/produção, DATABASE_URL já está no ambiente — o try/catch evita falha quando dotenv não está disponível
+try {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const dotenv = require('dotenv')
+  dotenv.config({ path: '.env.local' })
+} catch {}
 
 export default defineConfig({
   schema: 'prisma/schema.prisma',
