@@ -4,6 +4,8 @@ import { redirect } from 'next/navigation'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { prisma } from '@/lib/prisma'
 import { toSlug } from '@/lib/slug'
+import { seedRegioes } from '@/lib/seed-regioes'
+import { seedProfissoes } from '@/lib/seed-profissoes'
 
 async function assertSuperAdmin() {
   const supabase = createSupabaseServerClient()
@@ -32,6 +34,8 @@ export async function criarGabinete(formData: FormData) {
   const gabinete = await prisma.gabinete.create({
     data: { nome, slug, corPrimaria, corSecundaria },
   })
+
+  await Promise.all([seedRegioes(gabinete.id), seedProfissoes(gabinete.id)])
 
   redirect(`/super-admin/gabinetes/${gabinete.id}`)
 }
