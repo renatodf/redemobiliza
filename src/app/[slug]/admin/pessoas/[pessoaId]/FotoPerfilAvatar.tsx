@@ -105,6 +105,7 @@ export default function FotoPerfilAvatar({ fotoUrl, pessoaId, slug, canEdit }: F
               type="button"
               onClick={isPending ? undefined : handleRemover}
               aria-disabled={isPending}
+              aria-label="Confirmar remoção de foto"
               className={`text-red-600 font-medium hover:underline${isPending ? ' opacity-50' : ''}`}
             >
               Sim

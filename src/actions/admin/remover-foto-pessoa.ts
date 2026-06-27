@@ -38,7 +38,7 @@ export async function removerFotoPessoa(formData: FormData) {
     const oldPath = pessoa.fotoUrl.split('gabinete-assets/')[1]?.split('?')[0]
     if (oldPath) {
       const { error: storageError } = await getSupabaseAdmin().storage.from('gabinete-assets').remove([oldPath])
-      if (storageError) console.error('[removerFotoPessoa] storage remove error:', storageError)
+      if (storageError) console.error('[removerFotoPessoa] storage remove error — path:', oldPath, storageError)
     }
   }
 
