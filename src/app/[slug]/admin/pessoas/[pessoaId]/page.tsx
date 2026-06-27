@@ -10,6 +10,7 @@ import { editarObservacao } from '@/actions/admin/editar-observacao'
 import { excluirObservacao } from '@/actions/admin/excluir-observacao'
 import MobilizadorSection from './MobilizadorSection'
 import { getAppUrl } from '@/lib/app-url'
+import FotoPerfilAvatar from './FotoPerfilAvatar'
 
 export default async function FichaPessoaPage({
   params,
@@ -61,7 +62,15 @@ export default async function FichaPessoaPage({
   return (
     <div className="max-w-2xl mx-auto py-8 px-4 space-y-8">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">{pessoa.nome}</h1>
+        <div className="flex items-center gap-4">
+          <FotoPerfilAvatar
+            fotoUrl={pessoa.fotoUrl}
+            pessoaId={pessoa.id}
+            slug={params.slug}
+            canEdit={isAdmin || pessoa.userId === session.user.id}
+          />
+          <h1 className="text-2xl font-bold">{pessoa.nome}</h1>
+        </div>
         {pessoa.isEquipe && (
           <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
             Membro da Equipe
