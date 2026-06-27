@@ -1,6 +1,3 @@
-◇ injected env (6) from .env.local // tip: ⌘ override existing { override: true }
-Loaded Prisma config from prisma.config.ts.
-
 -- CreateSchema
 CREATE SCHEMA IF NOT EXISTS "public";
 

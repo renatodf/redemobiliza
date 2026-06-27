@@ -90,6 +90,7 @@ model Pessoa {
   nascimento       DateTime?
   origem           String?
   genero           String?
+  fotoUrl          String?
   isEquipe         Boolean   @default(false)
   isMobilizador    Boolean   @default(false)
   tokenMobilizador String?
