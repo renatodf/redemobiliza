@@ -111,9 +111,9 @@ export default function FotoPerfilAvatar({ fotoUrl, pessoaId, slug, canEdit }: F
             </button>
             <button
               type="button"
-              onClick={() => setConfirmandoRemocao(false)}
-              disabled={isPending}
-              className="text-gray-500 hover:underline disabled:opacity-50"
+              onClick={isPending ? undefined : () => setConfirmandoRemocao(false)}
+              aria-disabled={isPending}
+              className={`text-gray-500 hover:underline${isPending ? ' opacity-50' : ''}`}
             >
               Cancelar
             </button>
@@ -130,9 +130,9 @@ export default function FotoPerfilAvatar({ fotoUrl, pessoaId, slug, canEdit }: F
             </button>
             <button
               type="button"
-              onClick={() => { setConfirmandoRemocao(true); setErrorMsg(null) }}
-              disabled={isPending}
-              className="text-xs text-red-500 hover:underline disabled:opacity-50"
+              onClick={isPending ? undefined : () => { setConfirmandoRemocao(true); setErrorMsg(null) }}
+              aria-disabled={isPending}
+              className={`text-xs text-red-500 hover:underline${isPending ? ' opacity-50' : ''}`}
             >
               Remover foto
             </button>
