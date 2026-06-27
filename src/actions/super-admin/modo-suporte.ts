@@ -12,10 +12,10 @@ function gerarSessaoId(): string {
 export async function entrarModoSuporte(gabineteId: string) {
   const supabase = createSupabaseServerClient()
   const {
-    data: { session },
-  } = await supabase.auth.getSession()
+    data: { user },
+  } = await supabase.auth.getUser()
 
-  if (!session || session.user.app_metadata?.role !== 'super-admin') {
+  if (!user || user.app_metadata?.role !== 'super-admin') {
     redirect('/super-admin/login')
   }
 
@@ -24,7 +24,7 @@ export async function entrarModoSuporte(gabineteId: string) {
   await prisma.logSuporte.create({
     data: {
       gabineteId,
-      superAdminUserId: session.user.id,
+      superAdminUserId: user.id,
       acao: 'acesso_inicio',
       sessaoId,
     },
@@ -48,17 +48,17 @@ export async function entrarModoSuporte(gabineteId: string) {
 export async function sairModoSuporte(gabineteId: string, sessaoId: string) {
   const supabase = createSupabaseServerClient()
   const {
-    data: { session },
-  } = await supabase.auth.getSession()
+    data: { user },
+  } = await supabase.auth.getUser()
 
-  if (!session || session.user.app_metadata?.role !== 'super-admin') {
+  if (!user || user.app_metadata?.role !== 'super-admin') {
     redirect('/super-admin/login')
   }
 
   await prisma.logSuporte.create({
     data: {
       gabineteId,
-      superAdminUserId: session.user.id,
+      superAdminUserId: user.id,
       acao: 'acesso_fim',
       sessaoId,
       saidoEm: new Date(),

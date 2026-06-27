@@ -9,8 +9,8 @@ import { seedProfissoes } from '@/lib/seed-profissoes'
 
 async function assertSuperAdmin() {
   const supabase = createSupabaseServerClient()
-  const { data: { session } } = await supabase.auth.getSession()
-  if (!session || session.user.app_metadata?.role !== 'super-admin') {
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user || user.app_metadata?.role !== 'super-admin') {
     redirect('/super-admin/login')
   }
 }

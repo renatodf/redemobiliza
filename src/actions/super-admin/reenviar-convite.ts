@@ -13,8 +13,8 @@ export async function reenviarConvite(
   email: string
 ): Promise<ReenviarResult> {
   const supabase = createSupabaseServerClient()
-  const { data: { session } } = await supabase.auth.getSession()
-  if (!session || session.user.app_metadata?.role !== 'super-admin') {
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user || user.app_metadata?.role !== 'super-admin') {
     return { erro: 'Não autorizado.' }
   }
   const { data: users, error: listError } =

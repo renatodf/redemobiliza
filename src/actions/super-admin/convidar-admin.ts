@@ -6,8 +6,8 @@ import { getSupabaseAdmin } from '@/lib/supabase/admin'
 
 async function assertSuperAdmin() {
   const supabase = createSupabaseServerClient()
-  const { data: { session } } = await supabase.auth.getSession()
-  if (!session || session.user.app_metadata?.role !== 'super-admin') {
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user || user.app_metadata?.role !== 'super-admin') {
     redirect('/super-admin/login')
   }
 }
@@ -27,6 +27,7 @@ export async function convidarAdmin(gabineteId: string, formData: FormData) {
 
   if (inviteError) {
     const jaExiste =
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (inviteError as any).code === 'email_exists' ||
       inviteError.message.toLowerCase().includes('already registered') ||
       inviteError.status === 422
