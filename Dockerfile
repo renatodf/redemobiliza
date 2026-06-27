@@ -11,7 +11,12 @@ RUN npm ci
 FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
+# GIT_SHA bust Docker cache por commit (evita arquivos obsoletos no COPY)
+ARG GIT_SHA
+RUN echo "Build $GIT_SHA"
 COPY . .
+# Remove diretórios de route group obsoletos que o EasyPanel não limpa entre deploys
+RUN rm -rf 'src/app/super-admin/(admin)'
 ENV NEXT_TELEMETRY_DISABLED=1
 ARG NEXT_PUBLIC_SUPABASE_URL
 ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
