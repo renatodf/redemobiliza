@@ -18,6 +18,7 @@ export default function FotoPerfilAvatar({ fotoUrl, pessoaId, slug, canEdit }: F
   const inputRef = useRef<HTMLInputElement>(null)
   const [lightboxOpen, setLightboxOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
+  const [errorMsg, setErrorMsg] = useState<string | null>(null)
 
   function handleAvatarClick() {
     if (fotoUrl) {
@@ -28,6 +29,7 @@ export default function FotoPerfilAvatar({ fotoUrl, pessoaId, slug, canEdit }: F
   }
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    setErrorMsg(null)
     const file = e.target.files?.[0]
     if (!file) return
     e.target.value = ''
@@ -42,7 +44,7 @@ export default function FotoPerfilAvatar({ fotoUrl, pessoaId, slug, canEdit }: F
         await uploadFotoPessoa(formData)
         router.refresh()
       } catch (err) {
-        alert(err instanceof Error ? err.message : 'Erro ao enviar foto')
+        setErrorMsg(err instanceof Error ? err.message : 'Erro ao enviar foto')
       }
     })
   }
@@ -84,6 +86,10 @@ export default function FotoPerfilAvatar({ fotoUrl, pessoaId, slug, canEdit }: F
         >
           Alterar foto
         </button>
+      )}
+
+      {errorMsg && (
+        <p className="text-xs text-red-600 text-center max-w-[96px]">{errorMsg}</p>
       )}
 
       <input

@@ -34,7 +34,7 @@ export async function uploadFotoPessoa(formData: FormData) {
 
   const pessoa = await prisma.pessoa.findFirst({
     where: { id: pessoaId as string, gabineteId: gabinete.id },
-    select: { id: true, userId: true },
+    select: { id: true, userId: true, fotoUrl: true },
   })
   if (!pessoa) throw new Error('Pessoa não encontrada')
 
@@ -47,6 +47,13 @@ export async function uploadFotoPessoa(formData: FormData) {
   const isPropriaPessoa = pessoa.userId === user.id
 
   if (!isAdmin && !isPropriaPessoa) throw new Error('Sem permissão')
+
+  if (pessoa.fotoUrl) {
+    const oldUrl = pessoa.fotoUrl.split('gabinete-assets/')[1]?.split('?')[0]
+    if (oldUrl) {
+      await getSupabaseAdmin().storage.from('gabinete-assets').remove([oldUrl])
+    }
+  }
 
   const ext = ALLOWED_TYPES[safeType]
   const path = `${gabinete.id}/pessoas/${pessoaId}/foto.${ext}`
@@ -67,7 +74,7 @@ export async function uploadFotoPessoa(formData: FormData) {
 
   await prisma.pessoa.update({
     where: { id: pessoaId as string },
-    data: { fotoUrl: publicUrl },
+    data: { fotoUrl: `${publicUrl}?v=${Date.now()}` },
   })
 
   revalidatePath(`/${slug}/admin/pessoas/${pessoaId}`)
