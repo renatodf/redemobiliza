@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Lightbox from 'yet-another-react-lightbox'
 import 'yet-another-react-lightbox/styles.css'
 import { uploadFotoPessoa } from '@/actions/admin/upload-foto-pessoa'
+import { removerFotoPessoa } from '@/actions/admin/remover-foto-pessoa'
 
 interface FotoPerfilAvatarProps {
   fotoUrl: string | null
@@ -19,6 +20,7 @@ export default function FotoPerfilAvatar({ fotoUrl, pessoaId, slug, canEdit }: F
   const [lightboxOpen, setLightboxOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
+  const [confirmandoRemocao, setConfirmandoRemocao] = useState(false)
 
   function handleAvatarClick() {
     if (fotoUrl) {
@@ -45,6 +47,24 @@ export default function FotoPerfilAvatar({ fotoUrl, pessoaId, slug, canEdit }: F
         router.refresh()
       } catch (err) {
         setErrorMsg(err instanceof Error ? err.message : 'Erro ao enviar foto')
+      }
+    })
+  }
+
+  function handleRemover() {
+    setErrorMsg(null)
+    const formData = new FormData()
+    formData.set('slug', slug)
+    formData.set('pessoaId', pessoaId)
+
+    startTransition(async () => {
+      try {
+        await removerFotoPessoa(formData)
+        setConfirmandoRemocao(false)
+        router.refresh()
+      } catch (err) {
+        setConfirmandoRemocao(false)
+        setErrorMsg(err instanceof Error ? err.message : 'Erro ao remover foto')
       }
     })
   }
@@ -78,14 +98,46 @@ export default function FotoPerfilAvatar({ fotoUrl, pessoaId, slug, canEdit }: F
       </button>
 
       {canEdit && fotoUrl && (
-        <button
-          type="button"
-          onClick={isPending ? undefined : () => inputRef.current?.click()}
-          aria-disabled={isPending}
-          className={`text-xs text-blue-600 hover:underline${isPending ? ' opacity-50' : ''}`}
-        >
-          Alterar foto
-        </button>
+        confirmandoRemocao ? (
+          <div className="flex items-center gap-2 text-xs">
+            <span className="text-gray-600">Remover foto?</span>
+            <button
+              type="button"
+              onClick={isPending ? undefined : handleRemover}
+              aria-disabled={isPending}
+              className={`text-red-600 font-medium hover:underline${isPending ? ' opacity-50' : ''}`}
+            >
+              Sim
+            </button>
+            <button
+              type="button"
+              onClick={() => setConfirmandoRemocao(false)}
+              disabled={isPending}
+              className="text-gray-500 hover:underline disabled:opacity-50"
+            >
+              Cancelar
+            </button>
+          </div>
+        ) : (
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={isPending ? undefined : () => inputRef.current?.click()}
+              aria-disabled={isPending}
+              className={`text-xs text-blue-600 hover:underline${isPending ? ' opacity-50' : ''}`}
+            >
+              Alterar foto
+            </button>
+            <button
+              type="button"
+              onClick={() => { setConfirmandoRemocao(true); setErrorMsg(null) }}
+              disabled={isPending}
+              className="text-xs text-red-500 hover:underline disabled:opacity-50"
+            >
+              Remover foto
+            </button>
+          </div>
+        )
       )}
 
       {errorMsg && (
