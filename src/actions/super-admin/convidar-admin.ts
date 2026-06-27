@@ -26,7 +26,11 @@ export async function convidarAdmin(gabineteId: string, formData: FormData) {
     })
 
   if (inviteError) {
-    if (inviteError.message.includes('already registered')) {
+    const jaExiste =
+      (inviteError as any).code === 'email_exists' ||
+      inviteError.message.toLowerCase().includes('already registered') ||
+      inviteError.status === 422
+    if (jaExiste) {
       redirect(
         `/super-admin/gabinetes/${gabineteId}?erro=usuario_ja_existe&email=${encodeURIComponent(email)}`
       )
