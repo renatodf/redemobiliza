@@ -17,7 +17,14 @@ export async function uploadFotoPessoa(formData: FormData) {
   const { data: { session } } = await supabase.auth.getSession()
   if (!session) throw new Error('Não autenticado')
 
-  if (!file.type.startsWith('image/')) throw new Error('Arquivo inválido — envie uma imagem')
+  const ALLOWED_TYPES = {
+    'image/jpeg': 'jpg',
+    'image/png': 'png',
+    'image/webp': 'webp',
+    'image/gif': 'gif',
+  } as const
+  const safeType = file.type.toLowerCase() as keyof typeof ALLOWED_TYPES
+  if (!(safeType in ALLOWED_TYPES)) throw new Error('Tipo de imagem não permitido — use JPEG, PNG, WebP ou GIF')
   if (file.size > 5 * 1024 * 1024) throw new Error('Imagem muito grande — máximo 5MB')
 
   const gabinete = await getGabineteBySlug(slug)
@@ -39,13 +46,13 @@ export async function uploadFotoPessoa(formData: FormData) {
 
   if (!isAdmin && !isPropriaPessoa) throw new Error('Sem permissão')
 
-  const ext = file.name.split('.').pop() ?? 'jpg'
+  const ext = ALLOWED_TYPES[safeType]
   const path = `${gabinete.id}/pessoas/${pessoaId}/foto.${ext}`
   const buffer = Buffer.from(await file.arrayBuffer())
 
   const { error } = await getSupabaseAdmin().storage
     .from('gabinete-assets')
-    .upload(path, buffer, { upsert: true, contentType: file.type })
+    .upload(path, buffer, { upsert: true, contentType: safeType })
 
   if (error) throw new Error(`Erro no upload: ${error.message}`)
 
