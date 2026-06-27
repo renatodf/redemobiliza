@@ -1,5 +1,3 @@
-import { redirect } from 'next/navigation'
-import { headers } from 'next/headers'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 
 export default async function SuperAdminLayout({
@@ -7,19 +5,16 @@ export default async function SuperAdminLayout({
 }: {
   children: React.ReactNode
 }) {
-  // Não verificar auth na própria página de login — evita redirect loop
-  const pathname = headers().get('x-pathname') ?? ''
-  if (pathname === '/super-admin/login') {
-    return <>{children}</>
-  }
-
   const supabase = createSupabaseServerClient()
   const {
     data: { user },
   } = await supabase.auth.getUser()
 
+  // Sem redirect aqui — o middleware já protege todas as rotas /super-admin/*
+  // exceto /super-admin/login. Sem redirect no layout = sem redirect loop.
+  // Se não autenticado (ex: página de login), renderiza só os filhos sem chrome.
   if (!user || user.app_metadata?.role !== 'super-admin') {
-    redirect('/super-admin/login')
+    return <>{children}</>
   }
 
   return (
