@@ -30,6 +30,7 @@ export default function FotoPerfilAvatar({ fotoUrl, pessoaId, slug, canEdit }: F
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
+    e.target.value = ''
 
     const formData = new FormData()
     formData.set('slug', slug)
@@ -52,8 +53,9 @@ export default function FotoPerfilAvatar({ fotoUrl, pessoaId, slug, canEdit }: F
     <div className="flex flex-col items-center gap-1">
       <button
         type="button"
-        onClick={handleAvatarClick}
-        disabled={isPending}
+        onClick={isPending ? undefined : handleAvatarClick}
+        aria-disabled={isPending}
+        tabIndex={isClickable ? undefined : -1}
         className={[
           'w-24 h-24 rounded-full overflow-hidden border-2 border-gray-200 flex-shrink-0',
           isClickable && !isPending ? 'cursor-pointer' : 'cursor-default',
@@ -76,9 +78,9 @@ export default function FotoPerfilAvatar({ fotoUrl, pessoaId, slug, canEdit }: F
       {canEdit && fotoUrl && (
         <button
           type="button"
-          onClick={() => inputRef.current?.click()}
-          disabled={isPending}
-          className="text-xs text-blue-600 hover:underline disabled:opacity-50"
+          onClick={isPending ? undefined : () => inputRef.current?.click()}
+          aria-disabled={isPending}
+          className="text-xs text-blue-600 hover:underline aria-disabled:opacity-50"
         >
           Alterar foto
         </button>
