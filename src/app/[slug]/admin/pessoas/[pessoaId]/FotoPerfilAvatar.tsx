@@ -80,7 +80,7 @@ export default function FotoPerfilAvatar({ fotoUrl, pessoaId, slug, canEdit }: F
           type="button"
           onClick={isPending ? undefined : () => inputRef.current?.click()}
           aria-disabled={isPending}
-          className="text-xs text-blue-600 hover:underline aria-disabled:opacity-50"
+          className={`text-xs text-blue-600 hover:underline${isPending ? ' opacity-50' : ''}`}
         >
           Alterar foto
         </button>
