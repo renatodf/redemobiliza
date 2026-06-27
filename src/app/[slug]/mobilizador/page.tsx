@@ -5,6 +5,7 @@ import QRCode from 'qrcode'
 import { prisma } from '@/lib/prisma'
 import { getGabineteBySlug } from '@/lib/gabinete'
 import { AtualizarSenhaForm } from './AtualizarSenhaForm'
+import { getAppUrl } from '@/lib/app-url'
 
 export default async function MobilizadorPage({
   params,
@@ -39,7 +40,7 @@ export default async function MobilizadorPage({
     select: { id: true, nome: true, slug: true },
   })
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? ''
+  const appUrl = getAppUrl()
 
   // Gerar links e QR codes por segmento
   const linksSegmentos = await Promise.all(

@@ -2,6 +2,7 @@
 
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import { getAppUrl } from '@/lib/app-url'
 
 export async function solicitarRecuperacaoSenha(formData: FormData) {
   const email = formData.get('email') as string
@@ -12,7 +13,7 @@ export async function solicitarRecuperacaoSenha(formData: FormData) {
 
   const supabase = createSupabaseServerClient()
   await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/confirm`,
+    redirectTo: `${getAppUrl()}/auth/confirm`,
   })
 
   // Sempre redireciona para "enviado" — não revela se o e-mail existe

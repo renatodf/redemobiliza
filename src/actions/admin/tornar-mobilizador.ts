@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { prisma } from '@/lib/prisma'
 import { getSupabaseAdmin } from '@/lib/supabase/admin'
 import { assertAdminAccess } from '@/lib/assert-admin-access'
+import { getAppUrl } from '@/lib/app-url'
 
 export async function tornarMobilizador(formData: FormData): Promise<{ erro?: string }> {
   const slug = formData.get('slug') as string
@@ -27,7 +28,7 @@ export async function tornarMobilizador(formData: FormData): Promise<{ erro?: st
       data: { isMobilizador: true, tokenMobilizador },
     })
 
-    const redirectTo = `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback?token=${tokenMobilizador}&gabineteId=${gabinete.id}`
+    const redirectTo = `${getAppUrl()}/auth/callback?token=${tokenMobilizador}&gabineteId=${gabinete.id}`
 
     const { error: emailError } = await getSupabaseAdmin().auth.signInWithOtp({
       email: pessoa.email,

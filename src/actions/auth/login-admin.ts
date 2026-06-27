@@ -4,6 +4,7 @@ import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
+import { getAppUrl } from '@/lib/app-url'
 
 export async function loginAdmin(formData: FormData) {
   const email = formData.get('email') as string
@@ -70,7 +71,7 @@ export async function loginAdminGoogle() {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/confirm`,
+      redirectTo: `${getAppUrl()}/auth/confirm`,
     },
   })
 

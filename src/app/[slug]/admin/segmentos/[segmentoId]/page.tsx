@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation'
 import QRCode from 'qrcode'
 import { prisma } from '@/lib/prisma'
 import { getGabineteBySlug } from '@/lib/gabinete'
+import { getAppUrl } from '@/lib/app-url'
 
 export default async function SegmentoDetalhePage({
   params,
@@ -17,7 +18,7 @@ export default async function SegmentoDetalhePage({
   })
   if (!segmento) notFound()
 
-  const linkCadastro = `${process.env.NEXT_PUBLIC_APP_URL}/${params.slug}/cadastro/${segmento.slug}`
+  const linkCadastro = `${getAppUrl()}/${params.slug}/cadastro/${segmento.slug}`
 
   const qrDataUrl = await QRCode.toDataURL(linkCadastro, { width: 256, margin: 2 })
 

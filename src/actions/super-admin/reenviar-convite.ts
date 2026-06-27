@@ -2,6 +2,7 @@
 
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { getSupabaseAdmin } from '@/lib/supabase/admin'
+import { getAppUrl } from '@/lib/app-url'
 
 interface ReenviarResult {
   link?: string
@@ -48,7 +49,7 @@ export async function reenviarConvite(
       type: 'magiclink',
       email,
       options: {
-        redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/confirm`,
+        redirectTo: `${getAppUrl()}/auth/confirm`,
       },
     })
 

@@ -9,6 +9,7 @@ import { criarObservacao } from '@/actions/admin/criar-observacao'
 import { editarObservacao } from '@/actions/admin/editar-observacao'
 import { excluirObservacao } from '@/actions/admin/excluir-observacao'
 import MobilizadorSection from './MobilizadorSection'
+import { getAppUrl } from '@/lib/app-url'
 
 export default async function FichaPessoaPage({
   params,
@@ -250,7 +251,7 @@ export default async function FichaPessoaPage({
         temEmail={!!pessoa.email}
         isMobilizador={pessoa.isMobilizador}
         tokenMobilizador={pessoa.tokenMobilizador ?? null}
-        appUrl={process.env.NEXT_PUBLIC_APP_URL ?? ''}
+        appUrl={getAppUrl()}
       />
     </div>
   )

@@ -3,6 +3,7 @@
 import { redirect } from 'next/navigation'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { getSupabaseAdmin } from '@/lib/supabase/admin'
+import { getAppUrl } from '@/lib/app-url'
 
 async function assertSuperAdmin() {
   const supabase = createSupabaseServerClient()
@@ -22,7 +23,7 @@ export async function convidarAdmin(gabineteId: string, formData: FormData) {
 
   const { data: invite, error: inviteError } =
     await getSupabaseAdmin().auth.admin.inviteUserByEmail(email, {
-      redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/confirm`,
+      redirectTo: `${getAppUrl()}/auth/confirm`,
     })
 
   if (inviteError) {
