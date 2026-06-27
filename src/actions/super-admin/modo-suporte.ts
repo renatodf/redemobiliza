@@ -42,7 +42,7 @@ export async function entrarModoSuporte(gabineteId: string) {
     select: { slug: true },
   })
 
-  redirect(`/g/${gabinete?.slug ?? ''}/admin/`)
+  redirect(`/${gabinete?.slug ?? ''}/admin/`)
 }
 
 export async function sairModoSuporte(gabineteId: string, sessaoId: string) {
