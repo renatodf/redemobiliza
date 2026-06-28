@@ -29,6 +29,9 @@ model Gabinete {
   linksCompostos       LinkComposto[]
   logsSuporteAcessados LogSuporte[]
   observacoesPessoas   ObservacaoPessoa[]
+  areasDemanda         AreaDemanda[]
+  demandas             Demanda[]
+  configuracaoSistema  ConfiguracaoSistema?
 }
 
 model UsuarioGabinete {
@@ -91,6 +94,11 @@ model Pessoa {
   origem           String?
   genero           String?
   fotoUrl          String?
+  bairro           String?
+  logradouro       String?
+  numero           String?
+  complemento      String?
+  cep              String?
   isColaborador    Boolean   @default(false)
   isMobilizador    Boolean   @default(false)
   tokenMobilizador String?
@@ -101,11 +109,15 @@ model Pessoa {
   gabinete           Gabinete         @relation(fields: [gabineteId], references: [id])
   regiao             Regiao?          @relation(fields: [regiaoId], references: [id])
   profissao          Profissao?       @relation(fields: [profissaoId], references: [id])
-  segmentos          PessoaSegmento[]
-  redesComoIndicado  VinculoRede[]    @relation("Indicado")
-  redesComoIndicador VinculoRede[]    @relation("Indicador")
-  linksCompostos     LinkComposto[]   @relation("LinksMobilizador")
-  observacoes        ObservacaoPessoa[]
+  segmentos              PessoaSegmento[]
+  redesComoIndicado      VinculoRede[]          @relation("Indicado")
+  redesComoIndicador     VinculoRede[]          @relation("Indicador")
+  linksCompostos         LinkComposto[]         @relation("LinksMobilizador")
+  observacoes            ObservacaoPessoa[]
+  demandasSolicitadas    Demanda[]              @relation("DemandaSolicitante")
+  demandasResponsavel    Demanda[]              @relation("DemandaResponsavel")
+  demandasCriadas        Demanda[]              @relation("DemandaCriadoPor")
+  movimentacoesDemanda   MovimentacaoDemanda[]  @relation("MovimentacaoAutor")
 
   @@unique([gabineteId, whatsapp])
   @@unique([gabineteId, tokenMobilizador])
@@ -180,4 +192,66 @@ model ObservacaoPessoa {
 
   gabinete Gabinete @relation(fields: [gabineteId], references: [id])
   pessoa   Pessoa   @relation(fields: [pessoaId], references: [id])
+}
+
+model AreaDemanda {
+  id         String    @id @default(cuid())
+  nome       String
+  gabineteId String
+  gabinete   Gabinete  @relation(fields: [gabineteId], references: [id])
+  demandas   Demanda[]
+
+  @@index([gabineteId])
+}
+
+model Demanda {
+  id              String    @id @default(cuid())
+  gabineteId      String
+  titulo          String
+  descricao       String
+  solicitanteId   String
+  responsavelId   String
+  areaId          String
+  status          String    @default("aberta")
+  prazoDesfecho   DateTime
+  prazoAlterado   Boolean   @default(false)
+  alertaEnviadoEm DateTime?
+  observacao      String?
+  criadoEm        DateTime  @default(now())
+  criadoPorId     String
+
+  gabinete    Gabinete            @relation(fields: [gabineteId], references: [id])
+  solicitante Pessoa              @relation("DemandaSolicitante", fields: [solicitanteId], references: [id])
+  responsavel Pessoa              @relation("DemandaResponsavel", fields: [responsavelId], references: [id])
+  area        AreaDemanda         @relation(fields: [areaId], references: [id])
+  criadoPor   Pessoa              @relation("DemandaCriadoPor", fields: [criadoPorId], references: [id])
+  historico   MovimentacaoDemanda[]
+
+  @@index([gabineteId])
+  @@index([status])
+  @@index([responsavelId])
+  @@index([prazoDesfecho])
+}
+
+model MovimentacaoDemanda {
+  id        String   @id @default(cuid())
+  demandaId String
+  tipo      String
+  descricao String
+  autorId   String?
+  criadoEm  DateTime @default(now())
+
+  demanda Demanda  @relation(fields: [demandaId], references: [id])
+  autor   Pessoa?  @relation("MovimentacaoAutor", fields: [autorId], references: [id])
+
+  @@index([demandaId])
+}
+
+model ConfiguracaoSistema {
+  id                   String   @id @default(cuid())
+  gabineteId           String   @unique
+  prazoDemandasHoras   Int      @default(72)
+  alertaExpiracaoHoras Int      @default(12)
+
+  gabinete Gabinete @relation(fields: [gabineteId], references: [id])
 }
