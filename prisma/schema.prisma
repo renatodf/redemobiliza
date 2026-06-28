@@ -8,29 +8,30 @@ datasource db {
 }
 
 model Gabinete {
-  id                   String               @id @default(cuid())
-  nome                 String
-  slug                 String               @unique
-  nomeSistema          String               @default("Rede Mobiliza")
-  corPrimaria          String               @default("#1D4ED8")
-  corSecundaria        String               @default("#3B82F6")
-  logoUrl              String?
-  imagemBannerUrl      String?
-  ativo                Boolean              @default(true)
-  criadoEm             DateTime             @default(now())
-  atualizadoEm         DateTime             @updatedAt
-  areasDemanda         AreaDemanda[]
-  configuracaoSistema  ConfiguracaoSistema?
-  demandas             Demanda[]
+  id              String   @id @default(cuid())
+  nome            String
+  slug            String   @unique
+  nomeSistema     String   @default("Rede Mobiliza")
+  corPrimaria     String   @default("#1D4ED8")
+  corSecundaria   String   @default("#3B82F6")
+  logoUrl         String?
+  imagemBannerUrl String?
+  ativo           Boolean  @default(true)
+  criadoEm       DateTime @default(now())
+  atualizadoEm   DateTime @updatedAt
+
+  pessoas              Pessoa[]
+  segmentos            Segmento[]
+  regioes              Regiao[]
+  profissoes           Profissao[]
+  usuarios             UsuarioGabinete[]
+  vinculos             VinculoRede[]
   linksCompostos       LinkComposto[]
   logsSuporteAcessados LogSuporte[]
   observacoesPessoas   ObservacaoPessoa[]
-  pessoas              Pessoa[]
-  profissoes           Profissao[]
-  regioes              Regiao[]
-  segmentos            Segmento[]
-  usuarios             UsuarioGabinete[]
-  vinculos             VinculoRede[]
+  areasDemanda         AreaDemanda[]
+  demandas             Demanda[]
+  configuracaoSistema  ConfiguracaoSistema?
 }
 
 model UsuarioGabinete {
@@ -38,8 +39,9 @@ model UsuarioGabinete {
   userId     String
   gabineteId String
   papel      String
-  criadoEm   DateTime @default(now())
-  gabinete   Gabinete @relation(fields: [gabineteId], references: [id])
+  criadoEm  DateTime @default(now())
+
+  gabinete Gabinete @relation(fields: [gabineteId], references: [id])
 
   @@unique([userId, gabineteId])
 }
@@ -49,10 +51,11 @@ model LinkComposto {
   gabineteId    String
   mobilizadorId String
   segmentoId    String
-  criadoEm      DateTime @default(now())
-  gabinete      Gabinete @relation(fields: [gabineteId], references: [id])
-  mobilizador   Pessoa   @relation("LinksMobilizador", fields: [mobilizadorId], references: [id])
-  segmento      Segmento @relation(fields: [segmentoId], references: [id])
+  criadoEm     DateTime @default(now())
+
+  gabinete    Gabinete @relation(fields: [gabineteId], references: [id])
+  mobilizador Pessoa   @relation("LinksMobilizador", fields: [mobilizadorId], references: [id])
+  segmento    Segmento @relation(fields: [segmentoId], references: [id])
 
   @@unique([gabineteId, mobilizadorId, segmentoId])
 }
@@ -62,9 +65,10 @@ model Regiao {
   gabineteId String
   nome       String
   ativa      Boolean  @default(true)
-  criadoEm   DateTime @default(now())
-  pessoas    Pessoa[]
-  gabinete   Gabinete @relation(fields: [gabineteId], references: [id])
+  criadoEm  DateTime @default(now())
+
+  gabinete Gabinete @relation(fields: [gabineteId], references: [id])
+  pessoas  Pessoa[]
 }
 
 model Profissao {
@@ -72,75 +76,79 @@ model Profissao {
   gabineteId String
   nome       String
   ativa      Boolean  @default(true)
-  criadoEm   DateTime @default(now())
-  pessoas    Pessoa[]
-  gabinete   Gabinete @relation(fields: [gabineteId], references: [id])
+  criadoEm  DateTime @default(now())
+
+  gabinete Gabinete @relation(fields: [gabineteId], references: [id])
+  pessoas  Pessoa[]
 }
 
 model Pessoa {
-  id                   String                @id @default(cuid())
-  gabineteId           String
-  nome                 String
-  whatsapp             String
-  email                String?
-  regiaoId             String?
-  profissaoId          String?
-  nascimento           DateTime?
-  origem               String?
-  genero               String?
-  isColaborador        Boolean               @default(false)
-  isMobilizador        Boolean               @default(false)
-  tokenMobilizador     String?
-  userId               String?
-  criadoEm             DateTime              @default(now())
-  atualizadoEm         DateTime              @updatedAt
-  deletedAt            DateTime?
-  fotoUrl              String?
-  bairro               String?
-  logradouro           String?
-  numero               String?
-  complemento          String?
-  cep                  String?
-  demandasCriadas      Demanda[]             @relation("DemandaCriadoPor")
-  demandasResponsavel  Demanda[]             @relation("DemandaResponsavel")
-  demandasSolicitadas  Demanda[]             @relation("DemandaSolicitante")
-  linksCompostos       LinkComposto[]        @relation("LinksMobilizador")
-  movimentacoesDemanda MovimentacaoDemanda[] @relation("MovimentacaoAutor")
-  observacoes          ObservacaoPessoa[]
-  gabinete             Gabinete              @relation(fields: [gabineteId], references: [id])
-  profissao            Profissao?            @relation(fields: [profissaoId], references: [id])
-  regiao               Regiao?               @relation(fields: [regiaoId], references: [id])
-  segmentos            PessoaSegmento[]
-  redesComoIndicador   VinculoRede[]         @relation("Indicador")
-  redesComoIndicado    VinculoRede[]         @relation("Indicado")
+  id               String    @id @default(cuid())
+  gabineteId       String
+  nome             String
+  whatsapp         String
+  email            String?
+  regiaoId         String?
+  profissaoId      String?
+  nascimento       DateTime?
+  origem           String?
+  genero           String?
+  fotoUrl          String?
+  bairro           String?
+  logradouro       String?
+  numero           String?
+  complemento      String?
+  cep              String?
+  isColaborador    Boolean   @default(false)
+  isMobilizador    Boolean   @default(false)
+  tokenMobilizador String?
+  userId           String?
+  criadoEm        DateTime  @default(now())
+  atualizadoEm    DateTime  @updatedAt
+  deletedAt       DateTime?
+
+  gabinete           Gabinete         @relation(fields: [gabineteId], references: [id])
+  regiao             Regiao?          @relation(fields: [regiaoId], references: [id])
+  profissao          Profissao?       @relation(fields: [profissaoId], references: [id])
+  segmentos              PessoaSegmento[]
+  redesComoIndicado      VinculoRede[]          @relation("Indicado")
+  redesComoIndicador     VinculoRede[]          @relation("Indicador")
+  linksCompostos         LinkComposto[]         @relation("LinksMobilizador")
+  observacoes            ObservacaoPessoa[]
+  demandasSolicitadas    Demanda[]              @relation("DemandaSolicitante")
+  demandasResponsavel    Demanda[]              @relation("DemandaResponsavel")
+  demandasCriadas        Demanda[]              @relation("DemandaCriadoPor")
+  movimentacoesDemanda   MovimentacaoDemanda[]  @relation("MovimentacaoAutor")
 
   @@unique([gabineteId, whatsapp])
   @@unique([gabineteId, tokenMobilizador])
 }
 
 model Segmento {
-  id             String           @id @default(cuid())
-  gabineteId     String
-  nome           String
-  descricao      String?
-  cor            String?
-  icone          String?
-  tipo           String
-  slug           String
-  status         String           @default("ativo")
-  criadoEm       DateTime         @default(now())
-  atualizadoEm   DateTime         @updatedAt
-  linksCompostos LinkComposto[]
-  pessoas        PessoaSegmento[]
+  id           String   @id @default(cuid())
+  gabineteId   String
+  nome         String
+  descricao    String?
+  cor          String?
+  icone        String?
+  tipo         String
+  slug         String
+  status       String   @default("ativo")
+  criadoEm    DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
+
   gabinete       Gabinete         @relation(fields: [gabineteId], references: [id])
+  pessoas        PessoaSegmento[]
+  linksCompostos LinkComposto[]
 }
 
 model PessoaSegmento {
   pessoaId   String
   segmentoId String
-  criadoEm   DateTime @default(now())
-  pessoa     Pessoa   @relation(fields: [pessoaId], references: [id])
-  segmento   Segmento @relation(fields: [segmentoId], references: [id])
+  criadoEm  DateTime @default(now())
+
+  pessoa   Pessoa   @relation(fields: [pessoaId], references: [id])
+  segmento Segmento @relation(fields: [segmentoId], references: [id])
 
   @@id([pessoaId, segmentoId])
 }
@@ -151,11 +159,12 @@ model VinculoRede {
   pessoaId      String
   indicadoPorId String?
   nivel         Int
-  criadoEm      DateTime @default(now())
-  deletedAt     DateTime?
-  gabinete      Gabinete @relation(fields: [gabineteId], references: [id])
-  indicadoPor   Pessoa?  @relation("Indicador", fields: [indicadoPorId], references: [id])
-  pessoa        Pessoa   @relation("Indicado", fields: [pessoaId], references: [id])
+  criadoEm     DateTime @default(now())
+  deletedAt    DateTime?
+
+  gabinete    Gabinete @relation(fields: [gabineteId], references: [id])
+  pessoa      Pessoa   @relation("Indicado", fields: [pessoaId], references: [id])
+  indicadoPor Pessoa?  @relation("Indicador", fields: [indicadoPorId], references: [id])
 
   @@unique([gabineteId, pessoaId, indicadoPorId])
 }
@@ -167,9 +176,10 @@ model LogSuporte {
   acao             String
   detalhes         String?
   sessaoId         String
-  criadoEm         DateTime  @default(now())
-  saidoEm          DateTime?
-  gabinete         Gabinete  @relation(fields: [gabineteId], references: [id])
+  criadoEm        DateTime  @default(now())
+  saidoEm         DateTime?
+
+  gabinete Gabinete @relation(fields: [gabineteId], references: [id])
 }
 
 model ObservacaoPessoa {
@@ -179,11 +189,12 @@ model ObservacaoPessoa {
   autorUserId String
   autorNome   String
   texto       String
-  criadoEm    DateTime  @default(now())
-  editadoEm   DateTime?
-  deletedAt   DateTime?
-  gabinete    Gabinete  @relation(fields: [gabineteId], references: [id])
-  pessoa      Pessoa    @relation(fields: [pessoaId], references: [id])
+  criadoEm   DateTime  @default(now())
+  editadoEm  DateTime?
+  deletedAt  DateTime?
+
+  gabinete Gabinete @relation(fields: [gabineteId], references: [id])
+  pessoa   Pessoa   @relation(fields: [pessoaId], references: [id])
 }
 
 model AreaDemanda {
@@ -197,27 +208,28 @@ model AreaDemanda {
 }
 
 model Demanda {
-  id              String                @id @default(cuid())
+  id              String    @id @default(cuid())
   gabineteId      String
   titulo          String
   descricao       String
   solicitanteId   String
   responsavelId   String
   areaId          String
-  status          String                @default("aberta")
+  status          String    @default("aberta")
   prazoDesfecho   DateTime
-  prazoAlterado   Boolean               @default(false)
+  prazoAlterado   Boolean   @default(false)
   alertaEnviadoEm DateTime?
   observacao      String?
-  criadoEm        DateTime              @default(now())
+  criadoEm        DateTime  @default(now())
   criadoPorId     String
   deletedAt       DateTime?
-  area            AreaDemanda           @relation(fields: [areaId], references: [id])
-  criadoPor       Pessoa                @relation("DemandaCriadoPor", fields: [criadoPorId], references: [id])
-  gabinete        Gabinete              @relation(fields: [gabineteId], references: [id])
-  responsavel     Pessoa                @relation("DemandaResponsavel", fields: [responsavelId], references: [id])
-  solicitante     Pessoa                @relation("DemandaSolicitante", fields: [solicitanteId], references: [id])
-  historico       MovimentacaoDemanda[]
+
+  gabinete    Gabinete            @relation(fields: [gabineteId], references: [id])
+  solicitante Pessoa              @relation("DemandaSolicitante", fields: [solicitanteId], references: [id])
+  responsavel Pessoa              @relation("DemandaResponsavel", fields: [responsavelId], references: [id])
+  area        AreaDemanda         @relation(fields: [areaId], references: [id])
+  criadoPor   Pessoa              @relation("DemandaCriadoPor", fields: [criadoPorId], references: [id])
+  historico   MovimentacaoDemanda[]
 
   @@index([gabineteId])
   @@index([status])
@@ -232,8 +244,9 @@ model MovimentacaoDemanda {
   descricao String
   autorId   String?
   criadoEm  DateTime @default(now())
-  autor     Pessoa?  @relation("MovimentacaoAutor", fields: [autorId], references: [id])
-  demanda   Demanda  @relation(fields: [demandaId], references: [id])
+
+  demanda Demanda  @relation(fields: [demandaId], references: [id])
+  autor   Pessoa?  @relation("MovimentacaoAutor", fields: [autorId], references: [id])
 
   @@index([demandaId])
 }
@@ -243,5 +256,6 @@ model ConfiguracaoSistema {
   gabineteId           String   @unique
   prazoDemandasHoras   Int      @default(72)
   alertaExpiracaoHoras Int      @default(12)
-  gabinete             Gabinete @relation(fields: [gabineteId], references: [id])
+
+  gabinete Gabinete @relation(fields: [gabineteId], references: [id])
 }
