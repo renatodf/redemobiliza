@@ -36,7 +36,7 @@ export default async function PessoasPage({
       nome: true,
       whatsapp: true,
       email: true,
-      isEquipe: true,
+      isColaborador: true,
       regiao: { select: { nome: true } },
     },
   })
@@ -153,7 +153,7 @@ export default async function PessoasPage({
               <th className="text-left px-4 py-3 font-medium text-gray-600">Nome</th>
               <th className="text-left px-4 py-3 font-medium text-gray-600">WhatsApp</th>
               <th className="text-left px-4 py-3 font-medium text-gray-600">Região</th>
-              <th className="text-left px-4 py-3 font-medium text-gray-600">Equipe</th>
+              <th className="text-left px-4 py-3 font-medium text-gray-600">Colaborador</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
@@ -170,9 +170,9 @@ export default async function PessoasPage({
                 <td className="px-4 py-3 text-gray-600">{p.whatsapp}</td>
                 <td className="px-4 py-3 text-gray-600">{p.regiao?.nome ?? '—'}</td>
                 <td className="px-4 py-3">
-                  {p.isEquipe && (
+                  {p.isColaborador && (
                     <span className="inline-block bg-green-100 text-green-800 text-xs px-2 py-0.5 rounded-full">
-                      Equipe
+                      Colaborador
                     </span>
                   )}
                 </td>

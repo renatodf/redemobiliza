@@ -92,7 +92,7 @@ export default async function DashboardPage({
 
     prisma.pessoa.count({ where: { gabineteId: gabinete.id, isMobilizador: true } }),
 
-    prisma.pessoa.count({ where: { gabineteId: gabinete.id, isEquipe: true } }),
+    prisma.pessoa.count({ where: { gabineteId: gabinete.id, isColaborador: true } }),
 
     prisma.segmento.findMany({
       where: { gabineteId: gabinete.id, status: 'ativo' },
@@ -220,7 +220,7 @@ export default async function DashboardPage({
           <p className="text-xs text-gray-400 mt-0.5">ativos agora</p>
         </div>
         <div className="bg-white rounded-xl shadow-sm p-4">
-          <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">Equipe</p>
+          <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">Colaboradores</p>
           <p className="text-3xl font-bold text-purple-600 mt-1">{totalEquipe}</p>
           <p className="text-xs text-gray-400 mt-0.5">membros</p>
         </div>

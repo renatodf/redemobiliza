@@ -91,7 +91,7 @@ model Pessoa {
   origem           String?
   genero           String?
   fotoUrl          String?
-  isEquipe         Boolean   @default(false)
+  isColaborador    Boolean   @default(false)
   isMobilizador    Boolean   @default(false)
   tokenMobilizador String?
   userId           String?

@@ -4,7 +4,7 @@ import { createServerClient } from '@supabase/ssr'
 import { prisma } from '@/lib/prisma'
 import { getGabineteBySlug } from '@/lib/gabinete'
 import { editarPessoa } from '@/actions/admin/editar-pessoa'
-import { toggleEquipe } from '@/actions/admin/toggle-equipe'
+import { toggleColaborador } from '@/actions/admin/toggle-equipe'
 import { criarObservacao } from '@/actions/admin/criar-observacao'
 import { editarObservacao } from '@/actions/admin/editar-observacao'
 import { excluirObservacao } from '@/actions/admin/excluir-observacao'
@@ -71,30 +71,30 @@ export default async function FichaPessoaPage({
           />
           <h1 className="text-2xl font-bold">{pessoa.nome}</h1>
         </div>
-        {pessoa.isEquipe && (
+        {pessoa.isColaborador && (
           <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
-            Membro da Equipe
+            Colaborador
           </span>
         )}
       </div>
 
       <div className="bg-white rounded-lg p-4 shadow-sm">
-        {pessoa.isEquipe ? (
-          <form action={toggleEquipe}>
+        {pessoa.isColaborador ? (
+          <form action={toggleColaborador}>
             <input type="hidden" name="slug" value={params.slug} />
             <input type="hidden" name="pessoaId" value={pessoa.id} />
             <input type="hidden" name="acao" value="desmarcar" />
             <button type="submit" className="text-sm text-red-600 hover:underline">
-              Remover da equipe
+              Remover como colaborador
             </button>
           </form>
         ) : (
-          <form action={toggleEquipe}>
+          <form action={toggleColaborador}>
             <input type="hidden" name="slug" value={params.slug} />
             <input type="hidden" name="pessoaId" value={pessoa.id} />
             <input type="hidden" name="acao" value="marcar" />
             <button type="submit" className="text-sm text-green-700 hover:underline">
-              Adicionar à equipe
+              Marcar como colaborador
             </button>
           </form>
         )}

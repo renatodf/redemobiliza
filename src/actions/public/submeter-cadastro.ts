@@ -74,7 +74,7 @@ export async function submeterCadastro(input: SubmeterCadastroInput): Promise<{ 
         regiaoId: regiaoId || null,
         profissaoId: profissaoId || null,
         gabineteId: gabinete.id,
-        isEquipe: false,
+        isColaborador: false,
       },
     })
     pessoaId = criada.id

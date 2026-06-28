@@ -31,7 +31,7 @@ export async function cadastrarPessoa(formData: FormData) {
       gabineteId: gabinete.id,
       regiaoId,
       profissaoId,
-      isEquipe: false,
+      isColaborador: false,
     },
   })
 
