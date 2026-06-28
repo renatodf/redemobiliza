@@ -40,7 +40,7 @@ export default async function FichaPessoaPage({
   })
   if (!pessoa) notFound()
 
-  const [regioes, profissoes] = await Promise.all([
+  const [regioes, profissoes, demandas, totalRede] = await Promise.all([
     prisma.regiao.findMany({
       where: { gabineteId: gabinete.id, ativa: true },
       orderBy: { nome: 'asc' },
@@ -51,6 +51,21 @@ export default async function FichaPessoaPage({
       orderBy: { nome: 'asc' },
       select: { id: true, nome: true },
     }),
+    prisma.demanda.findMany({
+      where: { solicitanteId: pessoa.id, gabineteId: gabinete.id },
+      orderBy: { criadoEm: 'desc' },
+      include: {
+        area: { select: { nome: true } },
+        responsavel: { select: { nome: true } },
+        historico: {
+          orderBy: { criadoEm: 'asc' },
+          include: { autor: { select: { nome: true } } },
+        },
+      },
+    }),
+    pessoa.isMobilizador
+      ? prisma.vinculoRede.count({ where: { indicadoPorId: pessoa.id } })
+      : Promise.resolve(0),
   ])
 
   const role = session.user.app_metadata?.role as string | undefined
@@ -72,12 +87,20 @@ export default async function FichaPessoaPage({
           />
           <h1 className="text-2xl font-bold">{pessoa.nome}</h1>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap justify-end">
           {pessoa.isColaborador && (
             <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
               Colaborador
             </span>
           )}
+          {pessoa.isMobilizador && (
+            <span className="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full">
+              {totalRede} na rede
+            </span>
+          )}
+          <span className="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded-full">
+            {demandas.length} demanda{demandas.length !== 1 ? 's' : ''}
+          </span>
           <Link
             href={`/${params.slug}/admin/demandas/nova?solicitanteId=${pessoa.id}`}
             className="bg-blue-600 text-white text-xs px-3 py-1.5 rounded-md hover:bg-blue-700 font-medium"
@@ -261,6 +284,78 @@ export default async function FichaPessoaPage({
             <p className="text-sm text-gray-500">Nenhuma observação ainda.</p>
           )}
         </div>
+      </section>
+
+      {/* Histórico de demandas */}
+      <section className="bg-white rounded-lg p-6 shadow-sm space-y-4">
+        <h2 className="text-lg font-semibold">
+          Demandas ({demandas.length})
+        </h2>
+        {demandas.length === 0 ? (
+          <p className="text-sm text-gray-500">Nenhuma demanda registrada.</p>
+        ) : (
+          <div className="space-y-3">
+            {demandas.map((d) => {
+              const statusCfg = {
+                aberta:       { label: 'Em aberto',    cor: 'bg-yellow-100 text-yellow-800' },
+                expirada:     { label: 'Expirada',     cor: 'bg-orange-100 text-orange-800' },
+                atendida:     { label: 'Atendida',     cor: 'bg-green-100 text-green-800' },
+                nao_atendida: { label: 'Não atendida', cor: 'bg-red-100 text-red-800' },
+              }[d.status] ?? { label: d.status, cor: 'bg-gray-100 text-gray-700' }
+
+              return (
+                <details key={d.id} className="border border-gray-200 rounded-lg group">
+                  <summary className="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-gray-50 list-none">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <span className={`shrink-0 text-xs px-2 py-0.5 rounded-full font-medium ${statusCfg.cor}`}>
+                        {statusCfg.label}
+                      </span>
+                      <span className="text-sm font-medium text-gray-900 truncate">{d.titulo}</span>
+                    </div>
+                    <div className="flex items-center gap-3 shrink-0 ml-3">
+                      <span className="text-xs text-gray-400">
+                        {d.criadoEm.toLocaleDateString('pt-BR')}
+                      </span>
+                      <Link
+                        href={`/${params.slug}/admin/demandas/${d.id}`}
+                        className="text-xs text-blue-600 hover:underline"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        Abrir →
+                      </Link>
+                    </div>
+                  </summary>
+
+                  <div className="px-4 pb-4 pt-2 space-y-3 border-t border-gray-100">
+                    <div className="flex flex-wrap gap-4 text-xs text-gray-500">
+                      <span>Área: <strong className="text-gray-700">{d.area.nome}</strong></span>
+                      <span>Responsável: <strong className="text-gray-700">{d.responsavel.nome}</strong></span>
+                      <span>Prazo: <strong className={d.prazoAlterado ? 'text-orange-600' : 'text-gray-700'}>
+                        {d.prazoDesfecho.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                        {d.prazoAlterado && ' ⚑'}
+                      </strong></span>
+                    </div>
+
+                    {d.historico.length > 0 && (
+                      <ol className="relative border-l border-gray-200 space-y-3 ml-2">
+                        {d.historico.map((mov) => (
+                          <li key={mov.id} className="ml-4">
+                            <div className="absolute -left-1.5 mt-1 h-3 w-3 rounded-full border-2 border-white bg-gray-300" />
+                            <p className="text-xs text-gray-400">
+                              {mov.criadoEm.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                              {' · '}{mov.autor?.nome ?? 'Sistema'}
+                            </p>
+                            <p className="text-sm text-gray-700 mt-0.5">{mov.descricao}</p>
+                          </li>
+                        ))}
+                      </ol>
+                    )}
+                  </div>
+                </details>
+              )
+            })}
+          </div>
+        )}
       </section>
 
       <MobilizadorSection
