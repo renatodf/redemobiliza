@@ -43,7 +43,7 @@ export async function reatribuirResponsavel(formData: FormData): Promise<{ erro?
   if (!novoResponsavel) return { erro: 'Responsável não encontrado' }
 
   await prisma.demanda.update({
-    where: { id: demandaId },
+    where: { id: demandaId, gabineteId: gabinete.id },
     data: { responsavelId: novoResponsavelId },
   })
 
