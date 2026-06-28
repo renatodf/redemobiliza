@@ -27,7 +27,7 @@ export async function alterarPrazoDemandaMobilizador(formData: FormData): Promis
   const prazoNovo = new Date(novoPrazo)
   await prisma.demanda.update({
     where: { id: demandaId, gabineteId: gabinete.id },
-    data: { prazoDesfecho: prazoNovo, prazoAlterado: true, observacao: justificativa },
+    data: { prazoDesfecho: prazoNovo, prazoAlterado: true },
   })
 
   await prisma.movimentacaoDemanda.create({

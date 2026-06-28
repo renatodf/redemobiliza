@@ -46,7 +46,7 @@ export async function alterarPrazoDemanda(formData: FormData): Promise<{ erro?: 
 
   await prisma.demanda.update({
     where: { id: demandaId, gabineteId: gabinete.id },
-    data: { prazoDesfecho: prazoNovo, prazoAlterado: true, observacao: justificativa },
+    data: { prazoDesfecho: prazoNovo, prazoAlterado: true },
   })
 
   await prisma.movimentacaoDemanda.create({
