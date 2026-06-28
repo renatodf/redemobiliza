@@ -52,7 +52,7 @@ export default async function MobilizadorPage({
   )
 
   const convidados = await prisma.vinculoRede.findMany({
-    where: { gabineteId: gabinete.id, indicadoPorId: pessoa.id },
+    where: { gabineteId: gabinete.id, indicadoPorId: pessoa.id, deletedAt: null },
     orderBy: { criadoEm: 'desc' },
     select: {
       id: true,

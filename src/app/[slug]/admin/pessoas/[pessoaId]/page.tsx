@@ -31,7 +31,7 @@ export default async function FichaPessoaPage({
   if (!session) notFound()
 
   const pessoa = await prisma.pessoa.findFirst({
-    where: { id: params.pessoaId, gabineteId: gabinete.id },
+    where: { id: params.pessoaId, gabineteId: gabinete.id, deletedAt: null },
     include: {
       regiao: { select: { nome: true } },
       profissao: { select: { nome: true } },

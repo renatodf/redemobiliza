@@ -89,7 +89,7 @@ export default async function DemandasPage({
       _count: { id: true },
     }),
     prisma.areaDemanda.findMany({ where: { gabineteId: gabinete.id }, orderBy: { nome: 'asc' }, select: { id: true, nome: true } }),
-    prisma.pessoa.findMany({ where: { gabineteId: gabinete.id, isMobilizador: true, isColaborador: true }, orderBy: { nome: 'asc' }, select: { id: true, nome: true } }),
+    prisma.pessoa.findMany({ where: { gabineteId: gabinete.id, isMobilizador: true, isColaborador: true, deletedAt: null }, orderBy: { nome: 'asc' }, select: { id: true, nome: true } }),
     prisma.regiao.findMany({ where: { gabineteId: gabinete.id, ativa: true }, orderBy: { nome: 'asc' }, select: { id: true, nome: true } }),
     prisma.demanda.groupBy({
       by: ['status'],

@@ -17,6 +17,7 @@ interface Props {
 
 const mensagensSucesso: Record<string, string> = {
   convite_enviado: 'Convite enviado com sucesso!',
+  admin_vinculado: 'Super Admin vinculado como administrador deste gabinete.',
 }
 
 const mensagensErro: Record<string, string> = {
@@ -64,7 +65,7 @@ export default async function GabineteDetalhePage({ params, searchParams }: Prop
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">{gabinete.nome}</h1>
-          <p className="text-sm text-gray-500 font-mono mt-1">/g/{gabinete.slug}/</p>
+          <p className="text-sm text-gray-500 font-mono mt-1">/{gabinete.slug}/</p>
         </div>
         <div className="flex gap-2">
           <Link

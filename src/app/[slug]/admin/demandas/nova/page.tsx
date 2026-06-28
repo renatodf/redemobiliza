@@ -40,6 +40,7 @@ export default async function NovaDemandaPage({
     ? await prisma.pessoa.findMany({
         where: {
           gabineteId: gabinete.id,
+          deletedAt: null,
           OR: [
             { nome: { contains: q, mode: 'insensitive' } },
             { whatsapp: { contains: q } },
@@ -52,7 +53,7 @@ export default async function NovaDemandaPage({
 
   const solicitante = solicitanteId
     ? await prisma.pessoa.findFirst({
-        where: { id: solicitanteId, gabineteId: gabinete.id },
+        where: { id: solicitanteId, gabineteId: gabinete.id, deletedAt: null },
         select: { id: true, nome: true, whatsapp: true, bairro: true, logradouro: true, numero: true, complemento: true, cep: true, regiao: { select: { nome: true } } },
       })
     : null

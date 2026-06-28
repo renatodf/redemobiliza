@@ -19,6 +19,7 @@ export default async function PessoasPage({
   const pessoas = await prisma.pessoa.findMany({
     where: {
       gabineteId: gabinete.id,
+      deletedAt: null,
       ...(q
         ? {
             OR: [
@@ -37,6 +38,7 @@ export default async function PessoasPage({
       whatsapp: true,
       email: true,
       isColaborador: true,
+      isMobilizador: true,
       regiao: { select: { nome: true } },
     },
   })
@@ -154,6 +156,7 @@ export default async function PessoasPage({
               <th className="text-left px-4 py-3 font-medium text-gray-600">WhatsApp</th>
               <th className="text-left px-4 py-3 font-medium text-gray-600">Região</th>
               <th className="text-left px-4 py-3 font-medium text-gray-600">Colaborador</th>
+              <th className="text-left px-4 py-3 font-medium text-gray-600">Mobilizador</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
@@ -176,11 +179,18 @@ export default async function PessoasPage({
                     </span>
                   )}
                 </td>
+                <td className="px-4 py-3">
+                  {p.isMobilizador && (
+                    <span className="inline-block bg-purple-100 text-purple-800 text-xs px-2 py-0.5 rounded-full">
+                      Mobilizador
+                    </span>
+                  )}
+                </td>
               </tr>
             ))}
             {pessoas.length === 0 && (
               <tr>
-                <td colSpan={4} className="px-4 py-6 text-center text-gray-500">
+                <td colSpan={5} className="px-4 py-6 text-center text-gray-500">
                   Nenhuma pessoa encontrada
                 </td>
               </tr>
