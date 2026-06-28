@@ -2,13 +2,14 @@ import { notFound, redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import { getGabineteBySlug } from '@/lib/gabinete'
 import { criarDemanda } from '@/actions/admin/criar-demanda'
+import { cadastrarSolicitante } from '@/actions/admin/cadastrar-solicitante'
 
 export default async function NovaDemandaPage({
   params,
   searchParams,
 }: {
   params: { slug: string }
-  searchParams: { q?: string; solicitanteId?: string }
+  searchParams: { q?: string; solicitanteId?: string; cadastrar?: string }
 }) {
   const gabinete = await getGabineteBySlug(params.slug)
   if (!gabinete) notFound()
@@ -118,7 +119,66 @@ export default async function NovaDemandaPage({
             )}
 
             {q && resultadosBusca.length === 0 && (
-              <p className="text-sm text-gray-500">Nenhuma pessoa encontrada para &ldquo;{q}&rdquo;.</p>
+              <div className="space-y-3">
+                <p className="text-sm text-gray-500">
+                  Nenhuma pessoa encontrada para &ldquo;{q}&rdquo;.
+                </p>
+                {searchParams.cadastrar !== '1' ? (
+                  <a
+                    href={`/${params.slug}/admin/demandas/nova?q=${encodeURIComponent(q)}&cadastrar=1`}
+                    className="inline-block text-sm text-blue-600 hover:underline"
+                  >
+                    + Cadastrar &ldquo;{q}&rdquo; como novo solicitante
+                  </a>
+                ) : (
+                  <div className="border border-blue-200 rounded-lg p-4 bg-blue-50 space-y-3">
+                    <p className="text-sm font-medium text-blue-800">Cadastrar novo solicitante</p>
+                    <form action={cadastrarSolicitante} className="space-y-3">
+                      <input type="hidden" name="slug" value={params.slug} />
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700">Nome *</label>
+                        <input
+                          name="nome"
+                          required
+                          defaultValue={q}
+                          className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700">WhatsApp *</label>
+                        <input
+                          name="whatsapp"
+                          required
+                          placeholder="(61) 9 9999-9999"
+                          className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700">E-mail</label>
+                        <input
+                          name="email"
+                          type="email"
+                          className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+                        />
+                      </div>
+                      <div className="flex gap-2">
+                        <button
+                          type="submit"
+                          className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700"
+                        >
+                          Cadastrar e selecionar
+                        </button>
+                        <a
+                          href={`/${params.slug}/admin/demandas/nova?q=${encodeURIComponent(q)}`}
+                          className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800"
+                        >
+                          Cancelar
+                        </a>
+                      </div>
+                    </form>
+                  </div>
+                )}
+              </div>
             )}
           </div>
         )}
