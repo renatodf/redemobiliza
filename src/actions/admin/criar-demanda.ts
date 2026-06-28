@@ -5,6 +5,7 @@ import { prisma } from '@/lib/prisma'
 import { assertAdminAccess } from '@/lib/assert-admin-access'
 import { cookies } from 'next/headers'
 import { createServerClient } from '@supabase/ssr'
+import { enviarEmail, templateDemandaAtribuida } from '@/lib/email'
 
 async function getAutorId(gabineteId: string): Promise<string | null> {
   const cookieStore = cookies()
@@ -68,6 +69,31 @@ export async function criarDemanda(formData: FormData): Promise<{ erro?: string;
       },
     },
   })
+
+  // Enviar notificação ao responsável
+  const responsavel = await prisma.pessoa.findUnique({
+    where: { id: responsavelId },
+    select: { email: true, nome: true },
+  })
+  if (responsavel?.email) {
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? ''
+    const gabineteData = await prisma.gabinete.findUnique({ where: { id: gabinete.id }, select: { slug: true } })
+    try {
+      await enviarEmail({
+        para: responsavel.email,
+        assunto: `Nova demanda atribuída: ${titulo}`,
+        html: templateDemandaAtribuida({
+          nomeResponsavel: responsavel.nome,
+          tituloDemanda: titulo,
+          nomeSolicitante: (await prisma.pessoa.findUnique({ where: { id: solicitanteId }, select: { nome: true } }))?.nome ?? '',
+          prazo: prazoDesfecho,
+          urlDemanda: `${appUrl}/${gabineteData?.slug}/mobilizador/demandas/${demanda.id}`,
+        }),
+      })
+    } catch {
+      // falha no email não bloqueia a criação da demanda
+    }
+  }
 
   revalidatePath(`/${slug}/admin/demandas`)
   return { demandaId: demanda.id }
