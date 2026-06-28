@@ -52,19 +52,20 @@ model AreaDemanda {
 }
 
 model Demanda {
-  id            String   @id @default(cuid())
-  gabineteId    String
-  titulo        String
-  descricao     String
-  solicitanteId String
-  responsavelId String
-  areaId        String
-  status        String   @default("aberta") // aberta | expirada | atendida | nao_atendida
-  prazoDesfecho DateTime
-  prazoAlterado Boolean  @default(false)
-  observacao    String?
-  criadoEm     DateTime @default(now())
-  criadoPorId   String
+  id              String    @id @default(cuid())
+  gabineteId      String
+  titulo          String
+  descricao       String
+  solicitanteId   String
+  responsavelId   String
+  areaId          String
+  status          String    @default("aberta") // aberta | expirada | atendida | nao_atendida
+  prazoDesfecho   DateTime
+  prazoAlterado   Boolean   @default(false)
+  alertaEnviadoEm DateTime? // preenchido pelo cron ao enviar o alerta de expiração — evita duplicatas
+  observacao      String?
+  criadoEm       DateTime  @default(now())
+  criadoPorId     String
 
   gabinete    Gabinete            @relation(fields: [gabineteId], references: [id])
   solicitante Pessoa              @relation("DemandaSolicitante", fields: [solicitanteId], references: [id])
@@ -109,10 +110,11 @@ model ConfiguracaoSistema {
 - `ConfiguracaoSistema` tem `gabineteId` — cada gabinete configura seu próprio prazo padrão
 - `MovimentacaoDemanda` inclui o tipo `responsavel_alterado` (reatribuição pelo admin)
 
-### Áreas pré-cadastradas (seed na migration)
+### Áreas pré-cadastradas (seed por gabinete)
 
 Saúde, Educação, Habitação, Social, Segurança, Infraestrutura, Empreendedorismo.
-O admin pode criar, editar e excluir áreas livremente.
+
+Como `AreaDemanda` tem `gabineteId`, o seed não pode ser feito na migration (gabinetes são criados após o deploy). A solução é uma função `seedAreasGabinete(gabineteId)` chamada quando o super-admin cria um novo gabinete. O admin pode criar, editar e excluir áreas livremente após isso.
 
 ---
 
@@ -238,8 +240,9 @@ Lista de demandas atribuídas ao mobilizador logado, ordenadas por prazo (mais u
    - Registra evento `status_alterado` no histórico de cada uma
    - Envia e-mail ao responsável e ao admin
 
-2. **Alerta antecipado:** busca demandas com `status = "aberta"` e `prazoDesfecho` entre `now()` e `now() + alertaExpiracaoHoras`
+2. **Alerta antecipado:** busca demandas com `status = "aberta"`, `alertaEnviadoEm = null` e `prazoDesfecho` entre `now()` e `now() + alertaExpiracaoHoras`
    - Envia e-mail de alerta ao responsável (sem alterar status)
+   - Preenche `alertaEnviadoEm = now()` para não reenviar nas próximas execuções do cron
 
 ---
 
