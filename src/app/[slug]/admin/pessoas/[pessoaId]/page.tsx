@@ -9,6 +9,7 @@ import { toggleColaborador } from '@/actions/admin/toggle-equipe'
 import { criarObservacao } from '@/actions/admin/criar-observacao'
 import { editarObservacao } from '@/actions/admin/editar-observacao'
 import { excluirObservacao } from '@/actions/admin/excluir-observacao'
+import { softDeletePessoa } from '@/actions/admin/soft-delete-pessoa'
 import MobilizadorSection from './MobilizadorSection'
 import { getAppUrl } from '@/lib/app-url'
 import FotoPerfilAvatar from './FotoPerfilAvatar'
@@ -110,7 +111,7 @@ export default async function FichaPessoaPage({
         </div>
       </div>
 
-      <div className="bg-white rounded-lg p-4 shadow-sm">
+      <div className="bg-white rounded-lg p-4 shadow-sm space-y-3">
         {pessoa.isColaborador ? (
           <form action={toggleColaborador}>
             <input type="hidden" name="slug" value={params.slug} />
@@ -127,6 +128,21 @@ export default async function FichaPessoaPage({
             <input type="hidden" name="acao" value="marcar" />
             <button type="submit" className="text-sm text-green-700 hover:underline">
               Marcar como colaborador
+            </button>
+          </form>
+        )}
+        {isAdmin && (
+          <form action={softDeletePessoa}>
+            <input type="hidden" name="slug" value={params.slug} />
+            <input type="hidden" name="pessoaId" value={params.pessoaId} />
+            <button
+              type="submit"
+              className="text-sm text-red-600 hover:underline"
+              onClick={(e) => {
+                if (!confirm('Excluir este cadastro? A ação pode ser revertida pelo super-admin.')) e.preventDefault()
+              }}
+            >
+              Excluir cadastro
             </button>
           </form>
         )}
