@@ -38,17 +38,21 @@ export async function editarPessoa(formData: FormData) {
   if (!isAdmin && !isMobilizador) throw new Error('Sem permissão')
 
   if (isMobilizador && !isAdmin) {
-    // Verificar que a pessoa está na rede direta do mobilizador
+    // Verificar que a pessoa está na rede direta do mobilizador ou é o próprio mobilizador
     const mobilizadorPessoa = await prisma.pessoa.findFirst({
       where: { userId: user.id, gabineteId: gabinete.id, isMobilizador: true },
       select: { id: true },
     })
     if (!mobilizadorPessoa) throw new Error('Mobilizador não encontrado')
 
-    const vinculo = await prisma.vinculoRede.findFirst({
-      where: { gabineteId: gabinete.id, pessoaId, indicadoPorId: mobilizadorPessoa.id, deletedAt: null },
-    })
-    if (!vinculo) throw new Error('Pessoa fora da sua rede')
+    const isPropriaPessoa = mobilizadorPessoa.id === pessoaId
+
+    if (!isPropriaPessoa) {
+      const vinculo = await prisma.vinculoRede.findFirst({
+        where: { gabineteId: gabinete.id, pessoaId, indicadoPorId: mobilizadorPessoa.id, deletedAt: null },
+      })
+      if (!vinculo) throw new Error('Pessoa fora da sua rede')
+    }
   }
 
   const whatsapp = normalizeWhatsApp(whatsappRaw)
@@ -60,4 +64,5 @@ export async function editarPessoa(formData: FormData) {
   })
 
   revalidatePath(`/${slug}/admin/pessoas/${pessoaId}`)
+  revalidatePath(`/${slug}/mobilizador`)
 }
