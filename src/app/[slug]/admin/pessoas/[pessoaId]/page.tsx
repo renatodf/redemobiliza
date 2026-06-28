@@ -13,6 +13,7 @@ import { softDeletePessoa } from '@/actions/admin/soft-delete-pessoa'
 import MobilizadorSection from './MobilizadorSection'
 import { getAppUrl } from '@/lib/app-url'
 import FotoPerfilAvatar from './FotoPerfilAvatar'
+import PromoverMobilizadorDialog from './PromoverMobilizadorDialog'
 
 export default async function FichaPessoaPage({
   params,
@@ -108,6 +109,13 @@ export default async function FichaPessoaPage({
           >
             + Nova Demanda
           </Link>
+          {isAdmin && !pessoa.isMobilizador && (
+            <PromoverMobilizadorDialog
+              slug={params.slug}
+              pessoaId={pessoa.id}
+              nomeAbreviado={pessoa.nome.split(' ')[0]}
+            />
+          )}
         </div>
       </div>
 
