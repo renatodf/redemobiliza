@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma'
 import { getGabineteBySlug } from '@/lib/gabinete'
 import { criarAreaDemanda } from '@/actions/admin/criar-area-demanda'
 import { excluirAreaDemanda } from '@/actions/admin/excluir-area-demanda'
+import { editarAreaDemanda } from '@/actions/admin/editar-area-demanda'
 
 export default async function AreasPage({ params }: { params: { slug: string } }) {
   const gabinete = await getGabineteBySlug(params.slug)
@@ -33,20 +34,38 @@ export default async function AreasPage({ params }: { params: { slug: string } }
 
       <ul className="divide-y divide-gray-200 bg-white rounded-lg shadow-sm">
         {areas.map((a) => (
-          <li key={a.id} className="flex items-center justify-between px-4 py-3">
-            <span className="text-sm text-gray-900">
-              {a.nome}
-              <span className="ml-2 text-xs text-gray-400">({a._count.demandas} demandas)</span>
-            </span>
-            {a._count.demandas === 0 && (
-              <form action={excluirAreaDemanda}>
+          <li key={a.id} className="px-4 py-3">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-900">
+                {a.nome}
+                <span className="ml-2 text-xs text-gray-400">({a._count.demandas} demandas)</span>
+              </span>
+              {a._count.demandas === 0 && (
+                <form action={excluirAreaDemanda}>
+                  <input type="hidden" name="slug" value={params.slug} />
+                  <input type="hidden" name="areaId" value={a.id} />
+                  <button type="submit" className="text-red-600 text-xs hover:underline">
+                    Excluir
+                  </button>
+                </form>
+              )}
+            </div>
+            <details className="mt-1">
+              <summary className="cursor-pointer text-blue-600 text-xs hover:underline">Renomear</summary>
+              <form action={editarAreaDemanda} className="mt-2 flex gap-2">
                 <input type="hidden" name="slug" value={params.slug} />
                 <input type="hidden" name="areaId" value={a.id} />
-                <button type="submit" className="text-red-600 text-xs hover:underline">
-                  Excluir
+                <input
+                  name="nome"
+                  defaultValue={a.nome}
+                  required
+                  className="border border-gray-300 rounded-md px-2 py-1 text-sm"
+                />
+                <button type="submit" className="bg-blue-600 text-white px-3 py-1 rounded-md text-xs">
+                  Salvar
                 </button>
               </form>
-            )}
+            </details>
           </li>
         ))}
         {areas.length === 0 && (

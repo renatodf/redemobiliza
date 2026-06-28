@@ -6,13 +6,13 @@ import { assertAdminAccess } from '@/lib/assert-admin-access'
 
 export async function salvarConfiguracao(formData: FormData) {
   const slug = formData.get('slug') as string
+  const { gabinete } = await assertAdminAccess(slug)
+
   const prazoDemandasHoras = Number(formData.get('prazoDemandasHoras'))
   const alertaExpiracaoHoras = Number(formData.get('alertaExpiracaoHoras'))
 
   if (!prazoDemandasHoras || prazoDemandasHoras < 1) throw new Error('Prazo inválido')
   if (!alertaExpiracaoHoras || alertaExpiracaoHoras < 1) throw new Error('Alerta inválido')
-
-  const { gabinete } = await assertAdminAccess(slug)
 
   await prisma.configuracaoSistema.upsert({
     where: { gabineteId: gabinete.id },

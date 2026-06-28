@@ -6,10 +6,10 @@ import { assertAdminAccess } from '@/lib/assert-admin-access'
 
 export async function criarAreaDemanda(formData: FormData) {
   const slug = formData.get('slug') as string
+  const { gabinete } = await assertAdminAccess(slug)
+
   const nome = (formData.get('nome') as string).trim()
   if (!nome) throw new Error('Nome é obrigatório')
-
-  const { gabinete } = await assertAdminAccess(slug)
 
   const existente = await prisma.areaDemanda.findFirst({
     where: { gabineteId: gabinete.id, nome: { equals: nome, mode: 'insensitive' } },
