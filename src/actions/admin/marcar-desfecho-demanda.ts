@@ -30,6 +30,14 @@ export async function marcarDesfechoDemanda(formData: FormData): Promise<{ erro?
   })
   if (!pessoa) return { erro: 'Usuário não encontrado' }
 
+  const demanda = await prisma.demanda.findFirst({
+    where: { id: demandaId, gabineteId: gabinete.id },
+  })
+  if (!demanda) return { erro: 'Demanda não encontrada' }
+  if (demanda.status !== 'aberta' && demanda.status !== 'expirada') {
+    return { erro: 'Apenas demandas abertas ou expiradas podem ser encerradas' }
+  }
+
   await prisma.demanda.updateMany({
     where: { id: demandaId, gabineteId: gabinete.id },
     data: { status: desfecho },

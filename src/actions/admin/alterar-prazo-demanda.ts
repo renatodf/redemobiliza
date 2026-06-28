@@ -34,9 +34,12 @@ export async function alterarPrazoDemanda(formData: FormData): Promise<{ erro?: 
 
   const demanda = await prisma.demanda.findFirst({
     where: { id: demandaId, gabineteId: gabinete.id },
-    select: { prazoDesfecho: true },
+    select: { prazoDesfecho: true, status: true },
   })
   if (!demanda) return { erro: 'Demanda não encontrada' }
+  if (demanda.status !== 'aberta' && demanda.status !== 'expirada') {
+    return { erro: 'Apenas demandas abertas ou expiradas podem ter o prazo alterado' }
+  }
 
   const prazoAnterior = demanda.prazoDesfecho.toISOString()
   const prazoNovo = new Date(novoPrazo)

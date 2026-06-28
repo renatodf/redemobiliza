@@ -36,7 +36,14 @@ export async function criarGabinete(formData: FormData) {
     data: { nome, slug, corPrimaria, corSecundaria },
   })
 
-  await Promise.all([seedRegioes(gabinete.id), seedProfissoes(gabinete.id), seedAreasDemanda(gabinete.id)])
+  await Promise.all([
+    seedRegioes(gabinete.id),
+    seedProfissoes(gabinete.id),
+    seedAreasDemanda(gabinete.id),
+    prisma.configuracaoSistema.create({
+      data: { gabineteId: gabinete.id, prazoDemandasHoras: 72, alertaExpiracaoHoras: 12 },
+    }),
+  ])
 
   redirect(`/super-admin/gabinetes/${gabinete.id}`)
 }

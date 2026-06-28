@@ -17,6 +17,9 @@ export async function marcarDesfechoDemandaMobilizador(formData: FormData): Prom
     where: { id: demandaId, gabineteId: gabinete.id, responsavelId: pessoa.id },
   })
   if (!demanda) return { erro: 'Demanda não encontrada ou sem permissão' }
+  if (demanda.status !== 'aberta' && demanda.status !== 'expirada') {
+    return { erro: 'Apenas demandas abertas ou expiradas podem ser encerradas' }
+  }
 
   await prisma.demanda.update({ where: { id: demandaId, gabineteId: gabinete.id }, data: { status: desfecho } })
   await prisma.movimentacaoDemanda.create({

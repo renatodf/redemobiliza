@@ -50,6 +50,27 @@ export async function criarDemanda(formData: FormData): Promise<{ erro?: string;
   const criadoPorId = await getAutorId(gabinete.id)
   if (!criadoPorId) return { erro: 'Não foi possível identificar o autor' }
 
+  // Validar que solicitante pertence ao gabinete
+  const solicitanteCheck = await prisma.pessoa.findFirst({
+    where: { id: solicitanteId, gabineteId: gabinete.id },
+    select: { id: true },
+  })
+  if (!solicitanteCheck) return { erro: 'Solicitante não encontrado' }
+
+  // Validar que responsável pertence ao gabinete e é colaborador mobilizador
+  const responsavelCheck = await prisma.pessoa.findFirst({
+    where: { id: responsavelId, gabineteId: gabinete.id, isMobilizador: true, isColaborador: true },
+    select: { id: true },
+  })
+  if (!responsavelCheck) return { erro: 'Responsável não encontrado' }
+
+  // Validar que área pertence ao gabinete
+  const areaCheck = await prisma.areaDemanda.findFirst({
+    where: { id: areaId, gabineteId: gabinete.id },
+    select: { id: true },
+  })
+  if (!areaCheck) return { erro: 'Área não encontrada' }
+
   const demanda = await prisma.demanda.create({
     data: {
       gabineteId: gabinete.id,
