@@ -34,22 +34,36 @@ export async function loginAdmin(formData: FormData) {
     redirect('/login?erro=credenciais_invalidas')
   }
 
+  // Verificar se é admin de algum gabinete
   const usuarioGabinete = await prisma.usuarioGabinete.findFirst({
     where: { userId: session.user.id, papel: 'admin' },
     include: { gabinete: { select: { slug: true, ativo: true } } },
   })
 
-  if (!usuarioGabinete) {
-    await supabase.auth.signOut()
-    redirect('/login?erro=nao_autorizado')
+  if (usuarioGabinete) {
+    if (!usuarioGabinete.gabinete.ativo) {
+      await supabase.auth.signOut()
+      redirect('/login?erro=gabinete_inativo')
+    }
+    redirect(`/${usuarioGabinete.gabinete.slug}/admin/`)
   }
 
-  if (!usuarioGabinete.gabinete.ativo) {
-    await supabase.auth.signOut()
-    redirect('/login?erro=gabinete_inativo')
+  // Verificar se é mobilizador
+  const usuarioMobilizador = await prisma.usuarioGabinete.findFirst({
+    where: { userId: session.user.id, papel: 'mobilizador' },
+    include: { gabinete: { select: { slug: true, ativo: true } } },
+  })
+
+  if (usuarioMobilizador) {
+    if (!usuarioMobilizador.gabinete.ativo) {
+      await supabase.auth.signOut()
+      redirect('/login?erro=gabinete_inativo')
+    }
+    redirect(`/${usuarioMobilizador.gabinete.slug}/mobilizador/`)
   }
 
-  redirect(`/g/${usuarioGabinete.gabinete.slug}/admin/`)
+  await supabase.auth.signOut()
+  redirect('/login?erro=nao_autorizado')
 }
 
 export async function loginAdminGoogle() {
