@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation'
+import Link from 'next/link'
 import { cookies } from 'next/headers'
 import { createServerClient } from '@supabase/ssr'
 import { prisma } from '@/lib/prisma'
@@ -71,11 +72,19 @@ export default async function FichaPessoaPage({
           />
           <h1 className="text-2xl font-bold">{pessoa.nome}</h1>
         </div>
-        {pessoa.isColaborador && (
-          <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
-            Colaborador
-          </span>
-        )}
+        <div className="flex items-center gap-2">
+          {pessoa.isColaborador && (
+            <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
+              Colaborador
+            </span>
+          )}
+          <Link
+            href={`/${params.slug}/admin/demandas/nova?solicitanteId=${pessoa.id}`}
+            className="bg-blue-600 text-white text-xs px-3 py-1.5 rounded-md hover:bg-blue-700 font-medium"
+          >
+            + Nova Demanda
+          </Link>
+        </div>
       </div>
 
       <div className="bg-white rounded-lg p-4 shadow-sm">
