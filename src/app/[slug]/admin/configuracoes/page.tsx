@@ -1,5 +1,7 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
+import { cookies } from 'next/headers'
+import { createServerClient } from '@supabase/ssr'
 import { prisma } from '@/lib/prisma'
 import { getGabineteBySlug } from '@/lib/gabinete'
 import { salvarConfiguracao } from '@/actions/admin/salvar-configuracao'
@@ -15,12 +17,22 @@ import { inativarSegmento } from '@/actions/admin/inativar-segmento'
 import { salvarPersonalizacao } from '@/actions/admin/salvar-personalizacao'
 import { uploadLogo } from '@/actions/admin/upload-logo'
 import { uploadBanner } from '@/actions/admin/upload-banner'
+import { restaurarPessoa } from '@/actions/admin/restaurar-pessoa'
 
 export default async function ConfiguracoesPage({ params }: { params: { slug: string } }) {
   const gabinete = await getGabineteBySlug(params.slug)
   if (!gabinete) notFound()
 
-  const [config, areas, profissoes, regioes, segmentos] = await Promise.all([
+  const cookieStore = cookies()
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { cookies: { getAll: () => cookieStore.getAll() } }
+  )
+  const { data: { session } } = await supabase.auth.getSession()
+  const isSuperAdmin = session?.user?.app_metadata?.role === 'super-admin'
+
+  const [config, areas, profissoes, regioes, segmentos, pessoasExcluidas] = await Promise.all([
     prisma.configuracaoSistema.findUnique({ where: { gabineteId: gabinete.id } }),
     prisma.areaDemanda.findMany({
       where: { gabineteId: gabinete.id },
@@ -42,6 +54,13 @@ export default async function ConfiguracoesPage({ params }: { params: { slug: st
       orderBy: { nome: 'asc' },
       select: { id: true, nome: true },
     }),
+    isSuperAdmin
+      ? prisma.pessoa.findMany({
+          where: { gabineteId: gabinete.id, deletedAt: { not: null } },
+          orderBy: { deletedAt: 'desc' },
+          select: { id: true, nome: true, whatsapp: true, deletedAt: true },
+        })
+      : Promise.resolve([]),
   ])
 
   const prazoAtual = config?.prazoDemandasHoras ?? 72
@@ -309,6 +328,31 @@ export default async function ConfiguracoesPage({ params }: { params: { slug: st
           </form>
         </div>
       </div>
+
+      {isSuperAdmin && pessoasExcluidas.length > 0 && (
+        <div className="bg-white rounded-lg shadow-sm p-6 space-y-4">
+          <h2 className="text-base font-semibold text-red-700">Cadastros excluídos</h2>
+          <ul className="divide-y divide-gray-200 border border-gray-200 rounded-md">
+            {pessoasExcluidas.map((p) => (
+              <li key={p.id} className="flex items-center justify-between px-4 py-3">
+                <div>
+                  <p className="text-sm font-medium text-gray-900">{p.nome}</p>
+                  <p className="text-xs text-gray-500">
+                    {p.whatsapp} · excluído em {p.deletedAt!.toLocaleDateString('pt-BR')}
+                  </p>
+                </div>
+                <form action={restaurarPessoa}>
+                  <input type="hidden" name="slug" value={params.slug} />
+                  <input type="hidden" name="pessoaId" value={p.id} />
+                  <button type="submit" className="text-blue-600 text-xs hover:underline">
+                    Restaurar
+                  </button>
+                </form>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   )
 }
