@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { prisma } from '@/lib/prisma'
 import { assertMobilizadorAccess } from '@/lib/assert-mobilizador-access'
 import { getSupabaseAdmin } from '@/lib/supabase/admin'
-import { enviarEmail } from '@/lib/email'
+import { enviarEmail, escapeHtml } from '@/lib/email'
 
 export async function promoverMobilizadorPorMobilizador(
   _prevState: { erro?: string },
@@ -60,7 +60,7 @@ export async function promoverMobilizadorPorMobilizador(
     await enviarEmail({
       para: pessoa.email,
       assunto: 'Você agora tem acesso ao painel de mobilizador',
-      html: `<p>Olá, ${pessoa.nome}!</p><p>Seu acesso foi criado. Entre em <strong>/login</strong> com seu e-mail e a senha definida.</p>`,
+      html: `<p>Olá, ${escapeHtml(pessoa.nome)}!</p><p>Seu acesso foi criado. Entre em <strong>/login</strong> com seu e-mail e a senha definida.</p>`,
     })
 
     revalidatePath(`/${slug}/mobilizador`)
