@@ -47,15 +47,21 @@ export async function promoverMobilizadorPorMobilizador(
     })
     if (error || !data.user) return { erro: 'Erro ao criar acesso: ' + (error?.message ?? 'desconhecido') }
 
-    await prisma.$transaction([
-      prisma.pessoa.update({
-        where: { id: pessoaId },
-        data: { isMobilizador: true, userId: data.user.id },
-      }),
-      prisma.usuarioGabinete.create({
-        data: { userId: data.user.id, gabineteId: gabinete.id, papel: 'mobilizador' },
-      }),
-    ])
+    try {
+      await prisma.$transaction([
+        prisma.pessoa.update({
+          where: { id: pessoaId },
+          data: { isMobilizador: true, userId: data.user.id },
+        }),
+        prisma.usuarioGabinete.create({
+          data: { userId: data.user.id, gabineteId: gabinete.id, papel: 'mobilizador' },
+        }),
+      ])
+    } catch (txError) {
+      // Cleanup orphaned Supabase user
+      await getSupabaseAdmin().auth.admin.deleteUser(data.user.id)
+      throw txError
+    }
 
     await enviarEmail({
       para: pessoa.email,

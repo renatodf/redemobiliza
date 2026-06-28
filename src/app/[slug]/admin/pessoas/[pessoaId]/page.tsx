@@ -37,7 +37,7 @@ export default async function FichaPessoaPage({
     include: {
       regiao: { select: { nome: true } },
       profissao: { select: { nome: true } },
-      observacoes: { orderBy: { criadoEm: 'desc' } },
+      observacoes: { where: { deletedAt: null }, orderBy: { criadoEm: 'desc' } },
     },
   })
   if (!pessoa) notFound()
@@ -54,7 +54,7 @@ export default async function FichaPessoaPage({
       select: { id: true, nome: true },
     }),
     prisma.demanda.findMany({
-      where: { solicitanteId: pessoa.id, gabineteId: gabinete.id },
+      where: { solicitanteId: pessoa.id, gabineteId: gabinete.id, deletedAt: null },
       orderBy: { criadoEm: 'desc' },
       include: {
         area: { select: { nome: true } },
@@ -66,7 +66,7 @@ export default async function FichaPessoaPage({
       },
     }),
     pessoa.isMobilizador
-      ? prisma.vinculoRede.count({ where: { indicadoPorId: pessoa.id } })
+      ? prisma.vinculoRede.count({ where: { indicadoPorId: pessoa.id, deletedAt: null } })
       : Promise.resolve(0),
   ])
 
