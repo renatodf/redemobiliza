@@ -2,7 +2,8 @@
 
 import { revalidatePath } from 'next/cache'
 import { prisma } from '@/lib/prisma'
-import { assertAdminAccess } from '@/lib/assert-admin-access'
+import { createSupabaseServerClient } from '@/lib/supabase/server'
+import { getGabineteBySlug } from '@/lib/gabinete'
 import { normalizeWhatsApp } from '@/lib/whatsapp'
 
 export async function editarPessoa(formData: FormData) {
@@ -18,7 +19,37 @@ export async function editarPessoa(formData: FormData) {
   if (!nome) throw new Error('Nome é obrigatório')
   if (!whatsappRaw) throw new Error('WhatsApp é obrigatório')
 
-  const { gabinete } = await assertAdminAccess(slug)
+  const supabase = createSupabaseServerClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error('Não autenticado')
+
+  const gabinete = await getGabineteBySlug(slug)
+  if (!gabinete) throw new Error('Gabinete não encontrado')
+
+  const role = user.app_metadata?.role as string | undefined
+  const usuarioGabinete = await prisma.usuarioGabinete.findUnique({
+    where: { userId_gabineteId: { userId: user.id, gabineteId: gabinete.id } },
+    select: { papel: true },
+  })
+
+  const isAdmin = usuarioGabinete?.papel === 'admin' || role === 'super-admin'
+  const isMobilizador = usuarioGabinete?.papel === 'mobilizador'
+
+  if (!isAdmin && !isMobilizador) throw new Error('Sem permissão')
+
+  if (isMobilizador && !isAdmin) {
+    // Verificar que a pessoa está na rede direta do mobilizador
+    const mobilizadorPessoa = await prisma.pessoa.findFirst({
+      where: { userId: user.id, gabineteId: gabinete.id, isMobilizador: true },
+      select: { id: true },
+    })
+    if (!mobilizadorPessoa) throw new Error('Mobilizador não encontrado')
+
+    const vinculo = await prisma.vinculoRede.findFirst({
+      where: { gabineteId: gabinete.id, pessoaId, indicadoPorId: mobilizadorPessoa.id, deletedAt: null },
+    })
+    if (!vinculo) throw new Error('Pessoa fora da sua rede')
+  }
 
   const whatsapp = normalizeWhatsApp(whatsappRaw)
   if (!whatsapp) throw new Error('Número de WhatsApp inválido')
