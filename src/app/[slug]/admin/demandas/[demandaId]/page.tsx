@@ -9,18 +9,22 @@ import { reatribuirResponsavel as reatribuirResponsavelAction } from '@/actions/
 
 // Wrappers para actions que retornam valores, convertendo para void para compatibilidade com form action
 async function atualizarObservacaoDemanda(formData: FormData) {
+  'use server'
   await atualizarObservacaoDemandaAction(formData)
 }
 
 async function alterarPrazoDemanda(formData: FormData) {
+  'use server'
   await alterarPrazoDemandaAction(formData)
 }
 
 async function marcarDesfechoDemanda(formData: FormData) {
+  'use server'
   await marcarDesfechoDemandaAction(formData)
 }
 
 async function reatribuirResponsavel(formData: FormData) {
+  'use server'
   await reatribuirResponsavelAction(formData)
 }
 
