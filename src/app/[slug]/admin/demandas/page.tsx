@@ -217,7 +217,7 @@ export default async function DemandasPage({
           {Array.from({ length: totalPaginas }, (_, i) => i + 1).map((p) => (
             <a
               key={p}
-              href={`/${params.slug}/admin/demandas?pagina=${p}&${new URLSearchParams({ ...(searchParams.status ? { status: searchParams.status } : {}), ...(searchParams.areaId ? { areaId: searchParams.areaId } : {}) }).toString()}`}
+              href={`/${params.slug}/admin/demandas?${new URLSearchParams({ ...Object.fromEntries(Object.entries(searchParams).filter(([k, v]) => k !== 'pagina' && v)), pagina: String(p) }).toString()}`}
               className={`px-3 py-1 rounded text-sm ${p === pagina ? 'bg-blue-600 text-white' : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'}`}
             >
               {p}
