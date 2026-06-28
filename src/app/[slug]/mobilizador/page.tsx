@@ -61,6 +61,18 @@ export default async function MobilizadorPage({
     },
   })
 
+  const minhasDemandas = await prisma.demanda.findMany({
+    where: { gabineteId: gabinete.id, responsavelId: pessoa.id },
+    orderBy: { prazoDesfecho: 'asc' },
+    select: {
+      id: true,
+      titulo: true,
+      status: true,
+      prazoDesfecho: true,
+      area: { select: { nome: true } },
+    },
+  })
+
   return (
     <div className="space-y-8">
       <div>
@@ -124,6 +136,33 @@ export default async function MobilizadorPage({
                 </span>
               </li>
             ))}
+          </ul>
+        )}
+      </section>
+
+      <section className="bg-white rounded-lg p-6 shadow-sm space-y-4">
+        <h2 className="text-base font-semibold text-gray-800">
+          Minhas Demandas ({minhasDemandas.length})
+        </h2>
+        {minhasDemandas.length === 0 ? (
+          <p className="text-sm text-gray-500">Nenhuma demanda atribuída.</p>
+        ) : (
+          <ul className="divide-y divide-gray-100">
+            {minhasDemandas.map((d) => {
+              const statusCor = { aberta: 'text-yellow-600', expirada: 'text-orange-600', atendida: 'text-green-600', nao_atendida: 'text-red-600' }[d.status] ?? 'text-gray-600'
+              const statusLabel = { aberta: 'Em aberto', expirada: 'Expirada', atendida: 'Atendida', nao_atendida: 'Não atendida' }[d.status] ?? d.status
+              return (
+                <li key={d.id} className="py-3">
+                  <a href={`/${params.slug}/mobilizador/demandas/${d.id}`} className="flex items-center justify-between hover:bg-gray-50 -mx-2 px-2 py-1 rounded">
+                    <div>
+                      <p className="text-sm font-medium text-gray-900">{d.titulo}</p>
+                      <p className="text-xs text-gray-500">{d.area.nome} · Prazo: {d.prazoDesfecho.toLocaleDateString('pt-BR')}</p>
+                    </div>
+                    <span className={`text-xs font-medium ${statusCor}`}>{statusLabel}</span>
+                  </a>
+                </li>
+              )
+            })}
           </ul>
         )}
       </section>
