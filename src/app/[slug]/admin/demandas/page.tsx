@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 import { getGabineteBySlug } from '@/lib/gabinete'
+import { GraficoDemandas } from '@/components/GraficoDemandas'
 
 const STATUS_CONFIG = {
   aberta: { label: 'Em aberto', cor: 'bg-yellow-100 text-yellow-800' },
@@ -31,6 +32,13 @@ export default async function DemandasPage({
   const gabinete = await getGabineteBySlug(params.slug)
   if (!gabinete) notFound()
 
+  const hoje = new Date()
+  const inicioMes = new Date(hoje.getFullYear(), hoje.getMonth(), 1)
+  const fimMes = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0, 23, 59, 59, 999)
+  const mesLabel = hoje.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })
+  const dataInicioStr = inicioMes.toISOString().slice(0, 10)
+  const dataFimStr = fimMes.toISOString().slice(0, 10)
+
   const pagina = Math.max(1, Number(searchParams.pagina ?? 1))
 
   // Período padrão: últimos 30 dias (apenas quando não há filtros)
@@ -56,7 +64,7 @@ export default async function DemandasPage({
         }),
   }
 
-  const [demandas, total, contagens, areas, colaboradores, regioes] = await Promise.all([
+  const [demandas, total, contagens, areas, colaboradores, regioes, contagensMes] = await Promise.all([
     prisma.demanda.findMany({
       where,
       orderBy: { criadoEm: 'desc' },
@@ -83,11 +91,27 @@ export default async function DemandasPage({
     prisma.areaDemanda.findMany({ where: { gabineteId: gabinete.id }, orderBy: { nome: 'asc' }, select: { id: true, nome: true } }),
     prisma.pessoa.findMany({ where: { gabineteId: gabinete.id, isMobilizador: true, isColaborador: true }, orderBy: { nome: 'asc' }, select: { id: true, nome: true } }),
     prisma.regiao.findMany({ where: { gabineteId: gabinete.id, ativa: true }, orderBy: { nome: 'asc' }, select: { id: true, nome: true } }),
+    prisma.demanda.groupBy({
+      by: ['status'],
+      where: { gabineteId: gabinete.id, criadoEm: { gte: inicioMes, lte: fimMes } },
+      _count: { id: true },
+    }),
   ])
 
   const totalPaginas = Math.ceil(total / PAGE_SIZE)
 
   const contagemPorStatus = Object.fromEntries(contagens.map((c) => [c.status, c._count.id]))
+
+  const contagemMes = Object.fromEntries(contagensMes.map((c) => [c.status, c._count.id]))
+  const barrasDemandas = [
+    { status: 'aberta',       label: 'Em aberto',    bgClass: 'bg-yellow-400', count: contagemMes['aberta']       ?? 0 },
+    { status: 'expirada',     label: 'Expirada',     bgClass: 'bg-orange-400', count: contagemMes['expirada']     ?? 0 },
+    { status: 'atendida',     label: 'Atendida',     bgClass: 'bg-green-500',  count: contagemMes['atendida']     ?? 0 },
+    { status: 'nao_atendida', label: 'Não atendida', bgClass: 'bg-red-400',    count: contagemMes['nao_atendida'] ?? 0 },
+  ].map((b) => ({
+    ...b,
+    href: `/${params.slug}/admin/demandas?status=${b.status}&dataInicio=${dataInicioStr}&dataFim=${dataFimStr}`,
+  }))
   const totalPrazoAlterado = await prisma.demanda.count({ where: { gabineteId: gabinete.id, prazoAlterado: true } })
 
   return (
@@ -98,6 +122,8 @@ export default async function DemandasPage({
           + Nova demanda
         </Link>
       </div>
+
+      <GraficoDemandas barras={barrasDemandas} mesLabel={mesLabel} />
 
       {/* Cards de resumo */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3">

@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import { getGabineteBySlug } from '@/lib/gabinete'
+import { GraficoDemandas } from '@/components/GraficoDemandas'
 
 function calcularIntervalo(
   periodo: string,
@@ -70,6 +71,13 @@ export default async function DashboardPage({
     searchParams.fim
   )
 
+  const hoje = new Date()
+  const inicioMes = new Date(hoje.getFullYear(), hoje.getMonth(), 1)
+  const fimMes = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0, 23, 59, 59, 999)
+  const mesLabel = hoje.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })
+  const dataInicioStr = inicioMes.toISOString().slice(0, 10)
+  const dataFimStr = fimMes.toISOString().slice(0, 10)
+
   const [
     totalPessoas,
     novasPessoas,
@@ -80,6 +88,7 @@ export default async function DashboardPage({
     pessoasPorOrigem,
     pessoasPorRegiao,
     pessoasPorGenero,
+    demandasMes,
   ] = await Promise.all([
     prisma.pessoa.count({ where: { gabineteId: gabinete.id } }),
 
@@ -139,7 +148,24 @@ export default async function DashboardPage({
       _count: { id: true },
       orderBy: { _count: { id: 'desc' } },
     }),
+    prisma.demanda.groupBy({
+      by: ['status'],
+      where: { gabineteId: gabinete.id, criadoEm: { gte: inicioMes, lte: fimMes } },
+      _count: { id: true },
+    }),
   ])
+
+  const contagemDemandasMes = Object.fromEntries(demandasMes.map((d) => [d.status, d._count.id]))
+
+  const barrasDemandas = [
+    { status: 'aberta',       label: 'Em aberto',    bgClass: 'bg-yellow-400', count: contagemDemandasMes['aberta']       ?? 0 },
+    { status: 'expirada',     label: 'Expirada',     bgClass: 'bg-orange-400', count: contagemDemandasMes['expirada']     ?? 0 },
+    { status: 'atendida',     label: 'Atendida',     bgClass: 'bg-green-500',  count: contagemDemandasMes['atendida']     ?? 0 },
+    { status: 'nao_atendida', label: 'Não atendida', bgClass: 'bg-red-400',    count: contagemDemandasMes['nao_atendida'] ?? 0 },
+  ].map((b) => ({
+    ...b,
+    href: `/${params.slug}/admin/demandas?status=${b.status}&dataInicio=${dataInicioStr}&dataFim=${dataFimStr}`,
+  }))
 
   const rankingMobilizadores = mobilizadoresAtivos
     .map((m) => ({ nome: m.nome, contagem: m.redesComoIndicador.length }))
@@ -225,6 +251,8 @@ export default async function DashboardPage({
           <p className="text-xs text-gray-400 mt-0.5">membros</p>
         </div>
       </div>
+
+      <GraficoDemandas barras={barrasDemandas} mesLabel={mesLabel} />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
