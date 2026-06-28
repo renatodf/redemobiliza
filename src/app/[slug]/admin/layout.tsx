@@ -85,6 +85,8 @@ export default async function AdminLayout({
             { href: `/${params.slug}/admin/regioes`, label: 'Regiões' },
             { href: `/${params.slug}/admin/profissoes`, label: 'Profissões' },
             { href: `/${params.slug}/admin/personalizacao`, label: 'Personalização' },
+            { href: `/${params.slug}/admin/demandas`, label: 'Demandas' },
+            { href: `/${params.slug}/admin/configuracoes`, label: 'Configurações' },
           ].map(({ href, label }) => (
             <Link
               key={href}
