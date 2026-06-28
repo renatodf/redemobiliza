@@ -6,6 +6,7 @@ import { prisma } from '@/lib/prisma'
 import { getGabineteBySlug } from '@/lib/gabinete'
 import { AtualizarSenhaForm } from './AtualizarSenhaForm'
 import { getAppUrl } from '@/lib/app-url'
+import PromoverMobilizadorDialog from './PromoverMobilizadorDialog'
 
 export default async function MobilizadorPage({
   params,
@@ -57,7 +58,7 @@ export default async function MobilizadorPage({
     select: {
       id: true,
       criadoEm: true,
-      pessoa: { select: { nome: true, whatsapp: true } },
+      pessoa: { select: { id: true, nome: true, whatsapp: true, isMobilizador: true } },
     },
   })
 
@@ -131,9 +132,20 @@ export default async function MobilizadorPage({
                   <p className="text-sm font-medium text-gray-900">{v.pessoa.nome}</p>
                   <p className="text-xs text-gray-500">{v.pessoa.whatsapp}</p>
                 </div>
-                <span className="text-xs text-gray-400">
-                  {new Date(v.criadoEm).toLocaleDateString('pt-BR')}
-                </span>
+                <div className="flex items-center gap-3">
+                  {v.pessoa.isMobilizador ? (
+                    <span className="text-xs text-purple-600 font-medium">Mobilizador</span>
+                  ) : (
+                    <PromoverMobilizadorDialog
+                      slug={params.slug}
+                      pessoaId={v.pessoa.id}
+                      nomeAbreviado={v.pessoa.nome.split(' ')[0]}
+                    />
+                  )}
+                  <span className="text-xs text-gray-400">
+                    {new Date(v.criadoEm).toLocaleDateString('pt-BR')}
+                  </span>
+                </div>
               </li>
             ))}
           </ul>
