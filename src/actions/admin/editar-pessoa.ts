@@ -6,7 +6,10 @@ import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { getGabineteBySlug } from '@/lib/gabinete'
 import { normalizeWhatsApp } from '@/lib/whatsapp'
 
-export async function editarPessoa(formData: FormData) {
+export async function editarPessoa(
+  _prev: { ok: boolean; erro?: string } | null,
+  formData: FormData
+): Promise<{ ok: boolean; erro?: string }> {
   const slug = formData.get('slug') as string
   const pessoaId = formData.get('pessoaId') as string
   const nome = (formData.get('nome') as string).trim()
@@ -16,8 +19,8 @@ export async function editarPessoa(formData: FormData) {
   const profissaoId = (formData.get('profissaoId') as string | null) || null
   const genero = (formData.get('genero') as string | null) || null
 
-  if (!nome) throw new Error('Nome é obrigatório')
-  if (!whatsappRaw) throw new Error('WhatsApp é obrigatório')
+  if (!nome) return { ok: false, erro: 'Nome é obrigatório' }
+  if (!whatsappRaw) return { ok: false, erro: 'WhatsApp é obrigatório' }
 
   const supabase = createSupabaseServerClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -56,7 +59,7 @@ export async function editarPessoa(formData: FormData) {
   }
 
   const whatsapp = normalizeWhatsApp(whatsappRaw)
-  if (!whatsapp) throw new Error('Número de WhatsApp inválido')
+  if (!whatsapp) return { ok: false, erro: 'Número de WhatsApp inválido' }
 
   await prisma.pessoa.updateMany({
     where: { id: pessoaId, gabineteId: gabinete.id },
@@ -65,4 +68,5 @@ export async function editarPessoa(formData: FormData) {
 
   revalidatePath(`/${slug}/admin/pessoas/${pessoaId}`)
   revalidatePath(`/${slug}/mobilizador`)
+  return { ok: true }
 }
