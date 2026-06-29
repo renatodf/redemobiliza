@@ -1,4 +1,4 @@
-import { notFound, redirect } from 'next/navigation'
+import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import { getGabineteBySlug } from '@/lib/gabinete'
 import { criarDemanda } from '@/actions/admin/criar-demanda'
@@ -57,14 +57,6 @@ export default async function NovaDemandaPage({
         select: { id: true, nome: true, whatsapp: true, bairro: true, logradouro: true, numero: true, complemento: true, cep: true, regiao: { select: { nome: true } } },
       })
     : null
-
-  async function handleCriar(formData: FormData) {
-    'use server'
-    const result = await criarDemanda(formData)
-    if (result.demandaId) {
-      redirect(`/${params.slug}/admin/demandas/${result.demandaId}`)
-    }
-  }
 
   return (
     <div className="max-w-2xl mx-auto py-8 px-4 space-y-6">
@@ -187,7 +179,7 @@ export default async function NovaDemandaPage({
 
       {/* Formulário principal — só aparece quando solicitante selecionado */}
       {solicitante && (
-        <form action={handleCriar} className="space-y-6">
+        <form action={criarDemanda} className="space-y-6">
           <input type="hidden" name="slug" value={params.slug} />
           <input type="hidden" name="solicitanteId" value={solicitante.id} />
 

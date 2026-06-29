@@ -1,5 +1,6 @@
 'use server'
 
+import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 import { prisma } from '@/lib/prisma'
 import { assertAdminAccess } from '@/lib/assert-admin-access'
@@ -23,7 +24,7 @@ async function getAutorId(gabineteId: string): Promise<string | null> {
   return p?.id ?? null
 }
 
-export async function criarDemanda(formData: FormData): Promise<{ erro?: string; demandaId?: string }> {
+export async function criarDemanda(formData: FormData): Promise<void> {
   const slug = formData.get('slug') as string
   const titulo = (formData.get('titulo') as string).trim()
   const descricao = (formData.get('descricao') as string).trim()
@@ -33,7 +34,7 @@ export async function criarDemanda(formData: FormData): Promise<{ erro?: string;
   const prazoCustom = formData.get('prazoDesfecho') as string | null
 
   if (!titulo || !descricao || !solicitanteId || !responsavelId || !areaId) {
-    return { erro: 'Preencha todos os campos obrigatórios' }
+    throw new Error('Preencha todos os campos obrigatórios')
   }
 
   const { gabinete } = await assertAdminAccess(slug)
@@ -48,28 +49,28 @@ export async function criarDemanda(formData: FormData): Promise<{ erro?: string;
     : new Date(Date.now() + horasPrazo * 60 * 60 * 1000)
 
   const criadoPorId = await getAutorId(gabinete.id)
-  if (!criadoPorId) return { erro: 'Não foi possível identificar o autor' }
+  if (!criadoPorId) throw new Error('Não foi possível identificar o autor')
 
   // Validar que solicitante pertence ao gabinete
   const solicitanteCheck = await prisma.pessoa.findFirst({
     where: { id: solicitanteId, gabineteId: gabinete.id },
     select: { id: true },
   })
-  if (!solicitanteCheck) return { erro: 'Solicitante não encontrado' }
+  if (!solicitanteCheck) throw new Error('Solicitante não encontrado')
 
   // Validar que responsável pertence ao gabinete e é colaborador mobilizador
   const responsavelCheck = await prisma.pessoa.findFirst({
     where: { id: responsavelId, gabineteId: gabinete.id, isMobilizador: true, isColaborador: true },
     select: { id: true },
   })
-  if (!responsavelCheck) return { erro: 'Responsável não encontrado' }
+  if (!responsavelCheck) throw new Error('Responsável não encontrado')
 
   // Validar que área pertence ao gabinete
   const areaCheck = await prisma.areaDemanda.findFirst({
     where: { id: areaId, gabineteId: gabinete.id },
     select: { id: true },
   })
-  if (!areaCheck) return { erro: 'Área não encontrada' }
+  if (!areaCheck) throw new Error('Área não encontrada')
 
   const demanda = await prisma.demanda.create({
     data: {
@@ -117,5 +118,5 @@ export async function criarDemanda(formData: FormData): Promise<{ erro?: string;
   }
 
   revalidatePath(`/${slug}/admin/demandas`)
-  return { demandaId: demanda.id }
+  redirect(`/${slug}/admin/demandas/${demanda.id}`)
 }
