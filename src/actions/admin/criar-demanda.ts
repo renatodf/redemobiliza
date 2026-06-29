@@ -4,25 +4,7 @@ import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 import { prisma } from '@/lib/prisma'
 import { assertAdminAccess } from '@/lib/assert-admin-access'
-import { cookies } from 'next/headers'
-import { createServerClient } from '@supabase/ssr'
 import { enviarEmail, templateDemandaAtribuida } from '@/lib/email'
-
-async function getAutorId(gabineteId: string): Promise<string | null> {
-  const cookieStore = cookies()
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { cookies: { getAll: () => cookieStore.getAll() } }
-  )
-  const { data: { session } } = await supabase.auth.getSession()
-  if (!session) return null
-  const p = await prisma.pessoa.findFirst({
-    where: { userId: session.user.id, gabineteId },
-    select: { id: true },
-  })
-  return p?.id ?? null
-}
 
 export async function criarDemanda(formData: FormData): Promise<void> {
   const slug = formData.get('slug') as string
@@ -37,7 +19,7 @@ export async function criarDemanda(formData: FormData): Promise<void> {
     throw new Error('Preencha todos os campos obrigatórios')
   }
 
-  const { gabinete } = await assertAdminAccess(slug)
+  const { session, gabinete } = await assertAdminAccess(slug)
 
   const config = await prisma.configuracaoSistema.findUnique({
     where: { gabineteId: gabinete.id },
@@ -48,8 +30,11 @@ export async function criarDemanda(formData: FormData): Promise<void> {
     ? new Date(prazoCustom)
     : new Date(Date.now() + horasPrazo * 60 * 60 * 1000)
 
-  const criadoPorId = await getAutorId(gabinete.id)
-  if (!criadoPorId) throw new Error('Não foi possível identificar o autor')
+  const autorPessoa = await prisma.pessoa.findFirst({
+    where: { userId: session.user.id, gabineteId: gabinete.id },
+    select: { id: true },
+  })
+  if (!autorPessoa) throw new Error('Não foi possível identificar o autor')
 
   // Validar que solicitante pertence ao gabinete
   const solicitanteCheck = await prisma.pessoa.findFirst({
@@ -81,12 +66,12 @@ export async function criarDemanda(formData: FormData): Promise<void> {
       responsavelId,
       areaId,
       prazoDesfecho,
-      criadoPorId,
+      criadoPorId: autorPessoa.id,
       historico: {
         create: {
           tipo: 'criacao',
           descricao: 'Demanda criada',
-          autorId: criadoPorId,
+          autorId: autorPessoa.id,
         },
       },
     },
