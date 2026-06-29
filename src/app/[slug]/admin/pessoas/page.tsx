@@ -101,7 +101,7 @@ export default async function PessoasPage({
   const breadcrumbPessoas =
     pathIds.length > 0
       ? await prisma.pessoa.findMany({
-          where: { id: { in: pathIds }, gabineteId: gabinete.id },
+          where: { id: { in: pathIds }, gabineteId: gabinete.id, deletedAt: null },
           select: { id: true, nome: true },
         })
       : []
@@ -157,6 +157,8 @@ export default async function PessoasPage({
       )}
 
       <form method="GET" className="flex gap-2">
+        {rede && <input type="hidden" name="rede" value={rede} />}
+        {path && <input type="hidden" name="path" value={path} />}
         <input
           name="q"
           defaultValue={q}
