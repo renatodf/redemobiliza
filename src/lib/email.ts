@@ -1,9 +1,9 @@
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null
 const FROM = process.env.REMETENTE_EMAIL ?? 'noreply@redemobiliza.com.br'
 
-function escapeHtml(s: string): string {
+export function escapeHtml(s: string): string {
   return s
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
@@ -19,6 +19,10 @@ export interface EmailPayload {
 }
 
 export async function enviarEmail({ para, assunto, html }: EmailPayload): Promise<void> {
+  if (!resend) {
+    console.warn('[email] RESEND_API_KEY não configurada — e-mail ignorado:', assunto)
+    return
+  }
   const { error } = await resend.emails.send({
     from: FROM,
     to: para,
