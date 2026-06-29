@@ -73,7 +73,7 @@ export default async function PessoasPage({
     const ids = vinculos.map((v) => v.pessoaId)
     if (ids.length > 0) {
       pessoasRaw = await prisma.pessoa.findMany({
-        where: { id: { in: ids }, deletedAt: null, ...searchFilter },
+        where: { id: { in: ids }, gabineteId: gabinete.id, deletedAt: null, ...searchFilter },
         orderBy,
         take: 50,
         select: pessoaSelect,

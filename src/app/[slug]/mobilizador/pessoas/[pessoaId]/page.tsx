@@ -19,11 +19,11 @@ export default async function MobilizadorPessoaPage({
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     { cookies: { getAll: () => cookieStore.getAll() } }
   )
-  const { data: { session } } = await supabase.auth.getSession()
-  if (!session) notFound()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) notFound()
 
   const mobilizadorPessoa = await prisma.pessoa.findFirst({
-    where: { userId: session.user.id, gabineteId: gabinete.id, isMobilizador: true },
+    where: { userId: user.id, gabineteId: gabinete.id, isMobilizador: true },
     select: { id: true },
   })
   if (!mobilizadorPessoa) notFound()

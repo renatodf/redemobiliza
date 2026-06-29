@@ -54,11 +54,11 @@ export default async function MobilizadorRedePage({
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     { cookies: { getAll: () => cookieStore.getAll() } }
   )
-  const { data: { session } } = await supabase.auth.getSession()
-  if (!session) notFound()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) notFound()
 
   const mobilizadorPessoa = await prisma.pessoa.findFirst({
-    where: { userId: session.user.id, gabineteId: gabinete.id, isMobilizador: true },
+    where: { userId: user.id, gabineteId: gabinete.id, isMobilizador: true },
     select: { id: true, nome: true },
   })
   if (!mobilizadorPessoa) notFound()
@@ -98,7 +98,7 @@ export default async function MobilizadorRedePage({
   const pessoasRaw =
     ids.length > 0
       ? await prisma.pessoa.findMany({
-          where: { id: { in: ids }, deletedAt: null },
+          where: { id: { in: ids }, gabineteId: gabinete.id, deletedAt: null },
           orderBy,
           take: 50,
           select: pessoaSelect,
