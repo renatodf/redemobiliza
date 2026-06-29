@@ -14,6 +14,7 @@ import MobilizadorSection from './MobilizadorSection'
 import { getAppUrl } from '@/lib/app-url'
 import FotoPerfilAvatar from './FotoPerfilAvatar'
 import PromoverMobilizadorDialog from './PromoverMobilizadorDialog'
+import ExcluirPessoaButton from './ExcluirPessoaButton'
 
 export default async function FichaPessoaPage({
   params,
@@ -140,19 +141,7 @@ export default async function FichaPessoaPage({
           </form>
         )}
         {isAdmin && (
-          <form action={softDeletePessoa}>
-            <input type="hidden" name="slug" value={params.slug} />
-            <input type="hidden" name="pessoaId" value={params.pessoaId} />
-            <button
-              type="submit"
-              className="text-sm text-red-600 hover:underline"
-              onClick={(e) => {
-                if (!confirm('Excluir este cadastro? A ação pode ser revertida pelo super-admin.')) e.preventDefault()
-              }}
-            >
-              Excluir cadastro
-            </button>
-          </form>
+          <ExcluirPessoaButton slug={params.slug} pessoaId={params.pessoaId} />
         )}
       </div>
 
@@ -343,7 +332,6 @@ export default async function FichaPessoaPage({
                       <Link
                         href={`/${params.slug}/admin/demandas/${d.id}`}
                         className="text-xs text-blue-600 hover:underline"
-                        onClick={(e) => e.stopPropagation()}
                       >
                         Abrir →
                       </Link>
