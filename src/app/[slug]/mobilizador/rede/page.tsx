@@ -64,6 +64,25 @@ export default async function MobilizadorRedePage({
   if (!mobilizadorPessoa) notFound()
 
   const { sort, order, rede, path } = searchParams
+
+  // Verifica se ?rede pertence à sub-árvore do mobilizador logado
+  if (rede && rede !== mobilizadorPessoa.id) {
+    let currentId: string | null = rede
+    let authorized = false
+    const visited = new Set<string>()
+    while (currentId && !visited.has(currentId)) {
+      visited.add(currentId)
+      const vinculo: { indicadoPorId: string | null } | null = await prisma.vinculoRede.findFirst({
+        where: { pessoaId: currentId, gabineteId: gabinete.id, deletedAt: null },
+        select: { indicadoPorId: true },
+      })
+      const parentId: string | null = vinculo?.indicadoPorId ?? null
+      if (parentId === mobilizadorPessoa.id) { authorized = true; break }
+      currentId = parentId
+    }
+    if (!authorized) notFound()
+  }
+
   const orderBy = buildOrderBy(sort, order)
   const pathIds = path ? path.split(',').filter(Boolean) : []
 
@@ -173,7 +192,7 @@ export default async function MobilizadorRedePage({
                       {p.nome}
                     </Link>
                   </td>
-                  <td className="px-4 py-3 text-gray-600">{p.whatsapp}</td>
+                  <td className="px-4 py-3 text-gray-600">{p.whatsapp ?? '—'}</td>
                   <td className="px-4 py-3 text-gray-600">{p.regiao?.nome ?? '—'}</td>
                   <td className="px-4 py-3 text-center">
                     {p.totalRedes === 0 ? (
