@@ -1,5 +1,7 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
+import { cookies } from 'next/headers'
+import { createServerClient } from '@supabase/ssr'
 import { prisma } from '@/lib/prisma'
 import { getGabineteBySlug } from '@/lib/gabinete'
 
@@ -10,6 +12,39 @@ export default async function MobilizadorPessoaPage({
 }) {
   const gabinete = await getGabineteBySlug(params.slug)
   if (!gabinete) notFound()
+
+  const cookieStore = cookies()
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { cookies: { getAll: () => cookieStore.getAll() } }
+  )
+  const { data: { session } } = await supabase.auth.getSession()
+  if (!session) notFound()
+
+  const mobilizadorPessoa = await prisma.pessoa.findFirst({
+    where: { userId: session.user.id, gabineteId: gabinete.id, isMobilizador: true },
+    select: { id: true },
+  })
+  if (!mobilizadorPessoa) notFound()
+
+  // Verifica se pessoaId pertence à sub-árvore do mobilizador logado
+  if (params.pessoaId !== mobilizadorPessoa.id) {
+    let currentId: string | null = params.pessoaId
+    let authorized = false
+    const visited = new Set<string>()
+    while (currentId && !visited.has(currentId)) {
+      visited.add(currentId)
+      const vinculo: { indicadoPorId: string | null } | null = await prisma.vinculoRede.findFirst({
+        where: { pessoaId: currentId, gabineteId: gabinete.id, deletedAt: null },
+        select: { indicadoPorId: true },
+      })
+      const parentId: string | null = vinculo?.indicadoPorId ?? null
+      if (parentId === mobilizadorPessoa.id) { authorized = true; break }
+      currentId = parentId
+    }
+    if (!authorized) notFound()
+  }
 
   const pessoa = await prisma.pessoa.findFirst({
     where: { id: params.pessoaId, gabineteId: gabinete.id, deletedAt: null },
