@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation'
+import Link from 'next/link'
 import { cookies } from 'next/headers'
 import { createServerClient } from '@supabase/ssr'
 import QRCode from 'qrcode'
@@ -7,7 +8,6 @@ import { getGabineteBySlug } from '@/lib/gabinete'
 import { getAppUrl } from '@/lib/app-url'
 import { editarPessoa } from '@/actions/admin/editar-pessoa'
 import AlterarSenhaDialog from './AlterarSenhaDialog'
-import PromoverMobilizadorDialog from './PromoverMobilizadorDialog'
 
 export default async function MobilizadorPage({
   params,
@@ -71,14 +71,8 @@ export default async function MobilizadorPage({
     })
   )
 
-  const convidados = await prisma.vinculoRede.findMany({
+  const totalConvidados = await prisma.vinculoRede.count({
     where: { gabineteId: gabinete.id, indicadoPorId: pessoa.id, deletedAt: null },
-    orderBy: { criadoEm: 'desc' },
-    select: {
-      id: true,
-      criadoEm: true,
-      pessoa: { select: { id: true, nome: true, whatsapp: true, isMobilizador: true } },
-    },
   })
 
   const minhasDemandas = await prisma.demanda.findMany({
@@ -137,37 +131,22 @@ export default async function MobilizadorPage({
         </div>
       )}
 
-      <section className="bg-white rounded-lg p-6 shadow-sm space-y-4">
-        <h2 className="text-base font-semibold text-gray-800">
-          Pessoas convidadas ({convidados.length})
-        </h2>
-        {convidados.length === 0 ? (
+      <section className="bg-white rounded-lg p-6 shadow-sm space-y-3">
+        <div className="flex items-center justify-between">
+          <h2 className="text-base font-semibold text-gray-800">
+            Minha rede ({totalConvidados})
+          </h2>
+          {totalConvidados > 0 && (
+            <Link
+              href={`/${params.slug}/mobilizador/rede`}
+              className="text-sm text-blue-600 hover:underline"
+            >
+              Ver rede →
+            </Link>
+          )}
+        </div>
+        {totalConvidados === 0 && (
           <p className="text-sm text-gray-500">Nenhuma pessoa convidada ainda.</p>
-        ) : (
-          <ul className="divide-y divide-gray-100">
-            {convidados.map((v) => (
-              <li key={v.id} className="py-3 flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-900">{v.pessoa.nome}</p>
-                  <p className="text-xs text-gray-500">{v.pessoa.whatsapp}</p>
-                </div>
-                <div className="flex items-center gap-3">
-                  {v.pessoa.isMobilizador ? (
-                    <span className="text-xs text-purple-600 font-medium">Mobilizador</span>
-                  ) : (
-                    <PromoverMobilizadorDialog
-                      slug={params.slug}
-                      pessoaId={v.pessoa.id}
-                      nomeAbreviado={v.pessoa.nome.split(' ')[0]}
-                    />
-                  )}
-                  <span className="text-xs text-gray-400">
-                    {new Date(v.criadoEm).toLocaleDateString('pt-BR')}
-                  </span>
-                </div>
-              </li>
-            ))}
-          </ul>
         )}
       </section>
 
