@@ -36,11 +36,13 @@ export async function promoverMobilizador(
     })
     if (error || !data.user) return { erro: 'Erro ao criar acesso: ' + (error?.message ?? 'desconhecido') }
 
+    const tokenMobilizador = crypto.randomUUID().replace(/-/g, '')
+
     try {
       await prisma.$transaction([
         prisma.pessoa.update({
           where: { id: pessoaId },
-          data: { isMobilizador: true, userId: data.user.id },
+          data: { isMobilizador: true, userId: data.user.id, tokenMobilizador },
         }),
         prisma.usuarioGabinete.create({
           data: { userId: data.user.id, gabineteId: gabinete.id, papel: 'mobilizador' },
