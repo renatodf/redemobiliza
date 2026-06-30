@@ -6,7 +6,7 @@ import QRCode from 'qrcode'
 import { prisma } from '@/lib/prisma'
 import { getGabineteBySlug } from '@/lib/gabinete'
 import { getAppUrl } from '@/lib/app-url'
-import { editarPessoa } from '@/actions/admin/editar-pessoa'
+import EditarPessoaForm from '../admin/pessoas/[pessoaId]/EditarPessoaForm'
 import AlterarSenhaDialog from './AlterarSenhaDialog'
 
 export default async function MobilizadorPage({
@@ -179,89 +179,23 @@ export default async function MobilizadorPage({
 
       <section className="bg-white rounded-lg p-6 shadow-sm space-y-4">
         <h2 className="text-base font-semibold text-gray-800">Meu Perfil</h2>
-        <form action={editarPessoa} className="space-y-4">
-          <input type="hidden" name="slug" value={params.slug} />
-          <input type="hidden" name="pessoaId" value={pessoa.id} />
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Nome *</label>
-            <input
-              name="nome"
-              required
-              defaultValue={pessoa.nome}
-              className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-sm font-medium text-gray-700">WhatsApp *</label>
-              <input
-                name="whatsapp"
-                required
-                defaultValue={pessoa.whatsapp}
-                className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">E-mail</label>
-              <input
-                name="email"
-                type="email"
-                defaultValue={pessoa.email ?? ''}
-                className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
-              />
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Região</label>
-              <select
-                name="regiaoId"
-                defaultValue={pessoa.regiaoId ?? ''}
-                className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
-              >
-                <option value="">Selecionar...</option>
-                {regioes.map((r) => (
-                  <option key={r.id} value={r.id}>{r.nome}</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Profissão</label>
-              <select
-                name="profissaoId"
-                defaultValue={pessoa.profissaoId ?? ''}
-                className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
-              >
-                <option value="">Selecionar...</option>
-                {profissoes.map((p) => (
-                  <option key={p.id} value={p.id}>{p.nome}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Gênero</label>
-            <select
-              name="genero"
-              defaultValue={pessoa.genero ?? ''}
-              className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
-            >
-              <option value="">Não informado</option>
-              <option value="masculino">Masculino</option>
-              <option value="feminino">Feminino</option>
-              <option value="outro">Outro</option>
-            </select>
-          </div>
-          <div className="flex items-center justify-between">
-            <button
-              type="submit"
-              className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium"
-            >
-              Salvar alterações
-            </button>
-            <AlterarSenhaDialog />
-          </div>
-        </form>
+        <EditarPessoaForm
+          slug={params.slug}
+          pessoaId={pessoa.id}
+          pessoa={{
+            nome: pessoa.nome,
+            whatsapp: pessoa.whatsapp,
+            email: pessoa.email,
+            regiaoId: pessoa.regiaoId,
+            profissaoId: pessoa.profissaoId,
+            genero: pessoa.genero,
+          }}
+          regioes={regioes}
+          profissoes={profissoes}
+        />
+        <div className="pt-2">
+          <AlterarSenhaDialog />
+        </div>
       </section>
     </div>
   )
