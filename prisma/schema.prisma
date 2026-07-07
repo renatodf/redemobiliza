@@ -32,6 +32,7 @@ model Gabinete {
   areasDemanda         AreaDemanda[]
   demandas             Demanda[]
   configuracaoSistema  ConfiguracaoSistema?
+  areasColocacao       AreaColocacao[]
 }
 
 model UsuarioGabinete {
@@ -119,6 +120,7 @@ model Pessoa {
   demandasResponsavel    Demanda[]              @relation("DemandaResponsavel")
   demandasCriadas        Demanda[]              @relation("DemandaCriadoPor")
   movimentacoesDemanda   MovimentacaoDemanda[]  @relation("MovimentacaoAutor")
+  bancoTalentos          BancoTalentos?
 
   @@unique([gabineteId, whatsapp])
   @@unique([gabineteId, tokenMobilizador])
@@ -258,4 +260,43 @@ model ConfiguracaoSistema {
   alertaExpiracaoHoras Int      @default(12)
 
   gabinete Gabinete @relation(fields: [gabineteId], references: [id])
+}
+
+model AreaColocacao {
+  id         String   @id @default(cuid())
+  gabineteId String
+  nome       String
+  status     String   @default("ativa")
+  criadoEm   DateTime @default(now())
+
+  gabinete Gabinete            @relation(fields: [gabineteId], references: [id])
+  talentos BancoTalentosArea[]
+
+  @@unique([gabineteId, nome])
+  @@index([gabineteId])
+}
+
+model BancoTalentos {
+  id           String   @id @default(cuid())
+  pessoaId     String   @unique
+  curriculoUrl String?
+  prioridade   Int      @default(3)
+  isPcd        Boolean  @default(false)
+  observacao   String?
+  colocado     Boolean  @default(false)
+  criadoEm     DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
+
+  pessoa Pessoa              @relation(fields: [pessoaId], references: [id])
+  areas  BancoTalentosArea[]
+}
+
+model BancoTalentosArea {
+  bancoTalentosId String
+  areaColocacaoId String
+
+  bancoTalentos BancoTalentos @relation(fields: [bancoTalentosId], references: [id])
+  area          AreaColocacao @relation(fields: [areaColocacaoId], references: [id])
+
+  @@id([bancoTalentosId, areaColocacaoId])
 }

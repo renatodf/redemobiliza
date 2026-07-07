@@ -8,7 +8,7 @@ import EditarPessoaForm from './EditarPessoaForm'
 import { toggleColaborador } from '@/actions/admin/toggle-equipe'
 import { criarObservacao } from '@/actions/admin/criar-observacao'
 import { editarObservacao } from '@/actions/admin/editar-observacao'
-import { excluirObservacao } from '@/actions/admin/excluir-observacao'
+import ExcluirObservacaoButton from './ExcluirObservacaoButton'
 import MobilizadorSection from './MobilizadorSection'
 import { getAppUrl } from '@/lib/app-url'
 import FotoPerfilAvatar from './FotoPerfilAvatar'
@@ -21,6 +21,7 @@ import { mapPapelParaTipoConta } from '@/lib/tipo-conta'
 import { statusDemandaPill, foiAtendidaPill } from '@/lib/status-demanda'
 import CollapsibleSection from '@/components/admin/CollapsibleSection'
 import { corTextoContraste } from '@/lib/cor-contraste'
+import BancoTalentosDialog from './BancoTalentosDialog'
 
 export default async function FichaPessoaPage({
   params,
@@ -54,11 +55,12 @@ export default async function FichaPessoaPage({
         take: 1,
         select: { indicadoPor: { select: { id: true, nome: true, fotoUrl: true } } },
       },
+      bancoTalentos: { include: { areas: { select: { areaColocacaoId: true } } } },
     },
   })
   if (!pessoa) notFound()
 
-  const [regioes, profissoes, demandas, totalRede] = await Promise.all([
+  const [regioes, profissoes, demandas, totalRede, areasColocacao] = await Promise.all([
     prisma.regiao.findMany({
       where: { gabineteId: gabinete.id, ativa: true },
       orderBy: { nome: 'asc' },
@@ -77,6 +79,11 @@ export default async function FichaPessoaPage({
     pessoa.isMobilizador
       ? prisma.vinculoRede.count({ where: { indicadoPorId: pessoa.id, deletedAt: null } })
       : Promise.resolve(0),
+    prisma.areaColocacao.findMany({
+      where: { gabineteId: gabinete.id, status: 'ativa' },
+      orderBy: { nome: 'asc' },
+      select: { id: true, nome: true },
+    }),
   ])
 
   const role = session.user.app_metadata?.role as string | undefined
@@ -164,6 +171,27 @@ export default async function FichaPessoaPage({
             slug={params.slug}
             pessoaId={pessoa.id}
             nomeAbreviado={pessoa.nome.split(' ')[0]}
+          />
+        )}
+        {isAdmin && (
+          <BancoTalentosDialog
+            slug={params.slug}
+            pessoaId={pessoa.id}
+            primeiroNome={pessoa.nome.split(' ')[0]}
+            jaCadastrado={!!pessoa.bancoTalentos}
+            areasDisponiveis={areasColocacao}
+            bancoTalentos={
+              pessoa.bancoTalentos
+                ? {
+                    curriculoUrl: pessoa.bancoTalentos.curriculoUrl,
+                    prioridade: pessoa.bancoTalentos.prioridade,
+                    isPcd: pessoa.bancoTalentos.isPcd,
+                    observacao: pessoa.bancoTalentos.observacao,
+                    colocado: pessoa.bancoTalentos.colocado,
+                    areaIds: pessoa.bancoTalentos.areas.map((a) => a.areaColocacaoId),
+                  }
+                : null
+            }
           />
         )}
       </div>
@@ -365,33 +393,34 @@ export default async function FichaPessoaPage({
                         {obs.editadoEm && ' (editado)'}
                       </span>
                       {podeEditar && (
-                        <form action={excluirObservacao}>
-                          <input type="hidden" name="slug" value={params.slug} />
-                          <input type="hidden" name="pessoaId" value={pessoa.id} />
-                          <input type="hidden" name="observacaoId" value={obs.id} />
-                          <button type="submit" className="text-red-600 text-xs hover:underline">
-                            Excluir
-                          </button>
-                        </form>
+                        <div className="flex items-center gap-2">
+                          <label htmlFor={`editar-obs-${obs.id}`} className="cursor-pointer" aria-label="Editar observação">
+                            ✏️
+                          </label>
+                          <ExcluirObservacaoButton slug={params.slug} pessoaId={pessoa.id} observacaoId={obs.id} />
+                        </div>
                       )}
                     </div>
                     <p className="text-sm text-gray-800 whitespace-pre-wrap">{obs.texto}</p>
                     {podeEditar && (
-                      <form action={editarObservacao} className="space-y-1">
-                        <input type="hidden" name="slug" value={params.slug} />
-                        <input type="hidden" name="pessoaId" value={pessoa.id} />
-                        <input type="hidden" name="observacaoId" value={obs.id} />
-                        <textarea
-                          name="texto"
-                          required
-                          rows={2}
-                          defaultValue={obs.texto}
-                          className="block w-full border border-gray-200 rounded px-2 py-1 text-sm"
-                        />
-                        <button type="submit" className="text-xs text-blue-600 hover:underline">
-                          Salvar edição
-                        </button>
-                      </form>
+                      <>
+                        <input type="checkbox" id={`editar-obs-${obs.id}`} className="peer hidden" />
+                        <form action={editarObservacao} className="space-y-1 hidden peer-checked:block">
+                          <input type="hidden" name="slug" value={params.slug} />
+                          <input type="hidden" name="pessoaId" value={pessoa.id} />
+                          <input type="hidden" name="observacaoId" value={obs.id} />
+                          <textarea
+                            name="texto"
+                            required
+                            rows={2}
+                            defaultValue={obs.texto}
+                            className="block w-full border border-gray-200 rounded px-2 py-1 text-sm"
+                          />
+                          <button type="submit" className="text-xs text-blue-600 hover:underline">
+                            Salvar edição
+                          </button>
+                        </form>
+                      </>
                     )}
                   </div>
                 )
