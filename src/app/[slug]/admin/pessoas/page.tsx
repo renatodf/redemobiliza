@@ -126,7 +126,7 @@ export default async function PessoasPage({
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-3">
         <h1 className="text-2xl font-bold text-gray-900">Usuários</h1>
         <CadastrarUsuarioModal
           slug={params.slug}

@@ -36,7 +36,7 @@ export default function Sidebar({
 
   return (
     <aside
-      className="w-[200px] shrink-0 text-[var(--cor-texto)] flex flex-col min-h-screen"
+      className="w-[200px] shrink-0 text-[var(--cor-texto)] flex flex-col min-h-screen fixed inset-y-0 left-0 z-40 -translate-x-full transition-transform duration-200 peer-checked:translate-x-0 md:relative md:translate-x-0 md:z-auto"
       style={{ backgroundColor: corPrimaria, ['--cor-texto' as string]: corTexto }}
     >
       <div className="flex flex-col items-center py-6 px-3 text-center">
@@ -70,6 +70,10 @@ export default function Sidebar({
             <Link
               key={item.label}
               href={item.href!}
+              onClick={() => {
+                const toggle = document.getElementById('sidebar-toggle') as HTMLInputElement | null
+                if (toggle) toggle.checked = false
+              }}
               className={`px-3 py-2 rounded-md text-sm transition-colors ${
                 ativo
                   ? 'bg-[color-mix(in_srgb,var(--cor-texto)_15%,transparent)] text-[var(--cor-texto)]'

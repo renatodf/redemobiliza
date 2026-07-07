@@ -15,10 +15,17 @@ export default function Topbar({
 
   return (
     <header
-      className="text-[var(--cor-texto)] px-6 py-3 flex items-center justify-between"
+      className="text-[var(--cor-texto)] px-4 md:px-6 py-3 flex items-center justify-between gap-3"
       style={{ backgroundColor: corPrimaria, ['--cor-texto' as string]: corTexto }}
     >
-      <LiveClock />
+      <div className="flex items-center gap-3 min-w-0">
+        <label htmlFor="sidebar-toggle" aria-label="Abrir menu" className="md:hidden text-xl cursor-pointer shrink-0">
+          ☰
+        </label>
+        <div className="hidden sm:block">
+          <LiveClock />
+        </div>
+      </div>
       <div className="flex items-center gap-4">
         <span className="text-lg cursor-default" aria-hidden>🔍</span>
         <span className="text-lg cursor-default relative" aria-hidden>
@@ -29,7 +36,7 @@ export default function Topbar({
         </span>
         <div className="flex items-center gap-2">
           <Avatar fotoUrl={usuarioFotoUrl} nome={usuarioNome} size={28} />
-          <span className="text-sm">{usuarioNome}</span>
+          <span className="text-sm hidden sm:inline">{usuarioNome}</span>
         </div>
       </div>
     </header>

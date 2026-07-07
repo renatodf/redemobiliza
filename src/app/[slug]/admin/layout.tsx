@@ -71,6 +71,12 @@ export default async function AdminLayout({
 
   return (
     <div className="min-h-screen bg-[#F5F5F5] flex">
+      <input type="checkbox" id="sidebar-toggle" className="peer hidden" />
+      <label
+        htmlFor="sidebar-toggle"
+        aria-label="Fechar menu"
+        className="hidden peer-checked:block md:!hidden fixed inset-0 bg-black/40 z-30"
+      />
       <Sidebar
         slug={params.slug}
         gabineteNome={gabinete.nomeSistema ?? params.slug}
@@ -92,8 +98,8 @@ export default async function AdminLayout({
           </div>
         )}
         <Topbar usuarioNome={usuarioNome} usuarioFotoUrl={usuarioFotoUrl} corPrimaria={gabinete.corPrimaria} />
-        <main className="flex-1 p-6">
-          <div className="bg-white rounded-xl shadow-sm p-6 max-w-6xl mx-auto">
+        <main className="flex-1 p-4 md:p-6">
+          <div className="bg-white rounded-xl shadow-sm p-4 md:p-6 max-w-6xl mx-auto">
             {children}
           </div>
         </main>

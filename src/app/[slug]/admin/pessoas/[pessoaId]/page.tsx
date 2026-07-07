@@ -117,7 +117,7 @@ export default async function FichaPessoaPage({
 
   return (
     <div className="max-w-2xl mx-auto py-8 px-4 space-y-8">
-      <div className="flex items-start justify-between">
+      <div className="flex items-start justify-between flex-wrap gap-4">
         <div className="flex items-center gap-4">
           <FotoPerfilAvatar
             fotoUrl={pessoa.fotoUrl}
@@ -197,7 +197,7 @@ export default async function FichaPessoaPage({
       </div>
 
       <section className="space-y-4">
-        <div className="grid grid-cols-4 gap-4 text-sm">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
           <div>
             <p className="text-xs text-gray-500">Data de Nascimento</p>
             <p>{pessoa.nascimento ? pessoa.nascimento.toLocaleDateString('pt-BR') : '—'}</p>
@@ -276,7 +276,7 @@ export default async function FichaPessoaPage({
       </section>
 
       {(redeInfo || pessoa.isMobilizador) && (
-        <section className="bg-gray-50 rounded-lg p-4 grid grid-cols-3 gap-4 text-sm">
+        <section className="bg-gray-50 rounded-lg p-4 grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
           <div className="flex items-center gap-2">
             {redeInfo && <Avatar fotoUrl={redeInfo.fotoUrl} nome={redeInfo.nome} size={28} />}
             <div>
