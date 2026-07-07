@@ -12,15 +12,23 @@ export async function criarAreaColocacao(formData: FormData) {
   const { gabinete } = await assertAdminAccess(slug)
 
   const existente = await prisma.areaColocacao.findFirst({
-    where: { gabineteId: gabinete.id, nome, status: 'ativa' },
+    where: { gabineteId: gabinete.id, nome },
   })
-  if (existente) {
-    throw new Error(`Já existe uma área ativa com esse nome: "${existente.nome}"`)
-  }
 
-  await prisma.areaColocacao.create({
-    data: { nome, gabineteId: gabinete.id, status: 'ativa' },
-  })
+  if (existente) {
+    if (existente.status === 'ativa') {
+      throw new Error(`Já existe uma área ativa com esse nome: "${existente.nome}"`)
+    }
+
+    await prisma.areaColocacao.update({
+      where: { id: existente.id },
+      data: { status: 'ativa' },
+    })
+  } else {
+    await prisma.areaColocacao.create({
+      data: { nome, gabineteId: gabinete.id, status: 'ativa' },
+    })
+  }
 
   revalidatePath(`/${slug}/admin/configuracoes/areas-colocacao`)
 }
