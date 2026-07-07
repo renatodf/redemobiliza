@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { paginar } from '@/lib/paginacao'
+import { corTextoContraste } from '@/lib/cor-contraste'
 
 export default function Pagination({
   totalItens,
@@ -17,6 +18,7 @@ export default function Pagination({
   corPrimaria: string
 }) {
   const { totalPaginas } = paginar(totalItens, paginaAtual, tamanhoPagina)
+  const corTexto = corTextoContraste(corPrimaria)
 
   function hrefParaPagina(pagina: number) {
     const params = new URLSearchParams()
@@ -56,9 +58,9 @@ export default function Pagination({
             <Link
               key={item.numero}
               href={hrefParaPagina(item.numero)}
-              style={item.numero === paginaAtual ? { backgroundColor: corPrimaria } : undefined}
+              style={item.numero === paginaAtual ? { backgroundColor: corPrimaria, color: corTexto } : undefined}
               className={`px-2 py-1 rounded ${
-                item.numero === paginaAtual ? 'text-white' : 'text-gray-600 hover:bg-gray-100'
+                item.numero === paginaAtual ? '' : 'text-gray-600 hover:bg-gray-100'
               }`}
             >
               {item.numero}

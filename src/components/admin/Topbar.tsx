@@ -1,5 +1,6 @@
 import Avatar from './Avatar'
 import LiveClock from './LiveClock'
+import { corTextoContraste } from '@/lib/cor-contraste'
 
 export default function Topbar({
   usuarioNome,
@@ -10,10 +11,12 @@ export default function Topbar({
   usuarioFotoUrl: string | null
   corPrimaria: string
 }) {
+  const corTexto = corTextoContraste(corPrimaria)
+
   return (
     <header
-      className="text-white px-6 py-3 flex items-center justify-between"
-      style={{ backgroundColor: corPrimaria }}
+      className="text-[var(--cor-texto)] px-6 py-3 flex items-center justify-between"
+      style={{ backgroundColor: corPrimaria, ['--cor-texto' as string]: corTexto }}
     >
       <LiveClock />
       <div className="flex items-center gap-4">

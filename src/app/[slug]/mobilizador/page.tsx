@@ -192,6 +192,7 @@ export default async function MobilizadorPage({
           }}
           regioes={regioes}
           profissoes={profissoes}
+          corPrimaria={gabinete.corPrimaria}
         />
         <div className="pt-2">
           <AlterarSenhaDialog />

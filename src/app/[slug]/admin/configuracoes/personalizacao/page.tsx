@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation'
 import { getGabineteBySlug } from '@/lib/gabinete'
+import { corTextoContraste } from '@/lib/cor-contraste'
 import { salvarPersonalizacao } from '@/actions/admin/salvar-personalizacao'
 import { uploadLogo } from '@/actions/admin/upload-logo'
 import { uploadBanner } from '@/actions/admin/upload-banner'
@@ -7,6 +8,7 @@ import { uploadBanner } from '@/actions/admin/upload-banner'
 export default async function PersonalizacaoConfigPage({ params }: { params: { slug: string } }) {
   const gabinete = await getGabineteBySlug(params.slug)
   if (!gabinete) notFound()
+  const corTexto = corTextoContraste(gabinete.corPrimaria)
 
   return (
     <div className="bg-white rounded-lg shadow-sm p-6 space-y-6">
@@ -43,7 +45,11 @@ export default async function PersonalizacaoConfigPage({ params }: { params: { s
             />
           </div>
         </div>
-        <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700">
+        <button
+          type="submit"
+          style={{ backgroundColor: gabinete.corPrimaria, color: corTexto }}
+          className="px-4 py-2 rounded-md text-sm font-medium hover:opacity-90"
+        >
           Salvar
         </button>
       </form>
@@ -57,7 +63,11 @@ export default async function PersonalizacaoConfigPage({ params }: { params: { s
         <form action={uploadLogo} encType="multipart/form-data">
           <input type="hidden" name="slug" value={params.slug} />
           <input name="logo" type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" className="block text-sm" />
-          <button type="submit" className="mt-2 bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700">
+          <button
+            type="submit"
+            style={{ backgroundColor: gabinete.corPrimaria, color: corTexto }}
+            className="mt-2 px-4 py-2 rounded-md text-sm font-medium hover:opacity-90"
+          >
             Enviar logo
           </button>
         </form>
@@ -72,7 +82,11 @@ export default async function PersonalizacaoConfigPage({ params }: { params: { s
         <form action={uploadBanner} encType="multipart/form-data">
           <input type="hidden" name="slug" value={params.slug} />
           <input name="banner" type="file" accept="image/png,image/jpeg,image/webp" className="block text-sm" />
-          <button type="submit" className="mt-2 bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700">
+          <button
+            type="submit"
+            style={{ backgroundColor: gabinete.corPrimaria, color: corTexto }}
+            className="mt-2 px-4 py-2 rounded-md text-sm font-medium hover:opacity-90"
+          >
             Enviar banner
           </button>
         </form>

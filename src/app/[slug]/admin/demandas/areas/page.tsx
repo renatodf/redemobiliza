@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import { getGabineteBySlug } from '@/lib/gabinete'
+import { corTextoContraste } from '@/lib/cor-contraste'
 import { criarAreaDemanda } from '@/actions/admin/criar-area-demanda'
 import { excluirAreaDemanda } from '@/actions/admin/excluir-area-demanda'
 import { editarAreaDemanda } from '@/actions/admin/editar-area-demanda'
@@ -8,6 +9,7 @@ import { editarAreaDemanda } from '@/actions/admin/editar-area-demanda'
 export default async function AreasPage({ params }: { params: { slug: string } }) {
   const gabinete = await getGabineteBySlug(params.slug)
   if (!gabinete) notFound()
+  const corTexto = corTextoContraste(gabinete.corPrimaria)
 
   const areas = await prisma.areaDemanda.findMany({
     where: { gabineteId: gabinete.id },
@@ -27,7 +29,11 @@ export default async function AreasPage({ params }: { params: { slug: string } }
           placeholder="Nome da nova área"
           className="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm"
         />
-        <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium">
+        <button
+          type="submit"
+          style={{ backgroundColor: gabinete.corPrimaria, color: corTexto }}
+          className="px-4 py-2 rounded-md text-sm font-medium"
+        >
           Criar
         </button>
       </form>
@@ -61,7 +67,11 @@ export default async function AreasPage({ params }: { params: { slug: string } }
                   required
                   className="border border-gray-300 rounded-md px-2 py-1 text-sm"
                 />
-                <button type="submit" className="bg-blue-600 text-white px-3 py-1 rounded-md text-xs">
+                <button
+                  type="submit"
+                  style={{ backgroundColor: gabinete.corPrimaria, color: corTexto }}
+                  className="px-3 py-1 rounded-md text-xs"
+                >
                   Salvar
                 </button>
               </form>

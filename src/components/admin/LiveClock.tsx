@@ -11,13 +11,13 @@ export default function LiveClock() {
     return () => clearInterval(id)
   }, [])
 
-  if (!agora) return <span className="text-sm text-white/70">&nbsp;</span>
+  if (!agora) return <span className="text-sm text-[color-mix(in_srgb,var(--cor-texto)_70%,transparent)]">&nbsp;</span>
 
   const data = agora.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })
   const hora = agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
 
   return (
-    <span className="text-sm text-white/70 flex items-center gap-2">
+    <span className="text-sm text-[color-mix(in_srgb,var(--cor-texto)_70%,transparent)] flex items-center gap-2">
       <span>📅</span>
       {data} | {hora}
     </span>

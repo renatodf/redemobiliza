@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 import { getGabineteBySlug } from '@/lib/gabinete'
+import { corTextoContraste } from '@/lib/cor-contraste'
 import { atualizarObservacaoDemanda as atualizarObservacaoDemandaAction } from '@/actions/admin/atualizar-observacao-demanda'
 import { alterarPrazoDemanda as alterarPrazoDemandaAction } from '@/actions/admin/alterar-prazo-demanda'
 import { marcarDesfechoDemanda as marcarDesfechoDemandaAction } from '@/actions/admin/marcar-desfecho-demanda'
@@ -42,6 +43,7 @@ export default async function DetalheDemandaPage({
 }) {
   const gabinete = await getGabineteBySlug(params.slug)
   if (!gabinete) notFound()
+  const corTexto = corTextoContraste(gabinete.corPrimaria)
 
   const [demanda, colaboradores] = await Promise.all([
     prisma.demanda.findFirst({
@@ -121,7 +123,11 @@ export default async function DetalheDemandaPage({
                 <option key={c.id} value={c.id}>{c.nome}</option>
               ))}
             </select>
-            <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm">
+            <button
+              type="submit"
+              style={{ backgroundColor: gabinete.corPrimaria, color: corTexto }}
+              className="px-4 py-2 rounded-md text-sm"
+            >
               Confirmar
             </button>
           </form>
@@ -144,7 +150,11 @@ export default async function DetalheDemandaPage({
             placeholder="Adicionar ou atualizar observação..."
             className="block w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
           />
-          <button type="submit" className="bg-gray-700 text-white px-4 py-2 rounded-md text-sm font-medium">
+          <button
+            type="submit"
+            style={{ backgroundColor: gabinete.corPrimaria, color: corTexto }}
+            className="px-4 py-2 rounded-md text-sm font-medium"
+          >
             Salvar observação
           </button>
         </form>

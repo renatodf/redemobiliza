@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import { getGabineteBySlug } from '@/lib/gabinete'
+import { corTextoContraste } from '@/lib/cor-contraste'
 import { criarDemanda } from '@/actions/admin/criar-demanda'
 import { cadastrarSolicitante } from '@/actions/admin/cadastrar-solicitante'
 
@@ -13,6 +14,7 @@ export default async function NovaDemandaPage({
 }) {
   const gabinete = await getGabineteBySlug(params.slug)
   if (!gabinete) notFound()
+  const corTexto = corTextoContraste(gabinete.corPrimaria)
 
   const [areas, colaboradores, config] = await Promise.all([
     prisma.areaDemanda.findMany({
@@ -87,7 +89,11 @@ export default async function NovaDemandaPage({
                 placeholder="Buscar por nome ou WhatsApp..."
                 className="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm"
               />
-              <button type="submit" className="bg-gray-600 text-white px-4 py-2 rounded-md text-sm">
+              <button
+                type="submit"
+                style={{ backgroundColor: gabinete.corPrimaria, color: corTexto }}
+                className="px-4 py-2 rounded-md text-sm"
+              >
                 Buscar
               </button>
             </form>
@@ -157,7 +163,8 @@ export default async function NovaDemandaPage({
                       <div className="flex gap-2">
                         <button
                           type="submit"
-                          className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700"
+                          style={{ backgroundColor: gabinete.corPrimaria, color: corTexto }}
+                          className="px-4 py-2 rounded-md text-sm font-medium hover:opacity-90"
                         >
                           Cadastrar e selecionar
                         </button>
@@ -250,7 +257,8 @@ export default async function NovaDemandaPage({
 
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white py-2.5 rounded-md text-sm font-medium hover:bg-blue-700"
+            style={{ backgroundColor: gabinete.corPrimaria, color: corTexto }}
+            className="w-full py-2.5 rounded-md text-sm font-medium hover:opacity-90"
           >
             Abrir Demanda
           </button>

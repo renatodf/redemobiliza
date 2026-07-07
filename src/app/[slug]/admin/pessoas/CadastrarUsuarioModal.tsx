@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Modal from '@/components/admin/Modal'
 import { cadastrarPessoa } from '@/actions/admin/cadastrar-pessoa'
+import { corTextoContraste } from '@/lib/cor-contraste'
 
 export default function CadastrarUsuarioModal({
   slug,
@@ -16,14 +17,15 @@ export default function CadastrarUsuarioModal({
   corPrimaria: string
 }) {
   const [open, setOpen] = useState(false)
+  const corTexto = corTextoContraste(corPrimaria)
 
   return (
     <>
       <button
         type="button"
         onClick={() => setOpen(true)}
-        style={{ backgroundColor: corPrimaria }}
-        className="text-white px-4 py-2 rounded-md text-sm font-medium flex items-center gap-2"
+        style={{ backgroundColor: corPrimaria, color: corTexto }}
+        className="px-4 py-2 rounded-md text-sm font-medium flex items-center gap-2"
       >
         <span aria-hidden>👤</span>
         CADASTRAR USUÁRIO
@@ -82,8 +84,8 @@ export default function CadastrarUsuarioModal({
           </div>
           <button
             type="submit"
-            style={{ backgroundColor: corPrimaria }}
-            className="w-full text-white px-4 py-2 rounded-md text-sm font-medium"
+            style={{ backgroundColor: corPrimaria, color: corTexto }}
+            className="w-full px-4 py-2 rounded-md text-sm font-medium"
           >
             Cadastrar
           </button>

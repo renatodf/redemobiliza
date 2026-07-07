@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { corTextoContraste } from '@/lib/cor-contraste'
 
 type ItemMenu = { label: string; href?: string; emBreve?: boolean }
 
@@ -31,18 +32,19 @@ export default function Sidebar({
 }) {
   const pathname = usePathname()
   const itens = buildItens(slug)
+  const corTexto = corTextoContraste(corPrimaria)
 
   return (
     <aside
-      className="w-[200px] shrink-0 text-white flex flex-col min-h-screen"
-      style={{ backgroundColor: corPrimaria }}
+      className="w-[200px] shrink-0 text-[var(--cor-texto)] flex flex-col min-h-screen"
+      style={{ backgroundColor: corPrimaria, ['--cor-texto' as string]: corTexto }}
     >
       <div className="flex flex-col items-center py-6 px-3 text-center">
         {logoUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={logoUrl} alt={gabineteNome} className="w-14 h-14 rounded-full object-cover" />
         ) : (
-          <div className="w-14 h-14 rounded-full bg-white/10 flex items-center justify-center text-xl">
+          <div className="w-14 h-14 rounded-full bg-[color-mix(in_srgb,var(--cor-texto)_10%,transparent)] flex items-center justify-center text-xl">
             {gabineteNome.charAt(0).toUpperCase()}
           </div>
         )}
@@ -56,7 +58,7 @@ export default function Sidebar({
             return (
               <span
                 key={item.label}
-                className="px-3 py-2 rounded-md text-sm text-white/30 cursor-not-allowed flex items-center justify-between"
+                className="px-3 py-2 rounded-md text-sm text-[color-mix(in_srgb,var(--cor-texto)_30%,transparent)] cursor-not-allowed flex items-center justify-between"
                 title="Em breve"
               >
                 {item.label}
@@ -69,7 +71,9 @@ export default function Sidebar({
               key={item.label}
               href={item.href!}
               className={`px-3 py-2 rounded-md text-sm transition-colors ${
-                ativo ? 'bg-white/15 text-white' : 'text-white/70 hover:bg-white/10 hover:text-white'
+                ativo
+                  ? 'bg-[color-mix(in_srgb,var(--cor-texto)_15%,transparent)] text-[var(--cor-texto)]'
+                  : 'text-[color-mix(in_srgb,var(--cor-texto)_70%,transparent)] hover:bg-[color-mix(in_srgb,var(--cor-texto)_10%,transparent)] hover:text-[var(--cor-texto)]'
               }`}
             >
               {item.label}
@@ -78,8 +82,15 @@ export default function Sidebar({
         })}
       </nav>
 
-      <form action="/api/auth/logout" method="POST" className="px-3 pb-6 pt-4 mt-4 border-t border-white/10">
-        <button type="submit" className="w-full text-left px-3 py-2 rounded-md text-sm text-white/70 hover:bg-white/10 hover:text-white">
+      <form
+        action="/api/auth/logout"
+        method="POST"
+        className="px-3 pb-6 pt-4 mt-4 border-t border-[color-mix(in_srgb,var(--cor-texto)_10%,transparent)]"
+      >
+        <button
+          type="submit"
+          className="w-full text-left px-3 py-2 rounded-md text-sm text-[color-mix(in_srgb,var(--cor-texto)_70%,transparent)] hover:bg-[color-mix(in_srgb,var(--cor-texto)_10%,transparent)] hover:text-[var(--cor-texto)]"
+        >
           Sair
         </button>
       </form>

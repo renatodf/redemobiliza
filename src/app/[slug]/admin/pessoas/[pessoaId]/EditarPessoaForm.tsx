@@ -3,6 +3,7 @@
 import { useFormState, useFormStatus } from 'react-dom'
 import { useEffect, useState } from 'react'
 import { editarPessoa } from '@/actions/admin/editar-pessoa'
+import { corTextoContraste } from '@/lib/cor-contraste'
 
 type Regiao = { id: string; nome: string }
 type Profissao = { id: string; nome: string }
@@ -20,16 +21,18 @@ interface Props {
   }
   regioes: Regiao[]
   profissoes: Profissao[]
+  corPrimaria: string
 }
 
-function SubmitButton({ ok }: { ok: boolean | null }) {
+function SubmitButton({ ok, corPrimaria }: { ok: boolean | null; corPrimaria: string }) {
   const { pending } = useFormStatus()
   return (
     <div className="flex items-center gap-3">
       <button
         type="submit"
         disabled={pending}
-        className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium disabled:opacity-60"
+        style={{ backgroundColor: corPrimaria, color: corTextoContraste(corPrimaria) }}
+        className="px-4 py-2 rounded-md text-sm font-medium disabled:opacity-60"
       >
         {pending ? 'Salvando…' : 'Salvar alterações'}
       </button>
@@ -43,7 +46,7 @@ function SubmitButton({ ok }: { ok: boolean | null }) {
   )
 }
 
-export default function EditarPessoaForm({ slug, pessoaId, pessoa, regioes, profissoes }: Props) {
+export default function EditarPessoaForm({ slug, pessoaId, pessoa, regioes, profissoes, corPrimaria }: Props) {
   const [state, action] = useFormState(editarPessoa, null)
   const [showFeedback, setShowFeedback] = useState(false)
 
@@ -133,7 +136,7 @@ export default function EditarPessoaForm({ slug, pessoaId, pessoa, regioes, prof
       {state?.erro && (
         <p className="text-sm text-red-600">{state.erro}</p>
       )}
-      <SubmitButton ok={ok} />
+      <SubmitButton ok={ok} corPrimaria={corPrimaria} />
     </form>
   )
 }

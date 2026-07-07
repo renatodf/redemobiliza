@@ -3,6 +3,7 @@ import { cookies } from 'next/headers'
 import { createServerClient } from '@supabase/ssr'
 import { prisma } from '@/lib/prisma'
 import { getGabineteBySlug } from '@/lib/gabinete'
+import { corTextoContraste } from '@/lib/cor-contraste'
 import { salvarConfiguracao } from '@/actions/admin/salvar-configuracao'
 import { criarAreaDemanda } from '@/actions/admin/criar-area-demanda'
 import { excluirAreaDemanda } from '@/actions/admin/excluir-area-demanda'
@@ -12,6 +13,7 @@ import { restaurarPessoa } from '@/actions/admin/restaurar-pessoa'
 export default async function DemandasConfigPage({ params }: { params: { slug: string } }) {
   const gabinete = await getGabineteBySlug(params.slug)
   if (!gabinete) notFound()
+  const corTexto = corTextoContraste(gabinete.corPrimaria)
 
   const cookieStore = cookies()
   const supabase = createServerClient(
@@ -75,7 +77,11 @@ export default async function DemandasConfigPage({ params }: { params: { slug: s
             />
             <p className="mt-1 text-xs text-gray-500">Envia alerta por e-mail X horas antes de expirar. Padrão: 12h</p>
           </div>
-          <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium">
+          <button
+            type="submit"
+            style={{ backgroundColor: gabinete.corPrimaria, color: corTexto }}
+            className="px-4 py-2 rounded-md text-sm font-medium"
+          >
             Salvar
           </button>
         </form>
@@ -91,7 +97,11 @@ export default async function DemandasConfigPage({ params }: { params: { slug: s
             placeholder="Nome da nova área"
             className="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm"
           />
-          <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium">
+          <button
+            type="submit"
+            style={{ backgroundColor: gabinete.corPrimaria, color: corTexto }}
+            className="px-4 py-2 rounded-md text-sm font-medium"
+          >
             Criar
           </button>
         </form>
@@ -117,7 +127,13 @@ export default async function DemandasConfigPage({ params }: { params: { slug: s
                   <input type="hidden" name="slug" value={params.slug} />
                   <input type="hidden" name="areaId" value={a.id} />
                   <input name="nome" defaultValue={a.nome} required className="border border-gray-300 rounded-md px-2 py-1 text-sm" />
-                  <button type="submit" className="bg-blue-600 text-white px-3 py-1 rounded-md text-xs">Salvar</button>
+                  <button
+                    type="submit"
+                    style={{ backgroundColor: gabinete.corPrimaria, color: corTexto }}
+                    className="px-3 py-1 rounded-md text-xs"
+                  >
+                    Salvar
+                  </button>
                 </form>
               </details>
             </li>

@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import { getGabineteBySlug } from '@/lib/gabinete'
+import { corTextoContraste } from '@/lib/cor-contraste'
 import { GraficoDemandas } from '@/components/GraficoDemandas'
 
 function calcularIntervalo(
@@ -63,6 +64,7 @@ export default async function DashboardPage({
 }) {
   const gabinete = await getGabineteBySlug(params.slug)
   if (!gabinete) notFound()
+  const corTexto = corTextoContraste(gabinete.corPrimaria)
 
   const periodo = searchParams.periodo ?? '30dias'
   const { dataInicio, dataFim } = calcularIntervalo(
@@ -188,10 +190,9 @@ export default async function DashboardPage({
             <a
               key={p}
               href={`/${params.slug}/admin/dashboard?periodo=${p}`}
+              style={periodo === p ? { backgroundColor: gabinete.corPrimaria, borderColor: gabinete.corPrimaria, color: corTexto } : undefined}
               className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors ${
-                periodo === p
-                  ? 'bg-blue-600 text-white border-blue-600'
-                  : 'bg-white text-gray-600 border-gray-300 hover:border-blue-400'
+                periodo === p ? '' : 'bg-white text-gray-600 border-gray-300 hover:border-blue-400'
               }`}
             >
               {labelPeriodo[p]}

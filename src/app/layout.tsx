@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { Ubuntu_Condensed } from 'next/font/google'
 import './globals.css'
 
-const inter = Inter({ subsets: ['latin'] })
+const ubuntuCondensed = Ubuntu_Condensed({ subsets: ['latin'], weight: '400' })
 
 export const metadata: Metadata = {
   title: 'Rede Mobiliza',
@@ -16,7 +16,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-BR">
-      <body className={inter.className}>{children}</body>
+      <body className={ubuntuCondensed.className}>{children}</body>
     </html>
   )
 }

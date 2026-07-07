@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 import { getGabineteBySlug } from '@/lib/gabinete'
+import { corTextoContraste } from '@/lib/cor-contraste'
 import { GraficoDemandas } from '@/components/GraficoDemandas'
 
 const STATUS_CONFIG = {
@@ -31,6 +32,7 @@ export default async function DemandasPage({
 }) {
   const gabinete = await getGabineteBySlug(params.slug)
   if (!gabinete) notFound()
+  const corTexto = corTextoContraste(gabinete.corPrimaria)
 
   const hoje = new Date()
   const inicioMes = new Date(hoje.getFullYear(), hoje.getMonth(), 1)
@@ -118,7 +120,11 @@ export default async function DemandasPage({
     <div className="max-w-6xl mx-auto py-8 px-4 space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Demandas</h1>
-        <Link href={`/${params.slug}/admin/demandas/nova`} className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium">
+        <Link
+          href={`/${params.slug}/admin/demandas/nova`}
+          style={{ backgroundColor: gabinete.corPrimaria, color: corTexto }}
+          className="px-4 py-2 rounded-md text-sm font-medium"
+        >
           + Nova demanda
         </Link>
       </div>
@@ -176,7 +182,11 @@ export default async function DemandasPage({
             <option value="nao">Não</option>
           </select>
 
-          <button type="submit" className="bg-gray-700 text-white px-4 py-1.5 rounded-md text-sm">
+          <button
+            type="submit"
+            style={{ backgroundColor: gabinete.corPrimaria, color: corTexto }}
+            className="px-4 py-1.5 rounded-md text-sm"
+          >
             Filtrar
           </button>
         </div>
@@ -244,7 +254,8 @@ export default async function DemandasPage({
             <a
               key={p}
               href={`/${params.slug}/admin/demandas?${new URLSearchParams({ ...Object.fromEntries(Object.entries(searchParams).filter(([k, v]) => k !== 'pagina' && v)), pagina: String(p) }).toString()}`}
-              className={`px-3 py-1 rounded text-sm ${p === pagina ? 'bg-blue-600 text-white' : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'}`}
+              style={p === pagina ? { backgroundColor: gabinete.corPrimaria, color: corTexto } : undefined}
+              className={`px-3 py-1 rounded text-sm ${p === pagina ? '' : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'}`}
             >
               {p}
             </a>

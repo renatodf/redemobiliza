@@ -5,6 +5,7 @@ import { getGabineteBySlug } from '@/lib/gabinete'
 import Pagination from '@/components/admin/Pagination'
 import { paginar } from '@/lib/paginacao'
 import { mapPapelParaTipoConta } from '@/lib/tipo-conta'
+import { corTextoContraste } from '@/lib/cor-contraste'
 import UsuariosTable, { type UsuarioRow } from './UsuariosTable'
 import CadastrarUsuarioModal from './CadastrarUsuarioModal'
 
@@ -26,6 +27,7 @@ export default async function PessoasPage({
 }) {
   const gabinete = await getGabineteBySlug(params.slug)
   if (!gabinete) notFound()
+  const corTexto = corTextoContraste(gabinete.corPrimaria)
 
   const q = searchParams.q?.trim() ?? ''
   const { sort, order, rede, path } = searchParams
@@ -167,7 +169,11 @@ export default async function PessoasPage({
           placeholder="Buscar por nome, WhatsApp ou e-mail..."
           className="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm"
         />
-        <button type="submit" className="bg-gray-600 text-white px-4 py-2 rounded-md text-sm font-medium">
+        <button
+          type="submit"
+          style={{ backgroundColor: gabinete.corPrimaria, color: corTexto }}
+          className="px-4 py-2 rounded-md text-sm font-medium"
+        >
           Buscar
         </button>
       </form>

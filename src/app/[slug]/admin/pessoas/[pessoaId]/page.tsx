@@ -20,6 +20,7 @@ import VerMaisList from '@/components/admin/VerMaisList'
 import { mapPapelParaTipoConta } from '@/lib/tipo-conta'
 import { statusDemandaPill, foiAtendidaPill } from '@/lib/status-demanda'
 import CollapsibleSection from '@/components/admin/CollapsibleSection'
+import { corTextoContraste } from '@/lib/cor-contraste'
 
 export default async function FichaPessoaPage({
   params,
@@ -30,6 +31,7 @@ export default async function FichaPessoaPage({
 }) {
   const gabinete = await getGabineteBySlug(params.slug)
   if (!gabinete) notFound()
+  const corTextoSecundaria = corTextoContraste(gabinete.corSecundaria)
 
   const cookieStore = cookies()
   const supabase = createServerClient(
@@ -239,6 +241,7 @@ export default async function FichaPessoaPage({
               }}
               regioes={regioes}
               profissoes={profissoes}
+              corPrimaria={gabinete.corPrimaria}
             />
           </div>
         </div>
@@ -283,8 +286,8 @@ export default async function FichaPessoaPage({
         actions={
           <Link
             href={`/${params.slug}/admin/demandas/nova?solicitanteId=${pessoa.id}`}
-            style={{ backgroundColor: gabinete.corSecundaria }}
-            className="text-white text-xs px-3 py-1.5 rounded-md hover:opacity-90 font-medium"
+            style={{ backgroundColor: gabinete.corSecundaria, color: corTextoSecundaria }}
+            className="text-xs px-3 py-1.5 rounded-md hover:opacity-90 font-medium"
           >
             + CRIAR NOVA DEMANDA
           </Link>
@@ -334,8 +337,8 @@ export default async function FichaPessoaPage({
           <div className="flex justify-end">
             <button
               type="submit"
-              style={{ backgroundColor: gabinete.corSecundaria }}
-              className="text-white px-4 py-2 rounded-md text-sm font-medium"
+              style={{ backgroundColor: gabinete.corSecundaria, color: corTextoSecundaria }}
+              className="px-4 py-2 rounded-md text-sm font-medium"
             >
               + CRIAR NOVA OBSERVAÇÃO
             </button>

@@ -1,12 +1,14 @@
 import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import { getGabineteBySlug } from '@/lib/gabinete'
+import { corTextoContraste } from '@/lib/cor-contraste'
 import { criarProfissao } from '@/actions/admin/criar-profissao'
 import { desativarProfissao } from '@/actions/admin/desativar-profissao'
 
 export default async function ProfissoesPage({ params }: { params: { slug: string } }) {
   const gabinete = await getGabineteBySlug(params.slug)
   if (!gabinete) notFound()
+  const corTexto = corTextoContraste(gabinete.corPrimaria)
 
   const profissoes = await prisma.profissao.findMany({
     where: { gabineteId: gabinete.id, ativa: true },
@@ -26,7 +28,11 @@ export default async function ProfissoesPage({ params }: { params: { slug: strin
           placeholder="Nome da nova profissão"
           className="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm"
         />
-        <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium">
+        <button
+          type="submit"
+          style={{ backgroundColor: gabinete.corPrimaria, color: corTexto }}
+          className="px-4 py-2 rounded-md text-sm font-medium"
+        >
           Adicionar
         </button>
       </form>
