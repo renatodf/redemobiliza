@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import Avatar from '@/components/admin/Avatar'
 import SegmentPills from '@/components/admin/SegmentPills'
+import SortableHeader from '@/components/SortableHeader'
 import { softDeletePessoa } from '@/actions/admin/soft-delete-pessoa'
 
 export type UsuarioRow = {
@@ -44,7 +45,9 @@ export default function UsuariosTable({ slug, usuarios }: { slug: string; usuari
             />
           </th>
           <th className="w-12 px-2 py-3" />
-          <th className="text-left px-2 py-3 font-medium text-gray-600">Nome</th>
+          <th className="text-left px-2 py-3">
+            <SortableHeader label="Nome" field="nome" />
+          </th>
           <th className="text-left px-4 py-3 font-medium text-gray-600">Email</th>
           <th className="text-left px-4 py-3 font-medium text-gray-600">Tipo de Conta</th>
           <th className="text-left px-4 py-3 font-medium text-gray-600">Segmentos</th>

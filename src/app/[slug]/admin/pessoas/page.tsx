@@ -2,28 +2,13 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 import { getGabineteBySlug } from '@/lib/gabinete'
-import { cadastrarPessoa } from '@/actions/admin/cadastrar-pessoa'
-import SortableHeader from '@/components/SortableHeader'
+import Pagination from '@/components/admin/Pagination'
+import { paginar } from '@/lib/paginacao'
+import { mapPapelParaTipoConta } from '@/lib/tipo-conta'
+import UsuariosTable, { type UsuarioRow } from './UsuariosTable'
+import CadastrarUsuarioModal from './CadastrarUsuarioModal'
 
-const pessoaSelect = {
-  id: true,
-  nome: true,
-  whatsapp: true,
-  isColaborador: true,
-  isMobilizador: true,
-  regiao: { select: { nome: true } },
-  _count: { select: { redesComoIndicador: { where: { deletedAt: null } } } },
-  redesComoIndicador: {
-    where: { deletedAt: null },
-    select: {
-      pessoa: {
-        select: {
-          _count: { select: { redesComoIndicador: { where: { deletedAt: null } } } },
-        },
-      },
-    },
-  },
-} as const
+const PAGE_SIZE = 20
 
 function buildOrderBy(sort?: string, order?: string) {
   if (sort === 'nome') {
@@ -32,17 +17,12 @@ function buildOrderBy(sort?: string, order?: string) {
   return { criadoEm: 'desc' as const }
 }
 
-function buildRedeUrl(slug: string, pessoaId: string, currentPathIds: string[]): string {
-  const newPath = [...currentPathIds, pessoaId].join(',')
-  return `/${slug}/admin/pessoas?rede=${pessoaId}&path=${newPath}`
-}
-
 export default async function PessoasPage({
   params,
   searchParams,
 }: {
   params: { slug: string }
-  searchParams: { q?: string; sort?: string; order?: string; rede?: string; path?: string }
+  searchParams: { q?: string; sort?: string; order?: string; rede?: string; path?: string; page?: string }
 }) {
   const gabinete = await getGabineteBySlug(params.slug)
   if (!gabinete) notFound()
@@ -51,6 +31,7 @@ export default async function PessoasPage({
   const { sort, order, rede, path } = searchParams
   const orderBy = buildOrderBy(sort, order)
   const pathIds = path ? path.split(',').filter(Boolean) : []
+  const paginaSolicitada = Number(searchParams.page ?? '1') || 1
 
   const searchFilter = q
     ? {
@@ -62,55 +43,61 @@ export default async function PessoasPage({
       }
     : {}
 
-  // Busca pessoas (cascata ou todas)
-  let pessoasRaw: Awaited<ReturnType<typeof prisma.pessoa.findMany<{ select: typeof pessoaSelect }>>> = []
-
+  let idsFiltro: string[] | null = null
   if (rede) {
     const vinculos = await prisma.vinculoRede.findMany({
       where: { indicadoPorId: rede, gabineteId: gabinete.id, deletedAt: null },
       select: { pessoaId: true },
     })
-    const ids = vinculos.map((v) => v.pessoaId)
-    if (ids.length > 0) {
-      pessoasRaw = await prisma.pessoa.findMany({
-        where: { id: { in: ids }, gabineteId: gabinete.id, deletedAt: null, ...searchFilter },
-        orderBy,
-        take: 50,
-        select: pessoaSelect,
-      })
-    }
-  } else {
-    pessoasRaw = await prisma.pessoa.findMany({
-      where: { gabineteId: gabinete.id, deletedAt: null, ...searchFilter },
-      orderBy,
-      take: 50,
-      select: pessoaSelect,
-    })
+    idsFiltro = vinculos.map((v) => v.pessoaId)
   }
 
-  const pessoas = pessoasRaw.map((p) => ({
-    ...p,
-    totalRedes: p._count.redesComoIndicador,
-    totalCadastros: p.redesComoIndicador.reduce(
-      (acc, v) => acc + v.pessoa._count.redesComoIndicador,
-      0
-    ),
+  const whereBase = {
+    gabineteId: gabinete.id,
+    deletedAt: null,
+    ...searchFilter,
+    ...(idsFiltro ? { id: { in: idsFiltro } } : {}),
+  }
+
+  const totalItens = idsFiltro && idsFiltro.length === 0 ? 0 : await prisma.pessoa.count({ where: whereBase })
+  const { paginaAtual, skip, take } = paginar(totalItens, paginaSolicitada, PAGE_SIZE)
+
+  const pessoasRaw =
+    idsFiltro && idsFiltro.length === 0
+      ? []
+      : await prisma.pessoa.findMany({
+          where: whereBase,
+          orderBy,
+          skip,
+          take,
+          select: {
+            id: true,
+            nome: true,
+            email: true,
+            fotoUrl: true,
+            userId: true,
+            segmentos: { select: { segmento: { select: { id: true, nome: true } } } },
+          },
+        })
+
+  const userIds = pessoasRaw.map((p) => p.userId).filter((id): id is string => !!id)
+  const papeis = userIds.length
+    ? await prisma.usuarioGabinete.findMany({
+        where: { userId: { in: userIds }, gabineteId: gabinete.id },
+        select: { userId: true, papel: true },
+      })
+    : []
+  const papelPorUserId = new Map(papeis.map((p) => [p.userId, p.papel]))
+
+  const usuarios: UsuarioRow[] = pessoasRaw.map((p) => ({
+    id: p.id,
+    nome: p.nome,
+    email: p.email,
+    fotoUrl: p.fotoUrl,
+    tipoConta: mapPapelParaTipoConta(p.userId ? papelPorUserId.get(p.userId) : null),
+    segmentos: p.segmentos.map((s) => s.segmento),
   }))
 
-  // Breadcrumb
-  const breadcrumbPessoas =
-    pathIds.length > 0
-      ? await prisma.pessoa.findMany({
-          where: { id: { in: pathIds }, gabineteId: gabinete.id, deletedAt: null },
-          select: { id: true, nome: true },
-        })
-      : []
-
-  const breadcrumb = pathIds
-    .map((id) => breadcrumbPessoas.find((p) => p.id === id))
-    .filter(Boolean) as { id: string; nome: string }[]
-
-  // Formulário de cadastro
   const [regioes, profissoes] = await Promise.all([
     prisma.regiao.findMany({
       where: { gabineteId: gabinete.id, ativa: true },
@@ -124,15 +111,28 @@ export default async function PessoasPage({
     }),
   ])
 
-  return (
-    <div className="max-w-5xl mx-auto py-8 px-4 space-y-6">
-      <h1 className="text-2xl font-bold">Pessoas</h1>
+  const breadcrumbPessoas =
+    pathIds.length > 0
+      ? await prisma.pessoa.findMany({
+          where: { id: { in: pathIds }, gabineteId: gabinete.id, deletedAt: null },
+          select: { id: true, nome: true },
+        })
+      : []
+  const breadcrumb = pathIds
+    .map((id) => breadcrumbPessoas.find((p) => p.id === id))
+    .filter(Boolean) as { id: string; nome: string }[]
 
-      {/* Breadcrumb */}
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold text-gray-900">Usuários</h1>
+        <CadastrarUsuarioModal slug={params.slug} regioes={regioes} profissoes={profissoes} />
+      </div>
+
       {breadcrumb.length > 0 && (
         <nav className="text-sm text-gray-500 flex items-center gap-1 flex-wrap">
           <Link href={`/${params.slug}/admin/pessoas`} className="hover:text-gray-900">
-            Pessoas
+            Usuários
           </Link>
           {breadcrumb.map((item, i) => {
             const isLast = i === breadcrumb.length - 1
@@ -143,10 +143,7 @@ export default async function PessoasPage({
                 {isLast ? (
                   <span className="text-gray-900 font-medium">Rede de {item.nome}</span>
                 ) : (
-                  <Link
-                    href={`/${params.slug}/admin/pessoas?rede=${item.id}&path=${crumbPath}`}
-                    className="hover:text-gray-900"
-                  >
+                  <Link href={`/${params.slug}/admin/pessoas?rede=${item.id}&path=${crumbPath}`} className="hover:text-gray-900">
                     Rede de {item.nome}
                   </Link>
                 )}
@@ -170,162 +167,15 @@ export default async function PessoasPage({
         </button>
       </form>
 
-      {!rede && (
-        <details className="bg-white rounded-lg shadow-sm">
-          <summary className="px-4 py-3 text-sm font-medium cursor-pointer">
-            + Cadastrar pessoa manualmente
-          </summary>
-          <form action={cadastrarPessoa} className="px-4 pb-4 space-y-3">
-            <input type="hidden" name="slug" value={params.slug} />
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Nome *</label>
-              <input
-                name="nome"
-                required
-                className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">WhatsApp *</label>
-                <input
-                  name="whatsapp"
-                  required
-                  placeholder="(61) 9 9999-9999"
-                  className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">E-mail</label>
-                <input
-                  name="email"
-                  type="email"
-                  className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
-                />
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Região</label>
-                <select
-                  name="regiaoId"
-                  className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
-                >
-                  <option value="">Selecionar...</option>
-                  {regioes.map((r) => (
-                    <option key={r.id} value={r.id}>{r.nome}</option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Profissão</label>
-                <select
-                  name="profissaoId"
-                  className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
-                >
-                  <option value="">Selecionar...</option>
-                  {profissoes.map((p) => (
-                    <option key={p.id} value={p.id}>{p.nome}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Gênero</label>
-              <select
-                name="genero"
-                className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
-              >
-                <option value="">Prefiro não informar</option>
-                <option value="masculino">Masculino</option>
-                <option value="feminino">Feminino</option>
-                <option value="outro">Outro</option>
-              </select>
-            </div>
-            <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium">
-              Cadastrar
-            </button>
-          </form>
-        </details>
-      )}
-
-      <div className="bg-white rounded-lg shadow-sm overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead className="bg-gray-50 border-b border-gray-200">
-            <tr>
-              <th className="text-left px-4 py-3">
-                <SortableHeader label="Nome" field="nome" />
-              </th>
-              <th className="text-left px-4 py-3 font-medium text-gray-600">WhatsApp</th>
-              <th className="text-left px-4 py-3 font-medium text-gray-600">Região</th>
-              <th className="text-center px-4 py-3 font-medium text-gray-600">Redes</th>
-              <th className="text-center px-4 py-3 font-medium text-gray-600">Cadastros nas redes</th>
-              <th className="text-left px-4 py-3 font-medium text-gray-600">Colaborador</th>
-              <th className="text-left px-4 py-3 font-medium text-gray-600">Mobilizador</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100">
-            {pessoas.map((p) => {
-              const redeUrl = buildRedeUrl(params.slug, p.id, pathIds)
-              return (
-                <tr key={p.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3">
-                    <Link
-                      href={`/${params.slug}/admin/pessoas/${p.id}`}
-                      className="text-blue-600 hover:underline font-medium"
-                    >
-                      {p.nome}
-                    </Link>
-                  </td>
-                  <td className="px-4 py-3 text-gray-600">{p.whatsapp}</td>
-                  <td className="px-4 py-3 text-gray-600">{p.regiao?.nome ?? '—'}</td>
-                  <td className="px-4 py-3 text-center">
-                    {p.totalRedes === 0 ? (
-                      <span className="text-gray-400">—</span>
-                    ) : (
-                      <Link href={redeUrl} className="text-blue-600 hover:underline font-medium">
-                        {p.totalRedes}
-                      </Link>
-                    )}
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    {p.totalCadastros === 0 ? (
-                      <span className="text-gray-400">—</span>
-                    ) : (
-                      <Link href={redeUrl} className="text-blue-600 hover:underline font-medium">
-                        {p.totalCadastros}
-                      </Link>
-                    )}
-                  </td>
-                  <td className="px-4 py-3">
-                    {p.isColaborador && (
-                      <span className="inline-block bg-green-100 text-green-800 text-xs px-2 py-0.5 rounded-full">
-                        Colaborador
-                      </span>
-                    )}
-                  </td>
-                  <td className="px-4 py-3">
-                    {p.isMobilizador && (
-                      <Link
-                        href={redeUrl}
-                        className="inline-block bg-purple-100 text-purple-800 text-xs px-2 py-0.5 rounded-full hover:bg-purple-200"
-                      >
-                        Mobilizador
-                      </Link>
-                    )}
-                  </td>
-                </tr>
-              )
-            })}
-            {pessoas.length === 0 && (
-              <tr>
-                <td colSpan={7} className="px-4 py-6 text-center text-gray-500">
-                  Nenhuma pessoa encontrada
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+      <div className="bg-white rounded-lg overflow-x-auto">
+        <UsuariosTable slug={params.slug} usuarios={usuarios} />
+        <Pagination
+          totalItens={totalItens}
+          paginaAtual={paginaAtual}
+          tamanhoPagina={PAGE_SIZE}
+          baseUrl={`/${params.slug}/admin/pessoas`}
+          searchParams={{ q, sort, order, rede, path }}
+        />
       </div>
     </div>
   )
