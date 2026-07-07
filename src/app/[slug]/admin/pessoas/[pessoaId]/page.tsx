@@ -306,7 +306,7 @@ export default async function FichaPessoaPage({
 
       <section className="space-y-2">
         <h2 className="text-lg font-semibold border-b border-gray-100 pb-2">Segmentos</h2>
-        <SegmentPills segmentos={segmentosPessoa} maxVisiveis={10} />
+        <SegmentPills segmentos={segmentosPessoa} maxVisiveis={10} corPrimaria={gabinete.corPrimaria} />
       </section>
 
       <CollapsibleSection

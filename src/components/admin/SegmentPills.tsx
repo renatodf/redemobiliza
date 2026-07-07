@@ -1,13 +1,16 @@
 'use client'
 
 import { useState } from 'react'
+import { corTextoContraste } from '@/lib/cor-contraste'
 
 export default function SegmentPills({
   segmentos,
   maxVisiveis = 3,
+  corPrimaria,
 }: {
   segmentos: { id: string; nome: string }[]
   maxVisiveis?: number
+  corPrimaria?: string
 }) {
   const [expandido, setExpandido] = useState(false)
 
@@ -17,11 +20,18 @@ export default function SegmentPills({
 
   const visiveis = expandido ? segmentos : segmentos.slice(0, maxVisiveis)
   const restantes = segmentos.length - maxVisiveis
+  const corTexto = corPrimaria ? corTextoContraste(corPrimaria) : '#ffffff'
 
   return (
     <div className="flex flex-wrap gap-1 items-center">
-      {visiveis.map((s) => (
-        <span key={s.id} className="bg-black text-white text-xs px-2 py-0.5 rounded-full whitespace-nowrap">
+      {visiveis.map((s, i) => (
+        <span
+          key={s.id}
+          style={i === 0 && corPrimaria ? { backgroundColor: corPrimaria, color: corTexto } : undefined}
+          className={`text-[10px] uppercase tracking-wide px-2 py-1 rounded-sm whitespace-nowrap font-medium ${
+            i === 0 ? (corPrimaria ? '' : 'bg-black text-white') : 'bg-[#757575] text-white'
+          }`}
+        >
           {s.nome}
         </span>
       ))}

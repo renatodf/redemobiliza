@@ -19,6 +19,7 @@ export default function Pagination({
 }) {
   const { totalPaginas } = paginar(totalItens, paginaAtual, tamanhoPagina)
   const corTexto = corTextoContraste(corPrimaria)
+  const exibindo = Math.min(tamanhoPagina, Math.max(0, totalItens - (paginaAtual - 1) * tamanhoPagina))
 
   function hrefParaPagina(pagina: number) {
     const params = new URLSearchParams()
@@ -48,6 +49,9 @@ export default function Pagination({
 
   return (
     <div className="flex items-center justify-between px-4 py-3 text-sm">
+      <span className="text-[#757575]">
+        Exibindo {exibindo.toLocaleString('pt-BR')} de {totalItens.toLocaleString('pt-BR')}
+      </span>
       <div className="flex items-center gap-1">
         {itens.map((item) =>
           item.tipo === 'reticencias' ? (
@@ -60,17 +64,15 @@ export default function Pagination({
               href={hrefParaPagina(item.numero)}
               style={item.numero === paginaAtual ? { backgroundColor: corPrimaria, color: corTexto } : undefined}
               className={`px-2 py-1 rounded ${
-                item.numero === paginaAtual ? '' : 'text-gray-600 hover:bg-gray-100'
+                item.numero === paginaAtual ? '' : 'text-[#757575] hover:bg-gray-100'
               }`}
             >
               {item.numero}
             </Link>
           )
         )}
+        <span className="text-[#757575] pl-1">de {totalPaginas}</span>
       </div>
-      <span className="text-gray-500">
-        {totalItens.toLocaleString('pt-BR')} usuários cadastrados
-      </span>
     </div>
   )
 }

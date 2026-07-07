@@ -179,7 +179,7 @@ export default async function PessoasPage({
       </form>
 
       <div className="bg-white rounded-lg overflow-x-auto">
-        <UsuariosTable slug={params.slug} usuarios={usuarios} />
+        <UsuariosTable slug={params.slug} usuarios={usuarios} corPrimaria={gabinete.corPrimaria} />
         <Pagination
           totalItens={totalItens}
           paginaAtual={paginaAtual}

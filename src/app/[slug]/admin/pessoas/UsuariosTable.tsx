@@ -16,7 +16,37 @@ export type UsuarioRow = {
   segmentos: { id: string; nome: string }[]
 }
 
-export default function UsuariosTable({ slug, usuarios }: { slug: string; usuarios: UsuarioRow[] }) {
+function IconeEditar() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden>
+      <path
+        d="M11.3 2.3a1.5 1.5 0 0 1 2.1 2.1L5.5 12.3l-2.8.7.7-2.8 7.9-7.9Z"
+        stroke="#979797"
+        strokeWidth="1.4"
+        strokeLinejoin="round"
+      />
+    </svg>
+  )
+}
+
+function IconeExcluir() {
+  return (
+    <svg width="14" height="16" viewBox="0 0 14 16" fill="none" aria-hidden>
+      <path d="M1 4h12M5 4V2.5A1.5 1.5 0 0 1 6.5 1h1A1.5 1.5 0 0 1 9 2.5V4" stroke="#979797" strokeWidth="1.4" />
+      <path d="M2.5 4 3 14.5A1.2 1.2 0 0 0 4.2 15.7h5.6A1.2 1.2 0 0 0 11 14.5L11.5 4" stroke="#979797" strokeWidth="1.4" />
+    </svg>
+  )
+}
+
+export default function UsuariosTable({
+  slug,
+  usuarios,
+  corPrimaria,
+}: {
+  slug: string
+  usuarios: UsuarioRow[]
+  corPrimaria: string
+}) {
   const [selecionados, setSelecionados] = useState<Set<string>>(new Set())
 
   function toggleTodos(marcar: boolean) {
@@ -48,10 +78,10 @@ export default function UsuariosTable({ slug, usuarios }: { slug: string; usuari
           <th className="text-left px-2 py-3">
             <SortableHeader label="Nome" field="nome" />
           </th>
-          <th className="text-left px-4 py-3 font-medium text-gray-600">Email</th>
-          <th className="text-left px-4 py-3 font-medium text-gray-600">Tipo de Conta</th>
-          <th className="text-left px-4 py-3 font-medium text-gray-600">Segmentos</th>
-          <th className="text-right px-4 py-3 font-medium text-gray-600">Ações</th>
+          <th className="text-left px-4 py-3 font-medium text-[#686868]">Email</th>
+          <th className="text-left px-4 py-3 font-medium text-[#686868]">Tipo de Conta</th>
+          <th className="text-left px-4 py-3 font-medium text-[#686868]">Segmentos</th>
+          <th className="text-right px-4 py-3 font-medium text-[#686868]">Ações</th>
         </tr>
       </thead>
       <tbody className="divide-y divide-gray-100">
@@ -73,15 +103,15 @@ export default function UsuariosTable({ slug, usuarios }: { slug: string; usuari
                 {u.nome}
               </Link>
             </td>
-            <td className="px-4 py-3 text-gray-600">{u.email ?? '—'}</td>
-            <td className="px-4 py-3 text-gray-600">{u.tipoConta}</td>
+            <td className="px-4 py-3 text-[#757575]">{u.email ?? '—'}</td>
+            <td className="px-4 py-3 text-[#757575]">{u.tipoConta}</td>
             <td className="px-4 py-3">
-              <SegmentPills segmentos={u.segmentos} />
+              <SegmentPills segmentos={u.segmentos} corPrimaria={corPrimaria} />
             </td>
             <td className="px-4 py-3">
               <div className="flex items-center justify-end gap-3">
                 <Link href={`/${slug}/admin/pessoas/${u.id}?editar=1`} aria-label={`Editar ${u.nome}`}>
-                  ✏️
+                  <IconeEditar />
                 </Link>
                 <form
                   action={softDeletePessoa}
@@ -94,7 +124,7 @@ export default function UsuariosTable({ slug, usuarios }: { slug: string; usuari
                   <input type="hidden" name="slug" value={slug} />
                   <input type="hidden" name="pessoaId" value={u.id} />
                   <button type="submit" aria-label={`Excluir ${u.nome}`}>
-                    🗑️
+                    <IconeExcluir />
                   </button>
                 </form>
               </div>

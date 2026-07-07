@@ -36,15 +36,15 @@ export default function Sidebar({
 
   return (
     <aside
-      className="w-[200px] shrink-0 text-[var(--cor-texto)] flex flex-col min-h-screen fixed inset-y-0 left-0 z-40 -translate-x-full transition-transform duration-200 peer-checked:translate-x-0 md:relative md:translate-x-0 md:z-auto"
+      className="w-[200px] shrink-0 text-[var(--cor-texto)] flex flex-col min-h-screen md:min-h-0 md:h-full fixed inset-y-0 left-0 z-40 -translate-x-full transition-transform duration-200 peer-checked:translate-x-0 md:relative md:translate-x-0 md:z-auto"
       style={{ backgroundColor: corPrimaria, ['--cor-texto' as string]: corTexto }}
     >
       <div className="flex flex-col items-center py-6 px-3 text-center">
         {logoUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={logoUrl} alt={gabineteNome} className="w-14 h-14 rounded-full object-cover" />
+          <img src={logoUrl} alt={gabineteNome} className="w-24 h-24 rounded-full object-cover" />
         ) : (
-          <div className="w-14 h-14 rounded-full bg-[color-mix(in_srgb,var(--cor-texto)_10%,transparent)] flex items-center justify-center text-xl">
+          <div className="w-24 h-24 rounded-full bg-[color-mix(in_srgb,var(--cor-texto)_10%,transparent)] flex items-center justify-center text-3xl">
             {gabineteNome.charAt(0).toUpperCase()}
           </div>
         )}

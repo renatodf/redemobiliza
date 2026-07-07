@@ -70,39 +70,42 @@ export default async function AdminLayout({
   const usuarioFotoUrl = pessoaLogada?.fotoUrl ?? null
 
   return (
-    <div className="min-h-screen bg-[#F5F5F5] flex">
-      <input type="checkbox" id="sidebar-toggle" className="peer hidden" />
-      <label
-        htmlFor="sidebar-toggle"
-        aria-label="Fechar menu"
-        className="hidden peer-checked:block md:!hidden fixed inset-0 bg-black/40 z-30"
-      />
-      <Sidebar
-        slug={params.slug}
-        gabineteNome={gabinete.nomeSistema ?? params.slug}
-        logoUrl={gabinete.logoUrl}
-        corPrimaria={gabinete.corPrimaria}
-      />
-      <div className="flex-1 flex flex-col min-w-0">
-        {modoSuporteAtivo && sairAction && (
-          <div className="bg-yellow-400 text-yellow-900 px-4 py-2 flex items-center justify-between text-sm font-medium">
-            <span>
-              Modo Suporte ativo — você está visualizando{' '}
-              <strong>{gabinete.nomeSistema ?? params.slug}</strong>
-            </span>
-            <form action={sairAction}>
-              <button type="submit" className="underline hover:no-underline">
-                Sair do modo suporte
-              </button>
-            </form>
-          </div>
-        )}
-        <Topbar usuarioNome={usuarioNome} usuarioFotoUrl={usuarioFotoUrl} corPrimaria={gabinete.corPrimaria} />
-        <main className="flex-1 p-4 md:p-6">
-          <div className="bg-white rounded-xl shadow-sm p-4 md:p-6 max-w-6xl mx-auto">
-            {children}
-          </div>
-        </main>
+    <div className="min-h-screen bg-[#F5F6FA] flex flex-col">
+      <div className="h-[11px] w-full shrink-0" style={{ backgroundColor: gabinete.corPrimaria }} />
+      <div className="flex flex-1 min-h-0">
+        <input type="checkbox" id="sidebar-toggle" className="peer hidden" />
+        <label
+          htmlFor="sidebar-toggle"
+          aria-label="Fechar menu"
+          className="hidden peer-checked:block md:!hidden fixed inset-0 bg-black/40 z-30"
+        />
+        <Sidebar
+          slug={params.slug}
+          gabineteNome={gabinete.nomeSistema ?? params.slug}
+          logoUrl={gabinete.logoUrl}
+          corPrimaria={gabinete.corPrimaria}
+        />
+        <div className="flex-1 flex flex-col min-w-0">
+          {modoSuporteAtivo && sairAction && (
+            <div className="bg-yellow-400 text-yellow-900 px-4 py-2 flex items-center justify-between text-sm font-medium">
+              <span>
+                Modo Suporte ativo — você está visualizando{' '}
+                <strong>{gabinete.nomeSistema ?? params.slug}</strong>
+              </span>
+              <form action={sairAction}>
+                <button type="submit" className="underline hover:no-underline">
+                  Sair do modo suporte
+                </button>
+              </form>
+            </div>
+          )}
+          <Topbar usuarioNome={usuarioNome} usuarioFotoUrl={usuarioFotoUrl} corPrimaria={gabinete.corPrimaria} />
+          <main className="flex-1 p-4 md:p-6">
+            <div className="bg-white rounded-xl shadow-sm p-4 md:p-6 max-w-6xl mx-auto">
+              {children}
+            </div>
+          </main>
+        </div>
       </div>
     </div>
   )
