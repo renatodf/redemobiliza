@@ -8,6 +8,7 @@ const items = [
   { key: 'profissoes', label: 'Profissões' },
   { key: 'cidades', label: 'Cidades' },
   { key: 'segmentos', label: 'Segmentos' },
+  { key: 'areas-colocacao', label: 'Áreas de Colocação' },
   { key: 'personalizacao', label: 'Personalização' },
 ]
 
