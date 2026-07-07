@@ -7,6 +7,7 @@ import { toSlug } from '@/lib/slug'
 import { seedRegioes } from '@/lib/seed-regioes'
 import { seedProfissoes } from '@/lib/seed-profissoes'
 import { seedAreasDemanda } from '@/lib/seed-areas-demanda'
+import { seedAreasColocacao } from '@/lib/seed-areas-colocacao'
 
 async function assertSuperAdmin() {
   const supabase = createSupabaseServerClient()
@@ -40,6 +41,7 @@ export async function criarGabinete(formData: FormData) {
     seedRegioes(gabinete.id),
     seedProfissoes(gabinete.id),
     seedAreasDemanda(gabinete.id),
+    seedAreasColocacao(gabinete.id),
     prisma.configuracaoSistema.create({
       data: { gabineteId: gabinete.id, prazoDemandasHoras: 72, alertaExpiracaoHoras: 12 },
     }),
