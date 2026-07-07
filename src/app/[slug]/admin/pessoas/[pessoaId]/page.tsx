@@ -14,6 +14,7 @@ import { getAppUrl } from '@/lib/app-url'
 import FotoPerfilAvatar from './FotoPerfilAvatar'
 import PromoverMobilizadorDialog from './PromoverMobilizadorDialog'
 import ExcluirPessoaButton from './ExcluirPessoaButton'
+import BancoTalentosDialog from './BancoTalentosDialog'
 
 export default async function FichaPessoaPage({
   params,
@@ -38,11 +39,12 @@ export default async function FichaPessoaPage({
       regiao: { select: { nome: true } },
       profissao: { select: { nome: true } },
       observacoes: { where: { deletedAt: null }, orderBy: { criadoEm: 'desc' } },
+      bancoTalentos: { include: { areas: { select: { areaColocacaoId: true } } } },
     },
   })
   if (!pessoa) notFound()
 
-  const [regioes, profissoes, demandas, totalRede] = await Promise.all([
+  const [regioes, profissoes, demandas, totalRede, areasColocacao] = await Promise.all([
     prisma.regiao.findMany({
       where: { gabineteId: gabinete.id, ativa: true },
       orderBy: { nome: 'asc' },
@@ -68,6 +70,11 @@ export default async function FichaPessoaPage({
     pessoa.isMobilizador
       ? prisma.vinculoRede.count({ where: { indicadoPorId: pessoa.id, deletedAt: null } })
       : Promise.resolve(0),
+    prisma.areaColocacao.findMany({
+      where: { gabineteId: gabinete.id, status: 'ativa' },
+      orderBy: { nome: 'asc' },
+      select: { id: true, nome: true },
+    }),
   ])
 
   const role = session.user.app_metadata?.role as string | undefined
@@ -114,6 +121,27 @@ export default async function FichaPessoaPage({
               slug={params.slug}
               pessoaId={pessoa.id}
               nomeAbreviado={pessoa.nome.split(' ')[0]}
+            />
+          )}
+          {isAdmin && (
+            <BancoTalentosDialog
+              slug={params.slug}
+              pessoaId={pessoa.id}
+              primeiroNome={pessoa.nome.split(' ')[0]}
+              jaCadastrado={!!pessoa.bancoTalentos}
+              areasDisponiveis={areasColocacao}
+              bancoTalentos={
+                pessoa.bancoTalentos
+                  ? {
+                      curriculoUrl: pessoa.bancoTalentos.curriculoUrl,
+                      prioridade: pessoa.bancoTalentos.prioridade,
+                      isPcd: pessoa.bancoTalentos.isPcd,
+                      observacao: pessoa.bancoTalentos.observacao,
+                      colocado: pessoa.bancoTalentos.colocado,
+                      areaIds: pessoa.bancoTalentos.areas.map((a) => a.areaColocacaoId),
+                    }
+                  : null
+              }
             />
           )}
         </div>
