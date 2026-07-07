@@ -2,7 +2,15 @@
 
 import { softDeletePessoa } from '@/actions/admin/soft-delete-pessoa'
 
-export default function ExcluirPessoaButton({ slug, pessoaId }: { slug: string; pessoaId: string }) {
+export default function ExcluirPessoaButton({
+  slug,
+  pessoaId,
+  iconOnly = false,
+}: {
+  slug: string
+  pessoaId: string
+  iconOnly?: boolean
+}) {
   return (
     <form
       action={softDeletePessoa}
@@ -14,8 +22,8 @@ export default function ExcluirPessoaButton({ slug, pessoaId }: { slug: string; 
     >
       <input type="hidden" name="slug" value={slug} />
       <input type="hidden" name="pessoaId" value={pessoaId} />
-      <button type="submit" className="text-sm text-red-600 hover:underline">
-        Excluir cadastro
+      <button type="submit" className="text-sm text-red-600 hover:underline" aria-label="Excluir cadastro">
+        {iconOnly ? '🗑️' : 'Excluir cadastro'}
       </button>
     </form>
   )

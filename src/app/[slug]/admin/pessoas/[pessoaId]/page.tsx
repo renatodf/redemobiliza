@@ -14,6 +14,12 @@ import { getAppUrl } from '@/lib/app-url'
 import FotoPerfilAvatar from './FotoPerfilAvatar'
 import PromoverMobilizadorDialog from './PromoverMobilizadorDialog'
 import ExcluirPessoaButton from './ExcluirPessoaButton'
+import Avatar from '@/components/admin/Avatar'
+import SegmentPills from '@/components/admin/SegmentPills'
+import VerMaisList from '@/components/admin/VerMaisList'
+import { mapPapelParaTipoConta } from '@/lib/tipo-conta'
+import { statusDemandaPill, foiAtendidaPill } from '@/lib/status-demanda'
+import CollapsibleSection from '@/components/admin/CollapsibleSection'
 
 export default async function FichaPessoaPage({
   params,
@@ -38,6 +44,12 @@ export default async function FichaPessoaPage({
       regiao: { select: { nome: true } },
       profissao: { select: { nome: true } },
       observacoes: { where: { deletedAt: null }, orderBy: { criadoEm: 'desc' } },
+      segmentos: { select: { segmento: { select: { id: true, nome: true } } } },
+      redesComoIndicado: {
+        where: { deletedAt: null },
+        take: 1,
+        select: { indicadoPor: { select: { id: true, nome: true, fotoUrl: true } } },
+      },
     },
   })
   if (!pessoa) notFound()
@@ -77,9 +89,31 @@ export default async function FichaPessoaPage({
   })
   const isAdmin = usuarioGabinete?.papel === 'admin' || role === 'super-admin'
 
+  const papelUsuario = pessoa.userId
+    ? (await prisma.usuarioGabinete.findUnique({
+        where: { userId_gabineteId: { userId: pessoa.userId, gabineteId: gabinete.id } },
+        select: { papel: true },
+      }))?.papel ?? null
+    : null
+  const tipoConta = mapPapelParaTipoConta(papelUsuario)
+
+  let ultimoAcesso: string | null = null
+  if (pessoa.userId) {
+    const { getSupabaseAdmin } = await import('@/lib/supabase/admin')
+    const { data } = await getSupabaseAdmin().auth.admin.getUserById(pessoa.userId)
+    if (data.user?.last_sign_in_at) {
+      ultimoAcesso = new Date(data.user.last_sign_in_at).toLocaleDateString('pt-BR', {
+        day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit',
+      })
+    }
+  }
+
+  const redeInfo = pessoa.redesComoIndicado[0]?.indicadoPor ?? null
+  const segmentosPessoa = pessoa.segmentos.map((s) => s.segmento)
+
   return (
     <div className="max-w-2xl mx-auto py-8 px-4 space-y-8">
-      <div className="flex items-center justify-between">
+      <div className="flex items-start justify-between">
         <div className="flex items-center gap-4">
           <FotoPerfilAvatar
             fotoUrl={pessoa.fotoUrl}
@@ -87,39 +121,28 @@ export default async function FichaPessoaPage({
             slug={params.slug}
             canEdit={isAdmin || pessoa.userId === session.user.id}
           />
-          <h1 className="text-2xl font-bold">{pessoa.nome}</h1>
+          <div>
+            <p className="text-xs text-gray-500">Nome</p>
+            <p className="text-2xl font-bold text-gray-900">{pessoa.nome}</p>
+            <p className="text-xs text-gray-500 mt-2">Email</p>
+            <p className="text-sm text-gray-700">{pessoa.email ?? '—'}</p>
+          </div>
         </div>
-        <div className="flex items-center gap-2 flex-wrap justify-end">
-          {pessoa.isColaborador && (
-            <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
-              Colaborador
-            </span>
-          )}
-          {pessoa.isMobilizador && (
-            <span className="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full">
-              {totalRede} na rede
-            </span>
-          )}
-          <span className="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded-full">
-            {demandas.length} demanda{demandas.length !== 1 ? 's' : ''}
-          </span>
-          <Link
-            href={`/${params.slug}/admin/demandas/nova?solicitanteId=${pessoa.id}`}
-            className="bg-blue-600 text-white text-xs px-3 py-1.5 rounded-md hover:bg-blue-700 font-medium"
-          >
-            + Nova Demanda
-          </Link>
-          {isAdmin && !pessoa.isMobilizador && (
-            <PromoverMobilizadorDialog
-              slug={params.slug}
-              pessoaId={pessoa.id}
-              nomeAbreviado={pessoa.nome.split(' ')[0]}
-            />
-          )}
+        <div className="text-right space-y-2">
+          <div className="flex items-center gap-3 justify-end">
+            {isAdmin && (
+              <a href="#dados" aria-label="Editar dados">✏️</a>
+            )}
+            {isAdmin && <ExcluirPessoaButton slug={params.slug} pessoaId={params.pessoaId} iconOnly />}
+          </div>
+          <p className="text-xs text-gray-500">
+            Último Acesso<br />
+            <span className="text-gray-700">{ultimoAcesso ?? '—'}</span>
+          </p>
         </div>
       </div>
 
-      <div className="bg-white rounded-lg p-4 shadow-sm space-y-3">
+      <div className="flex items-center gap-4 flex-wrap">
         {pessoa.isColaborador ? (
           <form action={toggleColaborador}>
             <input type="hidden" name="slug" value={params.slug} />
@@ -139,32 +162,152 @@ export default async function FichaPessoaPage({
             </button>
           </form>
         )}
-        {isAdmin && (
-          <ExcluirPessoaButton slug={params.slug} pessoaId={params.pessoaId} />
+        {isAdmin && !pessoa.isMobilizador && (
+          <PromoverMobilizadorDialog
+            slug={params.slug}
+            pessoaId={pessoa.id}
+            nomeAbreviado={pessoa.nome.split(' ')[0]}
+          />
         )}
       </div>
 
-      <section className="bg-white rounded-lg p-6 shadow-sm space-y-4">
-        <h2 className="text-lg font-semibold">Dados</h2>
-        <EditarPessoaForm
-          slug={params.slug}
-          pessoaId={pessoa.id}
-          pessoa={{
-            nome: pessoa.nome,
-            whatsapp: pessoa.whatsapp,
-            email: pessoa.email,
-            regiaoId: pessoa.regiaoId,
-            profissaoId: pessoa.profissaoId,
-            genero: pessoa.genero,
-          }}
-          regioes={regioes}
-          profissoes={profissoes}
-        />
+      <section id="dados" className="space-y-4">
+        <div className="grid grid-cols-4 gap-4 text-sm">
+          <div>
+            <p className="text-xs text-gray-500">Data de Nascimento</p>
+            <p>{pessoa.nascimento ? pessoa.nascimento.toLocaleDateString('pt-BR') : '—'}</p>
+          </div>
+          <div>
+            <p className="text-xs text-gray-500">WhatsApp</p>
+            <p>{pessoa.whatsapp}</p>
+          </div>
+          <div className="col-span-2">
+            <p className="text-xs text-gray-500">Endereço</p>
+            <p>{[pessoa.logradouro, pessoa.numero, pessoa.complemento].filter(Boolean).join(', ') || '—'}</p>
+          </div>
+          <div>
+            <p className="text-xs text-gray-500">CEP</p>
+            <p>{pessoa.cep ?? '—'}</p>
+          </div>
+          <div>
+            <p className="text-xs text-gray-500">Cidade</p>
+            <p>{pessoa.regiao?.nome ?? '—'}</p>
+          </div>
+          <div>
+            <p className="text-xs text-gray-500">Bairro</p>
+            <p>{pessoa.bairro ?? '—'}</p>
+          </div>
+          <div>
+            <p className="text-xs text-gray-500">Sexo</p>
+            <p className="capitalize">{pessoa.genero ?? '—'}</p>
+          </div>
+          <div>
+            <p className="text-xs text-gray-500">Tipo de Conta</p>
+            <p>{tipoConta}</p>
+          </div>
+          <div>
+            <p className="text-xs text-gray-500">Profissão</p>
+            <p>{pessoa.profissao?.nome ?? '—'}</p>
+          </div>
+        </div>
+
+        <details className="border-t border-gray-100 pt-3">
+          <summary className="text-sm text-blue-600 hover:underline cursor-pointer">Editar dados</summary>
+          <div className="mt-3">
+            <EditarPessoaForm
+              slug={params.slug}
+              pessoaId={pessoa.id}
+              pessoa={{
+                nome: pessoa.nome,
+                whatsapp: pessoa.whatsapp,
+                email: pessoa.email,
+                regiaoId: pessoa.regiaoId,
+                profissaoId: pessoa.profissaoId,
+                genero: pessoa.genero,
+              }}
+              regioes={regioes}
+              profissoes={profissoes}
+            />
+          </div>
+        </details>
       </section>
 
-      <section className="bg-white rounded-lg p-6 shadow-sm space-y-4">
-        <h2 className="text-lg font-semibold">Observações</h2>
+      {(redeInfo || pessoa.isMobilizador) && (
+        <section className="bg-gray-50 rounded-lg p-4 grid grid-cols-3 gap-4 text-sm">
+          <div className="flex items-center gap-2">
+            {redeInfo && <Avatar fotoUrl={redeInfo.fotoUrl} nome={redeInfo.nome} size={28} />}
+            <div>
+              <p className="text-xs text-gray-500">Cadastrado na Rede</p>
+              <p>{redeInfo?.nome ?? '—'}</p>
+            </div>
+          </div>
+          <div>
+            <p className="text-xs text-gray-500">Criador da Rede</p>
+            <p>{redeInfo?.nome ?? '—'}</p>
+          </div>
+          <div>
+            <p className="text-xs text-gray-500">Cadastrados na Rede que Criou</p>
+            {totalRede > 0 ? (
+              <Link
+                href={`/${params.slug}/admin/pessoas?rede=${pessoa.id}`}
+                className="text-lg font-semibold text-blue-600 hover:underline"
+              >
+                {totalRede}
+              </Link>
+            ) : (
+              <p className="text-lg font-semibold text-gray-400">0</p>
+            )}
+          </div>
+        </section>
+      )}
 
+      <section className="space-y-2">
+        <h2 className="text-lg font-semibold border-b border-gray-100 pb-2">Segmentos</h2>
+        <SegmentPills segmentos={segmentosPessoa} maxVisiveis={10} />
+      </section>
+
+      <CollapsibleSection
+        title="Demandas do Usuário"
+        actions={
+          <Link
+            href={`/${params.slug}/admin/demandas/nova?solicitanteId=${pessoa.id}`}
+            className="bg-[#1E3A5F] text-white text-xs px-3 py-1.5 rounded-md hover:opacity-90 font-medium"
+          >
+            + CRIAR NOVA DEMANDA
+          </Link>
+        }
+      >
+        {demandas.length === 0 ? (
+          <p className="text-sm text-gray-500">Nenhuma demanda registrada.</p>
+        ) : (
+          <VerMaisList
+            itens={demandas}
+            porPagina={5}
+            renderItem={(d) => {
+              const status = statusDemandaPill(d.status)
+              const atendida = foiAtendidaPill(d.status)
+              return (
+                <div key={d.id} className="flex items-center justify-between py-2 border-b border-gray-50 text-sm">
+                  <Link href={`/${params.slug}/admin/demandas/${d.id}`} className="text-gray-900 hover:underline truncate flex-1">
+                    {d.titulo}
+                  </Link>
+                  <span className={`shrink-0 text-xs px-2 py-0.5 rounded-full font-medium ml-3 ${status.corClasse}`}>
+                    {status.label}
+                  </span>
+                  <span className={`shrink-0 text-xs px-2 py-0.5 rounded-full font-medium ml-3 ${atendida.corClasse}`}>
+                    {atendida.label}
+                  </span>
+                  <span className="shrink-0 text-xs text-gray-400 ml-3">
+                    {d.criadoEm.toLocaleDateString('pt-BR')}
+                  </span>
+                </div>
+              )
+            }}
+          />
+        )}
+      </CollapsibleSection>
+
+      <CollapsibleSection title="Observações Sobre o Usuário">
         <form action={criarObservacao} className="space-y-2">
           <input type="hidden" name="slug" value={params.slug} />
           <input type="hidden" name="pessoaId" value={pessoa.id} />
@@ -175,136 +318,68 @@ export default async function FichaPessoaPage({
             placeholder="Adicionar observação..."
             className="block w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
           />
-          <button type="submit" className="bg-gray-700 text-white px-4 py-2 rounded-md text-sm font-medium">
-            Adicionar observação
-          </button>
+          <div className="flex justify-end">
+            <button type="submit" className="bg-[#1E3A5F] text-white px-4 py-2 rounded-md text-sm font-medium">
+              + CRIAR NOVA OBSERVAÇÃO
+            </button>
+          </div>
         </form>
 
-        <div className="space-y-3 mt-4">
-          {pessoa.observacoes.map((obs) => {
-            const podeEditar = isAdmin || obs.autorUserId === session.user.id
-            return (
-              <div key={obs.id} className="border border-gray-200 rounded-md p-3 space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-gray-500">
-                    {obs.autorNome} —{' '}
-                    {new Date(obs.criadoEm).toLocaleDateString('pt-BR', {
-                      day: '2-digit',
-                      month: '2-digit',
-                      year: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })}
-                    {obs.editadoEm && ' (editado)'}
-                  </span>
-                  {podeEditar && (
-                    <form action={excluirObservacao}>
-                      <input type="hidden" name="slug" value={params.slug} />
-                      <input type="hidden" name="pessoaId" value={pessoa.id} />
-                      <input type="hidden" name="observacaoId" value={obs.id} />
-                      <button type="submit" className="text-red-600 text-xs hover:underline">
-                        Excluir
-                      </button>
-                    </form>
-                  )}
-                </div>
-                <p className="text-sm text-gray-800 whitespace-pre-wrap">{obs.texto}</p>
-                {podeEditar && (
-                  <form action={editarObservacao} className="space-y-1">
-                    <input type="hidden" name="slug" value={params.slug} />
-                    <input type="hidden" name="pessoaId" value={pessoa.id} />
-                    <input type="hidden" name="observacaoId" value={obs.id} />
-                    <textarea
-                      name="texto"
-                      required
-                      rows={2}
-                      defaultValue={obs.texto}
-                      className="block w-full border border-gray-200 rounded px-2 py-1 text-sm"
-                    />
-                    <button type="submit" className="text-xs text-blue-600 hover:underline">
-                      Salvar edição
-                    </button>
-                  </form>
-                )}
-              </div>
-            )
-          })}
-          {pessoa.observacoes.length === 0 && (
+        <div className="mt-4">
+          {pessoa.observacoes.length === 0 ? (
             <p className="text-sm text-gray-500">Nenhuma observação ainda.</p>
-          )}
-        </div>
-      </section>
-
-      {/* Histórico de demandas */}
-      <section className="bg-white rounded-lg p-6 shadow-sm space-y-4">
-        <h2 className="text-lg font-semibold">
-          Demandas ({demandas.length})
-        </h2>
-        {demandas.length === 0 ? (
-          <p className="text-sm text-gray-500">Nenhuma demanda registrada.</p>
-        ) : (
-          <div className="space-y-3">
-            {demandas.map((d) => {
-              const statusCfg = {
-                aberta:       { label: 'Em aberto',    cor: 'bg-yellow-100 text-yellow-800' },
-                expirada:     { label: 'Expirada',     cor: 'bg-orange-100 text-orange-800' },
-                atendida:     { label: 'Atendida',     cor: 'bg-green-100 text-green-800' },
-                nao_atendida: { label: 'Não atendida', cor: 'bg-red-100 text-red-800' },
-              }[d.status] ?? { label: d.status, cor: 'bg-gray-100 text-gray-700' }
-
-              return (
-                <details key={d.id} className="border border-gray-200 rounded-lg group">
-                  <summary className="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-gray-50 list-none">
-                    <div className="flex items-center gap-3 min-w-0">
-                      <span className={`shrink-0 text-xs px-2 py-0.5 rounded-full font-medium ${statusCfg.cor}`}>
-                        {statusCfg.label}
+          ) : (
+            <VerMaisList
+              itens={pessoa.observacoes}
+              porPagina={5}
+              renderItem={(obs) => {
+                const podeEditar = isAdmin || obs.autorUserId === session.user.id
+                return (
+                  <div key={obs.id} className="border border-gray-200 rounded-md p-3 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-gray-500">
+                        {obs.autorNome} —{' '}
+                        {new Date(obs.criadoEm).toLocaleDateString('pt-BR', {
+                          day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit',
+                        })}
+                        {obs.editadoEm && ' (editado)'}
                       </span>
-                      <span className="text-sm font-medium text-gray-900 truncate">{d.titulo}</span>
+                      {podeEditar && (
+                        <form action={excluirObservacao}>
+                          <input type="hidden" name="slug" value={params.slug} />
+                          <input type="hidden" name="pessoaId" value={pessoa.id} />
+                          <input type="hidden" name="observacaoId" value={obs.id} />
+                          <button type="submit" className="text-red-600 text-xs hover:underline">
+                            Excluir
+                          </button>
+                        </form>
+                      )}
                     </div>
-                    <div className="flex items-center gap-3 shrink-0 ml-3">
-                      <span className="text-xs text-gray-400">
-                        {d.criadoEm.toLocaleDateString('pt-BR')}
-                      </span>
-                      <Link
-                        href={`/${params.slug}/admin/demandas/${d.id}`}
-                        className="text-xs text-blue-600 hover:underline"
-                      >
-                        Abrir →
-                      </Link>
-                    </div>
-                  </summary>
-
-                  <div className="px-4 pb-4 pt-2 space-y-3 border-t border-gray-100">
-                    <div className="flex flex-wrap gap-4 text-xs text-gray-500">
-                      <span>Área: <strong className="text-gray-700">{d.area.nome}</strong></span>
-                      <span>Responsável: <strong className="text-gray-700">{d.responsavel.nome}</strong></span>
-                      <span>Prazo: <strong className={d.prazoAlterado ? 'text-orange-600' : 'text-gray-700'}>
-                        {d.prazoDesfecho.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                        {d.prazoAlterado && ' ⚑'}
-                      </strong></span>
-                    </div>
-
-                    {d.historico.length > 0 && (
-                      <ol className="relative border-l border-gray-200 space-y-3 ml-2">
-                        {d.historico.map((mov) => (
-                          <li key={mov.id} className="ml-4">
-                            <div className="absolute -left-1.5 mt-1 h-3 w-3 rounded-full border-2 border-white bg-gray-300" />
-                            <p className="text-xs text-gray-400">
-                              {mov.criadoEm.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                              {' · '}{mov.autor?.nome ?? 'Sistema'}
-                            </p>
-                            <p className="text-sm text-gray-700 mt-0.5">{mov.descricao}</p>
-                          </li>
-                        ))}
-                      </ol>
+                    <p className="text-sm text-gray-800 whitespace-pre-wrap">{obs.texto}</p>
+                    {podeEditar && (
+                      <form action={editarObservacao} className="space-y-1">
+                        <input type="hidden" name="slug" value={params.slug} />
+                        <input type="hidden" name="pessoaId" value={pessoa.id} />
+                        <input type="hidden" name="observacaoId" value={obs.id} />
+                        <textarea
+                          name="texto"
+                          required
+                          rows={2}
+                          defaultValue={obs.texto}
+                          className="block w-full border border-gray-200 rounded px-2 py-1 text-sm"
+                        />
+                        <button type="submit" className="text-xs text-blue-600 hover:underline">
+                          Salvar edição
+                        </button>
+                      </form>
                     )}
                   </div>
-                </details>
-              )
-            })}
-          </div>
-        )}
-      </section>
+                )
+              }}
+            />
+          )}
+        </div>
+      </CollapsibleSection>
 
       <MobilizadorSection
         slug={params.slug}
