@@ -1,7 +1,6 @@
 import 'server-only'
 
 export const dynamic = 'force-dynamic'
-import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { cookies } from 'next/headers'
 import { createServerClient } from '@supabase/ssr'
@@ -9,6 +8,8 @@ import { prisma } from '@/lib/prisma'
 import { getGabineteBySlug } from '@/lib/gabinete'
 import { readSuporteSessao } from '@/lib/modo-suporte'
 import { sairModoSuporte } from '@/actions/super-admin/modo-suporte'
+import Sidebar from '@/components/admin/Sidebar'
+import Topbar from '@/components/admin/Topbar'
 
 export default async function AdminLayout({
   children,
@@ -61,40 +62,41 @@ export default async function AdminLayout({
     }
   }
 
+  const pessoaLogada = await prisma.pessoa.findFirst({
+    where: { userId: session.user.id, gabineteId: gabinete.id, deletedAt: null },
+    select: { nome: true, fotoUrl: true },
+  })
+  const usuarioNome = pessoaLogada?.nome ?? session.user.email?.split('@')[0] ?? 'Usuário'
+  const usuarioFotoUrl = pessoaLogada?.fotoUrl ?? null
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      {modoSuporteAtivo && sairAction && (
-        <div className="bg-yellow-400 text-yellow-900 px-4 py-2 flex items-center justify-between text-sm font-medium">
-          <span>
-            Modo Suporte ativo — você está visualizando{' '}
-            <strong>{gabinete.nomeSistema ?? params.slug}</strong>
-          </span>
-          <form action={sairAction}>
-            <button type="submit" className="underline hover:no-underline">
-              Sair do modo suporte
-            </button>
-          </form>
-        </div>
-      )}
-      <nav className="bg-white border-b border-gray-200 px-4">
-        <div className="max-w-6xl mx-auto flex gap-6 text-sm overflow-x-auto">
-          {[
-            { href: `/${params.slug}/admin/dashboard`, label: 'Dashboard' },
-            { href: `/${params.slug}/admin/pessoas`, label: 'Pessoas' },
-            { href: `/${params.slug}/admin/demandas`, label: 'Demandas' },
-            { href: `/${params.slug}/admin/configuracoes`, label: 'Configurações' },
-          ].map(({ href, label }) => (
-            <Link
-              key={href}
-              href={href}
-              className="py-3 border-b-2 border-transparent hover:border-blue-500 hover:text-blue-700 text-gray-600 transition-colors whitespace-nowrap"
-            >
-              {label}
-            </Link>
-          ))}
-        </div>
-      </nav>
-      <main>{children}</main>
+    <div className="min-h-screen bg-[#F5F5F5] flex">
+      <Sidebar
+        slug={params.slug}
+        gabineteNome={gabinete.nomeSistema ?? params.slug}
+        logoUrl={gabinete.logoUrl}
+      />
+      <div className="flex-1 flex flex-col min-w-0">
+        {modoSuporteAtivo && sairAction && (
+          <div className="bg-yellow-400 text-yellow-900 px-4 py-2 flex items-center justify-between text-sm font-medium">
+            <span>
+              Modo Suporte ativo — você está visualizando{' '}
+              <strong>{gabinete.nomeSistema ?? params.slug}</strong>
+            </span>
+            <form action={sairAction}>
+              <button type="submit" className="underline hover:no-underline">
+                Sair do modo suporte
+              </button>
+            </form>
+          </div>
+        )}
+        <Topbar usuarioNome={usuarioNome} usuarioFotoUrl={usuarioFotoUrl} />
+        <main className="flex-1 p-6">
+          <div className="bg-white rounded-xl shadow-sm p-6 max-w-6xl mx-auto">
+            {children}
+          </div>
+        </main>
+      </div>
     </div>
   )
 }
