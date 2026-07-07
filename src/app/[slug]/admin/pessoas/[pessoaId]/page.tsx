@@ -68,14 +68,7 @@ export default async function FichaPessoaPage({
     prisma.demanda.findMany({
       where: { solicitanteId: pessoa.id, gabineteId: gabinete.id, deletedAt: null },
       orderBy: { criadoEm: 'desc' },
-      include: {
-        area: { select: { nome: true } },
-        responsavel: { select: { nome: true } },
-        historico: {
-          orderBy: { criadoEm: 'asc' },
-          include: { autor: { select: { nome: true } } },
-        },
-      },
+      select: { id: true, titulo: true, status: true, criadoEm: true },
     }),
     pessoa.isMobilizador
       ? prisma.vinculoRede.count({ where: { indicadoPorId: pessoa.id, deletedAt: null } })
