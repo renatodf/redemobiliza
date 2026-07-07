@@ -48,11 +48,11 @@ export default function Pagination({
   }
 
   return (
-    <div className="flex items-center justify-between px-4 py-3 text-sm">
-      <span className="text-[#757575]">
+    <div className="flex items-center justify-between flex-wrap gap-3 px-4 py-3 text-sm">
+      <span className="text-[#757575] whitespace-nowrap">
         Exibindo {exibindo.toLocaleString('pt-BR')} de {totalItens.toLocaleString('pt-BR')}
       </span>
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-1 flex-wrap">
         {itens.map((item) =>
           item.tipo === 'reticencias' ? (
             <span key={item.chave} className="text-gray-400 px-1">
