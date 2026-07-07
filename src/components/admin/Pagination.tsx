@@ -7,12 +7,14 @@ export default function Pagination({
   tamanhoPagina,
   baseUrl,
   searchParams,
+  corPrimaria,
 }: {
   totalItens: number
   paginaAtual: number
   tamanhoPagina: number
   baseUrl: string
   searchParams: Record<string, string | undefined>
+  corPrimaria: string
 }) {
   const { totalPaginas } = paginar(totalItens, paginaAtual, tamanhoPagina)
 
@@ -54,8 +56,9 @@ export default function Pagination({
             <Link
               key={item.numero}
               href={hrefParaPagina(item.numero)}
+              style={item.numero === paginaAtual ? { backgroundColor: corPrimaria } : undefined}
               className={`px-2 py-1 rounded ${
-                item.numero === paginaAtual ? 'bg-black text-white' : 'text-gray-600 hover:bg-gray-100'
+                item.numero === paginaAtual ? 'text-white' : 'text-gray-600 hover:bg-gray-100'
               }`}
             >
               {item.numero}

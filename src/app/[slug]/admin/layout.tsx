@@ -75,6 +75,7 @@ export default async function AdminLayout({
         slug={params.slug}
         gabineteNome={gabinete.nomeSistema ?? params.slug}
         logoUrl={gabinete.logoUrl}
+        corPrimaria={gabinete.corPrimaria}
       />
       <div className="flex-1 flex flex-col min-w-0">
         {modoSuporteAtivo && sairAction && (
@@ -90,7 +91,7 @@ export default async function AdminLayout({
             </form>
           </div>
         )}
-        <Topbar usuarioNome={usuarioNome} usuarioFotoUrl={usuarioFotoUrl} />
+        <Topbar usuarioNome={usuarioNome} usuarioFotoUrl={usuarioFotoUrl} corPrimaria={gabinete.corPrimaria} />
         <main className="flex-1 p-6">
           <div className="bg-white rounded-xl shadow-sm p-6 max-w-6xl mx-auto">
             {children}

@@ -23,8 +23,10 @@ import CollapsibleSection from '@/components/admin/CollapsibleSection'
 
 export default async function FichaPessoaPage({
   params,
+  searchParams,
 }: {
   params: { slug: string; pessoaId: string }
+  searchParams: { editar?: string }
 }) {
   const gabinete = await getGabineteBySlug(params.slug)
   if (!gabinete) notFound()
@@ -124,7 +126,7 @@ export default async function FichaPessoaPage({
         <div className="text-right space-y-2">
           <div className="flex items-center gap-3 justify-end">
             {isAdmin && (
-              <a href="#dados" aria-label="Editar dados">✏️</a>
+              <label htmlFor="editar-dados-toggle" aria-label="Editar dados" className="cursor-pointer">✏️</label>
             )}
             {isAdmin && <ExcluirPessoaButton slug={params.slug} pessoaId={params.pessoaId} iconOnly />}
           </div>
@@ -164,7 +166,7 @@ export default async function FichaPessoaPage({
         )}
       </div>
 
-      <section id="dados" className="space-y-4">
+      <section className="space-y-4">
         <div className="grid grid-cols-4 gap-4 text-sm">
           <div>
             <p className="text-xs text-gray-500">Data de Nascimento</p>
@@ -204,9 +206,26 @@ export default async function FichaPessoaPage({
           </div>
         </div>
 
-        <details className="border-t border-gray-100 pt-3">
-          <summary className="text-sm text-blue-600 hover:underline cursor-pointer">Editar dados</summary>
-          <div className="mt-3">
+        <div className="border-t border-gray-100 pt-3">
+          <input
+            type="checkbox"
+            id="editar-dados-toggle"
+            className="peer hidden"
+            defaultChecked={searchParams.editar === '1'}
+          />
+          <label
+            htmlFor="editar-dados-toggle"
+            className="text-sm text-blue-600 hover:underline cursor-pointer inline-block peer-checked:hidden"
+          >
+            Editar dados
+          </label>
+          <label
+            htmlFor="editar-dados-toggle"
+            className="text-sm text-gray-500 hover:underline cursor-pointer hidden peer-checked:inline-block"
+          >
+            Fechar edição
+          </label>
+          <div className="mt-3 hidden peer-checked:block">
             <EditarPessoaForm
               slug={params.slug}
               pessoaId={pessoa.id}
@@ -222,7 +241,7 @@ export default async function FichaPessoaPage({
               profissoes={profissoes}
             />
           </div>
-        </details>
+        </div>
       </section>
 
       {(redeInfo || pessoa.isMobilizador) && (
@@ -264,7 +283,8 @@ export default async function FichaPessoaPage({
         actions={
           <Link
             href={`/${params.slug}/admin/demandas/nova?solicitanteId=${pessoa.id}`}
-            className="bg-[#1E3A5F] text-white text-xs px-3 py-1.5 rounded-md hover:opacity-90 font-medium"
+            style={{ backgroundColor: gabinete.corSecundaria }}
+            className="text-white text-xs px-3 py-1.5 rounded-md hover:opacity-90 font-medium"
           >
             + CRIAR NOVA DEMANDA
           </Link>
@@ -312,7 +332,11 @@ export default async function FichaPessoaPage({
             className="block w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
           />
           <div className="flex justify-end">
-            <button type="submit" className="bg-[#1E3A5F] text-white px-4 py-2 rounded-md text-sm font-medium">
+            <button
+              type="submit"
+              style={{ backgroundColor: gabinete.corSecundaria }}
+              className="text-white px-4 py-2 rounded-md text-sm font-medium"
+            >
               + CRIAR NOVA OBSERVAÇÃO
             </button>
           </div>

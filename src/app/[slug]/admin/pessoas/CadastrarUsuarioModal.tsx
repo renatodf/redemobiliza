@@ -8,10 +8,12 @@ export default function CadastrarUsuarioModal({
   slug,
   regioes,
   profissoes,
+  corPrimaria,
 }: {
   slug: string
   regioes: { id: string; nome: string }[]
   profissoes: { id: string; nome: string }[]
+  corPrimaria: string
 }) {
   const [open, setOpen] = useState(false)
 
@@ -20,7 +22,8 @@ export default function CadastrarUsuarioModal({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="bg-black text-white px-4 py-2 rounded-md text-sm font-medium flex items-center gap-2"
+        style={{ backgroundColor: corPrimaria }}
+        className="text-white px-4 py-2 rounded-md text-sm font-medium flex items-center gap-2"
       >
         <span aria-hidden>👤</span>
         CADASTRAR USUÁRIO
@@ -77,7 +80,11 @@ export default function CadastrarUsuarioModal({
               <option value="outro">Outro</option>
             </select>
           </div>
-          <button type="submit" className="w-full bg-black text-white px-4 py-2 rounded-md text-sm font-medium">
+          <button
+            type="submit"
+            style={{ backgroundColor: corPrimaria }}
+            className="w-full text-white px-4 py-2 rounded-md text-sm font-medium"
+          >
             Cadastrar
           </button>
         </form>

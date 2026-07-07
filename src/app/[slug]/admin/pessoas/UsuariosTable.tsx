@@ -80,7 +80,7 @@ export default function UsuariosTable({ slug, usuarios }: { slug: string; usuari
             </td>
             <td className="px-4 py-3">
               <div className="flex items-center justify-end gap-3">
-                <Link href={`/${slug}/admin/pessoas/${u.id}`} aria-label={`Editar ${u.nome}`}>
+                <Link href={`/${slug}/admin/pessoas/${u.id}?editar=1`} aria-label={`Editar ${u.nome}`}>
                   ✏️
                 </Link>
                 <form

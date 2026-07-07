@@ -126,7 +126,12 @@ export default async function PessoasPage({
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900">Usuários</h1>
-        <CadastrarUsuarioModal slug={params.slug} regioes={regioes} profissoes={profissoes} />
+        <CadastrarUsuarioModal
+          slug={params.slug}
+          regioes={regioes}
+          profissoes={profissoes}
+          corPrimaria={gabinete.corPrimaria}
+        />
       </div>
 
       {breadcrumb.length > 0 && (
@@ -175,6 +180,7 @@ export default async function PessoasPage({
           tamanhoPagina={PAGE_SIZE}
           baseUrl={`/${params.slug}/admin/pessoas`}
           searchParams={{ q, sort, order, rede, path }}
+          corPrimaria={gabinete.corPrimaria}
         />
       </div>
     </div>

@@ -4,12 +4,17 @@ import LiveClock from './LiveClock'
 export default function Topbar({
   usuarioNome,
   usuarioFotoUrl,
+  corPrimaria,
 }: {
   usuarioNome: string
   usuarioFotoUrl: string | null
+  corPrimaria: string
 }) {
   return (
-    <header className="bg-[#1A1A1A] text-white px-6 py-3 flex items-center justify-between">
+    <header
+      className="text-white px-6 py-3 flex items-center justify-between"
+      style={{ backgroundColor: corPrimaria }}
+    >
       <LiveClock />
       <div className="flex items-center gap-4">
         <span className="text-lg cursor-default" aria-hidden>🔍</span>

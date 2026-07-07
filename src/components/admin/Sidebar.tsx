@@ -22,16 +22,21 @@ export default function Sidebar({
   slug,
   gabineteNome,
   logoUrl,
+  corPrimaria,
 }: {
   slug: string
   gabineteNome: string
   logoUrl: string | null
+  corPrimaria: string
 }) {
   const pathname = usePathname()
   const itens = buildItens(slug)
 
   return (
-    <aside className="w-[200px] shrink-0 bg-[#1A1A1A] text-white flex flex-col min-h-screen">
+    <aside
+      className="w-[200px] shrink-0 text-white flex flex-col min-h-screen"
+      style={{ backgroundColor: corPrimaria }}
+    >
       <div className="flex flex-col items-center py-6 px-3 text-center">
         {logoUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
