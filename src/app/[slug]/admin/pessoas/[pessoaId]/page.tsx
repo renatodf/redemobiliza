@@ -8,7 +8,7 @@ import EditarPessoaForm from './EditarPessoaForm'
 import { toggleColaborador } from '@/actions/admin/toggle-equipe'
 import { criarObservacao } from '@/actions/admin/criar-observacao'
 import { editarObservacao } from '@/actions/admin/editar-observacao'
-import { excluirObservacao } from '@/actions/admin/excluir-observacao'
+import ExcluirObservacaoButton from './ExcluirObservacaoButton'
 import MobilizadorSection from './MobilizadorSection'
 import { getAppUrl } from '@/lib/app-url'
 import FotoPerfilAvatar from './FotoPerfilAvatar'
@@ -226,33 +226,34 @@ export default async function FichaPessoaPage({
                     {obs.editadoEm && ' (editado)'}
                   </span>
                   {podeEditar && (
-                    <form action={excluirObservacao}>
-                      <input type="hidden" name="slug" value={params.slug} />
-                      <input type="hidden" name="pessoaId" value={pessoa.id} />
-                      <input type="hidden" name="observacaoId" value={obs.id} />
-                      <button type="submit" className="text-red-600 text-xs hover:underline">
-                        Excluir
-                      </button>
-                    </form>
+                    <div className="flex items-center gap-2">
+                      <label htmlFor={`editar-obs-${obs.id}`} className="cursor-pointer" aria-label="Editar observação">
+                        ✏️
+                      </label>
+                      <ExcluirObservacaoButton slug={params.slug} pessoaId={pessoa.id} observacaoId={obs.id} />
+                    </div>
                   )}
                 </div>
                 <p className="text-sm text-gray-800 whitespace-pre-wrap">{obs.texto}</p>
                 {podeEditar && (
-                  <form action={editarObservacao} className="space-y-1">
-                    <input type="hidden" name="slug" value={params.slug} />
-                    <input type="hidden" name="pessoaId" value={pessoa.id} />
-                    <input type="hidden" name="observacaoId" value={obs.id} />
-                    <textarea
-                      name="texto"
-                      required
-                      rows={2}
-                      defaultValue={obs.texto}
-                      className="block w-full border border-gray-200 rounded px-2 py-1 text-sm"
-                    />
-                    <button type="submit" className="text-xs text-blue-600 hover:underline">
-                      Salvar edição
-                    </button>
-                  </form>
+                  <>
+                    <input type="checkbox" id={`editar-obs-${obs.id}`} className="peer hidden" />
+                    <form action={editarObservacao} className="space-y-1 hidden peer-checked:block">
+                      <input type="hidden" name="slug" value={params.slug} />
+                      <input type="hidden" name="pessoaId" value={pessoa.id} />
+                      <input type="hidden" name="observacaoId" value={obs.id} />
+                      <textarea
+                        name="texto"
+                        required
+                        rows={2}
+                        defaultValue={obs.texto}
+                        className="block w-full border border-gray-200 rounded px-2 py-1 text-sm"
+                      />
+                      <button type="submit" className="text-xs text-blue-600 hover:underline">
+                        Salvar edição
+                      </button>
+                    </form>
+                  </>
                 )}
               </div>
             )

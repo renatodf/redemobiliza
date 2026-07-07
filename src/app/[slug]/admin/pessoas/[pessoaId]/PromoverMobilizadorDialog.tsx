@@ -16,7 +16,7 @@ export default function PromoverMobilizadorDialog({ slug, pessoaId, nomeAbreviad
     <>
       <button
         type="button"
-        className="text-sm text-purple-700 hover:underline"
+        className="bg-blue-600 text-white text-xs px-3 py-1.5 rounded-md hover:bg-blue-700 font-medium"
         onClick={() => (document.getElementById('dialog-promover') as HTMLDialogElement)?.showModal()}
       >
         + Mobilizador
