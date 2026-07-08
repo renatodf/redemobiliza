@@ -92,11 +92,11 @@ export default function UsuariosTable({
             <th className="text-right px-4 py-3 font-medium text-[#686868]">Ações</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-100">
+        <tbody>
         {usuarios.map((u) => (
           <tr
             key={u.id}
-            className="border-2 border-transparent hover:border-[#244F99] hover:shadow-[0_8px_19px_#E5E5E5] transition-colors"
+            className="border-2 border-transparent border-b-gray-100 hover:border-[#244F99] hover:shadow-[0_8px_19px_#E5E5E5] transition-colors"
             style={{ height: 72 }}
           >
             <td className="px-4 py-3">
