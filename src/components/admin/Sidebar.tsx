@@ -145,10 +145,19 @@ export default function Sidebar({
 
   return (
     <aside
-      className="w-[200px] shrink-0 text-[var(--cor-texto)] flex flex-col min-h-screen md:min-h-0 md:h-full fixed inset-y-0 left-0 z-40 -translate-x-full transition-transform duration-200 peer-checked:translate-x-0 md:relative md:translate-x-0 md:z-auto"
+      className="w-[200px] shrink-0 text-[var(--cor-texto)] flex flex-col min-h-screen md:min-h-0 md:h-full fixed inset-y-0 left-0 z-40 -translate-x-full transition-transform duration-200 peer-checked:translate-x-0 md:relative md:translate-x-0 md:z-auto overflow-hidden"
       style={{ backgroundColor: corPrimaria, ['--cor-texto' as string]: corTexto }}
     >
-      <div className="flex flex-col items-center py-6 px-3 text-center">
+      {logoUrl && (
+        <div
+          aria-hidden
+          className="absolute -inset-20 bg-center bg-cover pointer-events-none"
+          style={{ backgroundImage: `url(${logoUrl})`, filter: 'blur(40px)', transform: 'scale(1.6)' }}
+        />
+      )}
+      <div aria-hidden className="absolute inset-0 pointer-events-none" style={{ backgroundColor: corPrimaria, opacity: logoUrl ? 0.43 : 1 }} />
+
+      <div className="relative z-10 flex flex-col items-center py-6 px-3 text-center">
         {logoUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={logoUrl} alt={gabineteNome} className="w-24 h-24 rounded-full object-cover" />
@@ -160,7 +169,7 @@ export default function Sidebar({
         <span className="mt-2 text-sm font-medium">{gabineteNome}</span>
       </div>
 
-      <nav className="flex-1 flex flex-col gap-1 px-3">
+      <nav className="relative z-10 flex-1 flex flex-col gap-1 px-3">
         {itens.map((item) => {
           const hrefsComMatch = itens
             .map((i) => i.href)
@@ -206,7 +215,7 @@ export default function Sidebar({
       <form
         action="/api/auth/logout"
         method="POST"
-        className="px-3 pb-6 pt-4 mt-4 border-t border-[color-mix(in_srgb,var(--cor-texto)_10%,transparent)]"
+        className="relative z-10 px-3 pb-6 pt-4 mt-4 border-t border-[color-mix(in_srgb,var(--cor-texto)_10%,transparent)]"
       >
         <button
           type="submit"
