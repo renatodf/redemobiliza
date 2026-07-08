@@ -8,6 +8,7 @@ import { mapPapelParaTipoConta } from '@/lib/tipo-conta'
 import { corTextoContraste } from '@/lib/cor-contraste'
 import UsuariosTable, { type UsuarioRow } from './UsuariosTable'
 import CadastrarUsuarioModal from './CadastrarUsuarioModal'
+import UsuariosTabs from './UsuariosTabs'
 
 const PAGE_SIZE = 20
 
@@ -34,6 +35,13 @@ export default async function PessoasPage({
   const orderBy = buildOrderBy(sort, order)
   const pathIds = path ? path.split(',').filter(Boolean) : []
   const paginaSolicitada = Number(searchParams.page ?? '1') || 1
+
+  const donaDaRede = rede
+    ? await prisma.pessoa.findFirst({
+        where: { id: rede, gabineteId: gabinete.id },
+        select: { nome: true },
+      })
+    : null
 
   const searchFilter = q
     ? {
@@ -126,8 +134,16 @@ export default async function PessoasPage({
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between flex-wrap gap-3">
-        <h1 className="text-2xl font-bold text-gray-900">Usuários</h1>
+      <p className="text-[13px] text-[rgba(113,113,113,0.65)]">Início / Usuários</p>
+      <div className="flex items-center justify-between flex-wrap gap-3 -mt-3">
+        <h1 className="text-2xl font-bold text-gray-900">
+          Usuários
+          {donaDaRede && (
+            <span className="font-normal text-gray-500">
+              {' '}<span className="mx-1 text-gray-500">-</span> Rede de {donaDaRede.nome}
+            </span>
+          )}
+        </h1>
         <CadastrarUsuarioModal
           slug={params.slug}
           regioes={regioes}
@@ -135,6 +151,8 @@ export default async function PessoasPage({
           corPrimaria={gabinete.corPrimaria}
         />
       </div>
+
+      <UsuariosTabs slug={params.slug} corPrimaria={gabinete.corPrimaria} />
 
       {breadcrumb.length > 0 && (
         <nav className="text-sm text-gray-500 flex items-center gap-1 flex-wrap">

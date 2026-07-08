@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { getSupabaseAdmin } from '@/lib/supabase/admin'
 import { getAppUrl } from '@/lib/app-url'
+import { prisma } from '@/lib/prisma'
 
 async function assertSuperAdmin() {
   const supabase = createSupabaseServerClient()
@@ -32,7 +33,20 @@ export async function convidarAdmin(gabineteId: string, formData: FormData) {
       (inviteError as any).code === 'email_exists' ||
       inviteError.message.toLowerCase().includes('already registered') ||
       inviteError.status === 422
+
     if (jaExiste) {
+      const { data: { users } } = await getSupabaseAdmin().auth.admin.listUsers({ perPage: 1000 })
+      const existingUser = users.find(u => u.email?.toLowerCase() === email)
+
+      if (existingUser?.app_metadata?.role === 'super-admin') {
+        await prisma.usuarioGabinete.upsert({
+          where: { userId_gabineteId: { userId: existingUser.id, gabineteId } },
+          create: { userId: existingUser.id, gabineteId, papel: 'admin' },
+          update: {},
+        })
+        redirect(`/super-admin/gabinetes/${gabineteId}?sucesso=admin_vinculado`)
+      }
+
       redirect(
         `/super-admin/gabinetes/${gabineteId}?erro=usuario_ja_existe&email=${encodeURIComponent(email)}`
       )
