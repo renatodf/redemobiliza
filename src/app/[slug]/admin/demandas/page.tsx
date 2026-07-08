@@ -49,6 +49,7 @@ export default async function DemandasPage({
 
   const where = {
     gabineteId: gabinete.id,
+    deletedAt: null,
     ...(searchParams.status ? { status: searchParams.status } : {}),
     ...(searchParams.areaId ? { areaId: searchParams.areaId } : {}),
     ...(searchParams.responsavelId ? { responsavelId: searchParams.responsavelId } : {}),

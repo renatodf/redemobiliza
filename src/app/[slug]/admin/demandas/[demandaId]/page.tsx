@@ -52,7 +52,7 @@ export default async function DetalheDemandaPage({
 
   const [demanda, colaboradores, areas] = await Promise.all([
     prisma.demanda.findFirst({
-      where: { id: params.demandaId, gabineteId: gabinete.id },
+      where: { id: params.demandaId, gabineteId: gabinete.id, deletedAt: null },
       include: {
         solicitante: { select: { nome: true, whatsapp: true, bairro: true, logradouro: true, numero: true, complemento: true, cep: true, regiao: { select: { nome: true } } } },
         responsavel: { select: { id: true, nome: true } },
