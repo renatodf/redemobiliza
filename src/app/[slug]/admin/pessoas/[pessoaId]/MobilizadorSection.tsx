@@ -3,6 +3,7 @@
 import { useState, useTransition } from 'react'
 import { tornarMobilizador } from '@/actions/admin/tornar-mobilizador'
 import { revogarMobilizador } from '@/actions/admin/revogar-mobilizador'
+import { corTextoContraste } from '@/lib/cor-contraste'
 
 type Props = {
   slug: string
@@ -11,6 +12,7 @@ type Props = {
   isMobilizador: boolean
   tokenMobilizador: string | null
   appUrl: string
+  corPrimaria: string
 }
 
 export default function MobilizadorSection({
@@ -20,7 +22,9 @@ export default function MobilizadorSection({
   isMobilizador,
   tokenMobilizador,
   appUrl,
+  corPrimaria,
 }: Props) {
+  const corTexto = corTextoContraste(corPrimaria)
   const [erro, setErro] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
 
@@ -94,7 +98,8 @@ export default function MobilizadorSection({
               <button
                 type="submit"
                 disabled={isPending}
-                className="bg-purple-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-purple-700 disabled:opacity-50"
+                style={{ backgroundColor: corPrimaria, color: corTexto }}
+                className="px-4 py-2 rounded-md text-sm font-medium hover:opacity-90 disabled:opacity-50"
               >
                 {isPending ? 'Enviando convite...' : 'Tornar mobilizador'}
               </button>

@@ -187,6 +187,7 @@ export default async function FichaPessoaPage({
             slug={params.slug}
             pessoaId={pessoa.id}
             nomeAbreviado={pessoa.nome.split(' ')[0]}
+            corPrimaria={gabinete.corPrimaria}
           />
         )}
         {isAdmin && (
@@ -231,6 +232,11 @@ export default async function FichaPessoaPage({
             <p className="text-xs text-[#686868]">Telefone Fixo</p>
             <p className="text-[#757575]">{pessoa.telefoneFixo ?? '—'}</p>
           </div>
+        </div>
+
+        <div className="border-t border-gray-100" />
+
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
           <div className="col-span-2">
             <p className="text-xs text-[#686868]">Endereço</p>
             <p className="text-[#757575]">{[pessoa.logradouro, pessoa.numero, pessoa.complemento].filter(Boolean).join(', ') || '—'}</p>
@@ -243,6 +249,11 @@ export default async function FichaPessoaPage({
             <p className="text-xs text-[#686868]">Cidade</p>
             <p className="text-[#757575]">{pessoa.regiao?.nome ?? '—'}</p>
           </div>
+        </div>
+
+        <div className="border-t border-gray-100" />
+
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
           <div>
             <p className="text-xs text-[#686868]">Bairro</p>
             <p className="text-[#757575]">{pessoa.bairro ?? '—'}</p>
@@ -259,6 +270,11 @@ export default async function FichaPessoaPage({
             <p className="text-xs text-[#686868]">Religião</p>
             <p className="text-[#757575]">{pessoa.religiao ?? '—'}</p>
           </div>
+        </div>
+
+        <div className="border-t border-gray-100" />
+
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
           <div>
             <p className="text-xs text-[#686868]">Escolaridade</p>
             <p className="text-[#757575]">{pessoa.escolaridade ?? '—'}</p>
@@ -316,6 +332,8 @@ export default async function FichaPessoaPage({
           </div>
         </div>
       </section>
+
+      <div className="border-t border-gray-100" />
 
       {(redeInfo || pessoa.isMobilizador) && (
         <section className="bg-gray-50 rounded-lg p-4 grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
@@ -481,6 +499,7 @@ export default async function FichaPessoaPage({
         isMobilizador={pessoa.isMobilizador}
         tokenMobilizador={pessoa.tokenMobilizador ?? null}
         appUrl={getAppUrl()}
+        corPrimaria={gabinete.corPrimaria}
       />
     </div>
   )

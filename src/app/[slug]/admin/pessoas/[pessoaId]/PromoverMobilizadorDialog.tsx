@@ -2,21 +2,25 @@
 
 import { useFormState } from 'react-dom'
 import { promoverMobilizador } from '@/actions/admin/promover-mobilizador'
+import { corTextoContraste } from '@/lib/cor-contraste'
 
 interface Props {
   slug: string
   pessoaId: string
   nomeAbreviado: string
+  corPrimaria: string
 }
 
-export default function PromoverMobilizadorDialog({ slug, pessoaId, nomeAbreviado }: Props) {
+export default function PromoverMobilizadorDialog({ slug, pessoaId, nomeAbreviado, corPrimaria }: Props) {
   const [state, action, pending] = useFormState(promoverMobilizador, {})
+  const corTexto = corTextoContraste(corPrimaria)
 
   return (
     <>
       <button
         type="button"
-        className="bg-blue-600 text-white text-xs px-3 py-1.5 rounded-md hover:bg-blue-700 font-medium"
+        style={{ backgroundColor: corPrimaria, color: corTexto }}
+        className="text-xs px-3 py-1.5 rounded-md hover:opacity-90 font-medium"
         onClick={() => (document.getElementById('dialog-promover') as HTMLDialogElement)?.showModal()}
       >
         + Mobilizador
@@ -64,7 +68,8 @@ export default function PromoverMobilizadorDialog({ slug, pessoaId, nomeAbreviad
             <button
               type="submit"
               disabled={pending}
-              className="bg-purple-600 text-white px-4 py-2 rounded-md text-sm font-medium disabled:opacity-50"
+              style={{ backgroundColor: corPrimaria, color: corTexto }}
+              className="px-4 py-2 rounded-md text-sm font-medium disabled:opacity-50"
             >
               {pending ? 'Salvando...' : 'Confirmar'}
             </button>
