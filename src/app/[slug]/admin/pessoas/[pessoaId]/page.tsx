@@ -34,7 +34,6 @@ export default async function FichaPessoaPage({
 }) {
   const gabinete = await getGabineteBySlug(params.slug)
   if (!gabinete) notFound()
-  const corTextoSecundaria = corTextoContraste(gabinete.corSecundaria)
 
   const cookieStore = cookies()
   const supabase = createServerClient(
@@ -381,7 +380,7 @@ export default async function FichaPessoaPage({
         actions={
           <Link
             href={`/${params.slug}/admin/demandas/nova?solicitanteId=${pessoa.id}`}
-            style={{ backgroundColor: gabinete.corSecundaria, color: corTextoSecundaria }}
+            style={{ backgroundColor: gabinete.corPrimaria, color: corTextoContraste(gabinete.corPrimaria) }}
             className="text-[11px] px-2.5 py-1 rounded-md hover:opacity-90 font-medium"
           >
             + CRIAR NOVA DEMANDA
@@ -431,7 +430,7 @@ export default async function FichaPessoaPage({
           <div className="flex justify-end">
             <button
               type="submit"
-              style={{ backgroundColor: gabinete.corSecundaria, color: corTextoSecundaria }}
+              style={{ backgroundColor: gabinete.corPrimaria, color: corTextoContraste(gabinete.corPrimaria) }}
               className="text-[11px] px-2.5 py-1 rounded-md hover:opacity-90 font-medium"
             >
               + CRIAR NOVA OBSERVAÇÃO
