@@ -25,9 +25,13 @@ export default function CadastrarUsuarioModal({
         type="button"
         onClick={() => setOpen(true)}
         style={{ backgroundColor: corPrimaria, color: corTexto }}
-        className="px-4 py-2 rounded-md text-sm font-medium flex items-center gap-2"
+        className="h-[42px] px-5 rounded-sm text-sm font-medium tracking-wide flex items-center gap-2.5 shadow-[0_12px_35px_rgba(212,212,212,0.6)]"
       >
-        <span aria-hidden>👤</span>
+        <svg width="18" height="14" viewBox="0 0 18 14" fill="none" aria-hidden className="shrink-0">
+          <circle cx="6" cy="4" r="3" stroke={corTexto} strokeWidth="1.4" />
+          <path d="M1 13c0-3 2.2-5 5-5s5 2 5 5" stroke={corTexto} strokeWidth="1.4" strokeLinecap="round" fill="none" />
+          <path d="M14 3v6M11 6h6" stroke={corTexto} strokeWidth="1.6" strokeLinecap="round" />
+        </svg>
         CADASTRAR USUÁRIO
       </button>
 
