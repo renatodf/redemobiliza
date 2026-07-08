@@ -72,7 +72,7 @@ export default async function AdminLayout({
   const usuarioFotoUrl = pessoaLogada?.fotoUrl ?? null
 
   return (
-    <div className="min-h-screen bg-[#F5F6FA] flex flex-col">
+    <div className="h-screen overflow-hidden bg-[#F5F6FA] flex flex-col">
       <div className="h-[11px] w-full shrink-0" style={{ backgroundColor: gabinete.corPrimaria }} />
       <div className="flex flex-1 min-h-0">
         <input type="checkbox" id="sidebar-toggle" className="peer hidden" />
@@ -87,9 +87,9 @@ export default async function AdminLayout({
           logoUrl={gabinete.logoUrl}
           corPrimaria={gabinete.corPrimaria}
         />
-        <div className="flex-1 flex flex-col min-w-0">
+        <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
           {modoSuporteAtivo && sairAction && (
-            <div className="bg-yellow-400 text-yellow-900 px-4 py-2 flex items-center justify-between text-sm font-medium">
+            <div className="bg-yellow-400 text-yellow-900 px-4 py-2 flex items-center justify-between text-sm font-medium shrink-0">
               <span>
                 Modo Suporte ativo — você está visualizando{' '}
                 <strong>{gabinete.nomeSistema ?? params.slug}</strong>
@@ -102,7 +102,7 @@ export default async function AdminLayout({
             </div>
           )}
           <Topbar usuarioNome={usuarioNome} usuarioFotoUrl={usuarioFotoUrl} corPrimaria={gabinete.corPrimaria} />
-          <main className="flex-1 p-4 md:p-6">
+          <main className="flex-1 overflow-y-auto p-4 md:p-6">
             <div className="bg-white rounded-xl shadow-sm p-4 md:p-6 max-w-6xl mx-auto">
               {children}
             </div>
