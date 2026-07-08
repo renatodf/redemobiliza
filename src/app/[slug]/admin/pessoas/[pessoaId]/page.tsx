@@ -426,13 +426,16 @@ export default async function FichaPessoaPage({
                 return (
                   <div key={obs.id} className="border border-gray-200 rounded-md p-3 space-y-2">
                     <div className="flex items-center justify-between">
-                      <span className="text-xs text-gray-500">
-                        {obs.autorNome} —{' '}
-                        {new Date(obs.criadoEm).toLocaleDateString('pt-BR', {
-                          day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit',
-                        })}
-                        {obs.editadoEm && ' (editado)'}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <Avatar fotoUrl={null} nome={obs.autorNome} size={32} />
+                        <span className="text-xs text-gray-500">
+                          {obs.autorNome} —{' '}
+                          {new Date(obs.criadoEm).toLocaleDateString('pt-BR', {
+                            day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit',
+                          })}
+                          {obs.editadoEm && ' (editado)'}
+                        </span>
+                      </div>
                       {podeEditar && (
                         <div className="flex items-center gap-2">
                           <label htmlFor={`editar-obs-${obs.id}`} className="cursor-pointer" aria-label="Editar observação">
