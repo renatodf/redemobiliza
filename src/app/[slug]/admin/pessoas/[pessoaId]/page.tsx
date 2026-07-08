@@ -368,7 +368,7 @@ export default async function FichaPessoaPage({
           <Link
             href={`/${params.slug}/admin/demandas/nova?solicitanteId=${pessoa.id}`}
             style={{ backgroundColor: gabinete.corSecundaria, color: corTextoSecundaria }}
-            className="text-xs px-3 py-1.5 rounded-md hover:opacity-90 font-medium"
+            className="text-[11px] px-2.5 py-1 rounded-md hover:opacity-90 font-medium"
           >
             + CRIAR NOVA DEMANDA
           </Link>
@@ -418,7 +418,7 @@ export default async function FichaPessoaPage({
             <button
               type="submit"
               style={{ backgroundColor: gabinete.corSecundaria, color: corTextoSecundaria }}
-              className="px-4 py-2 rounded-md text-sm font-medium"
+              className="text-[11px] px-2.5 py-1 rounded-md hover:opacity-90 font-medium"
             >
               + CRIAR NOVA OBSERVAÇÃO
             </button>
