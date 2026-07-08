@@ -90,9 +90,9 @@ export default function FotoPerfilAvatar({ fotoUrl, pessoaId, slug, canEdit }: F
           <img src={fotoUrl} alt="Foto de perfil" className="w-full h-full object-cover" />
         ) : (
           <svg viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
-            <circle cx="48" cy="48" r="48" fill="#E5E7EB" />
-            <circle cx="48" cy="38" r="16" fill="#9CA3AF" />
-            <path d="M16 80c0-17.673 14.327-32 32-32s32 14.327 32 32" fill="#9CA3AF" />
+            <circle cx="48" cy="48" r="48" fill="#D8D8D8" />
+            <circle cx="48" cy="38" r="15" stroke="#FFFFFF" strokeWidth="7" />
+            <path d="M14 84c0-18.778 15.222-34 34-34s34 15.222 34 34" stroke="#FFFFFF" strokeWidth="7" strokeLinecap="round" fill="none" />
           </svg>
         )}
       </button>
