@@ -2,7 +2,6 @@
 
 import { useState, useTransition } from 'react'
 import { tornarMobilizador } from '@/actions/admin/tornar-mobilizador'
-import { revogarMobilizador } from '@/actions/admin/revogar-mobilizador'
 import { corTextoContraste } from '@/lib/cor-contraste'
 
 type Props = {
@@ -38,16 +37,6 @@ export default function MobilizadorSection({
     })
   }
 
-  function handleRevogar(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    setErro(null)
-    const fd = new FormData(e.currentTarget)
-    startTransition(async () => {
-      const res = await revogarMobilizador(fd)
-      if (res.erro) setErro(res.erro)
-    })
-  }
-
   return (
     <section className="bg-white rounded-lg p-6 shadow-sm space-y-4">
       <h2 className="text-lg font-semibold">Mobilizador</h2>
@@ -73,17 +62,6 @@ export default function MobilizadorSection({
               </p>
             </div>
           )}
-          <form onSubmit={handleRevogar}>
-            <input type="hidden" name="slug" value={slug} />
-            <input type="hidden" name="pessoaId" value={pessoaId} />
-            <button
-              type="submit"
-              disabled={isPending}
-              className="text-sm text-red-600 hover:underline disabled:opacity-50"
-            >
-              {isPending ? 'Revogando...' : 'Revogar status de mobilizador'}
-            </button>
-          </form>
         </div>
       ) : (
         <div className="space-y-2">

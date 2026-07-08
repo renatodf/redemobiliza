@@ -13,6 +13,7 @@ import MobilizadorSection from './MobilizadorSection'
 import { getAppUrl } from '@/lib/app-url'
 import FotoPerfilAvatar from './FotoPerfilAvatar'
 import PromoverMobilizadorDialog from './PromoverMobilizadorDialog'
+import RevogarMobilizadorTopButton from './RevogarMobilizadorTopButton'
 import ExcluirPessoaButton from './ExcluirPessoaButton'
 import Avatar from '@/components/admin/Avatar'
 import SegmentPills from '@/components/admin/SegmentPills'
@@ -166,19 +167,32 @@ export default async function FichaPessoaPage({
               <input type="hidden" name="acao" value={pessoa.isColaborador ? 'desmarcar' : 'marcar'} />
               <button
                 type="submit"
-                style={{ backgroundColor: gabinete.corPrimaria, color: corTextoContraste(gabinete.corPrimaria) }}
+                style={
+                  pessoa.isColaborador
+                    ? { backgroundColor: '#fff', color: gabinete.corPrimaria, border: `1px solid ${gabinete.corPrimaria}` }
+                    : { backgroundColor: gabinete.corPrimaria, color: corTextoContraste(gabinete.corPrimaria) }
+                }
                 className="text-[11px] px-2.5 py-1 rounded-md hover:opacity-90 font-medium"
               >
                 {pessoa.isColaborador ? 'Remover como colaborador' : 'Marcar como colaborador'}
               </button>
             </form>
-            {isAdmin && !pessoa.isMobilizador && (
-              <PromoverMobilizadorDialog
-                slug={params.slug}
-                pessoaId={pessoa.id}
-                nomeAbreviado={pessoa.nome.split(' ')[0]}
-                corPrimaria={gabinete.corPrimaria}
-              />
+            {isAdmin && (
+              pessoa.isMobilizador ? (
+                <RevogarMobilizadorTopButton
+                  slug={params.slug}
+                  pessoaId={pessoa.id}
+                  nome={pessoa.nome}
+                  corPrimaria={gabinete.corPrimaria}
+                />
+              ) : (
+                <PromoverMobilizadorDialog
+                  slug={params.slug}
+                  pessoaId={pessoa.id}
+                  nomeAbreviado={pessoa.nome.split(' ')[0]}
+                  corPrimaria={gabinete.corPrimaria}
+                />
+              )
             )}
             {isAdmin && (
               <BancoTalentosDialog
