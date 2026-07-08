@@ -1,9 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import Modal from '@/components/admin/Modal'
 import { cadastrarPessoa } from '@/actions/admin/cadastrar-pessoa'
 import { corTextoContraste } from '@/lib/cor-contraste'
+import { comprimirImagem } from '@/lib/comprimir-imagem'
 
 export default function CadastrarUsuarioModal({
   slug,
@@ -18,6 +19,27 @@ export default function CadastrarUsuarioModal({
 }) {
   const [open, setOpen] = useState(false)
   const corTexto = corTextoContraste(corPrimaria)
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const [comprimindo, setComprimindo] = useState(false)
+  const inputFotoRef = useRef<HTMLInputElement>(null)
+
+  async function handleFotoChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const arquivo = e.target.files?.[0]
+    if (!arquivo) return
+
+    setComprimindo(true)
+    try {
+      const comprimido = await comprimirImagem(arquivo)
+      if (inputFotoRef.current) {
+        const dt = new DataTransfer()
+        dt.items.add(comprimido)
+        inputFotoRef.current.files = dt.files
+      }
+      setPreviewUrl(URL.createObjectURL(comprimido))
+    } finally {
+      setComprimindo(false)
+    }
+  }
 
   return (
     <>
@@ -36,8 +58,37 @@ export default function CadastrarUsuarioModal({
       </button>
 
       <Modal open={open} onClose={() => setOpen(false)} title="Cadastrar usuário">
-        <form action={cadastrarPessoa} className="space-y-3">
+        <form action={cadastrarPessoa} encType="multipart/form-data" className="space-y-3">
           <input type="hidden" name="slug" value={slug} />
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Foto (opcional)</label>
+            <div className="mt-1 flex items-center gap-3">
+              <div className="w-14 h-14 rounded-full bg-gray-100 overflow-hidden shrink-0 flex items-center justify-center border border-gray-200">
+                {previewUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={previewUrl} alt="Pré-visualização" className="w-full h-full object-cover" />
+                ) : (
+                  <span className="text-gray-300 text-2xl">👤</span>
+                )}
+              </div>
+              <div className="flex-1">
+                <input
+                  ref={inputFotoRef}
+                  name="foto"
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
+                  onChange={handleFotoChange}
+                  className="block w-full text-sm"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  {comprimindo
+                    ? 'Reduzindo tamanho da imagem…'
+                    : 'Imagem quadrada, mínimo 200×200px. Fotos grandes são reduzidas automaticamente.'}
+                </p>
+              </div>
+            </div>
+          </div>
           <div>
             <label className="block text-sm font-medium text-gray-700">Nome *</label>
             <input name="nome" required className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 text-sm" />
