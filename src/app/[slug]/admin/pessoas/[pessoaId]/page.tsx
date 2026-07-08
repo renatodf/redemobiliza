@@ -159,48 +159,51 @@ export default async function FichaPessoaPage({
             Último Acesso<br />
             <span className="text-[#757575]">{ultimoAcesso ?? '—'}</span>
           </p>
-          <form action={toggleColaborador}>
-            <input type="hidden" name="slug" value={params.slug} />
-            <input type="hidden" name="pessoaId" value={pessoa.id} />
-            <input type="hidden" name="acao" value={pessoa.isColaborador ? 'desmarcar' : 'marcar'} />
-            <button type="submit" className="text-xs text-[#686868] hover:underline">
-              {pessoa.isColaborador ? 'Remover como colaborador' : 'Marcar como colaborador'}
-            </button>
-          </form>
+          <div className="flex flex-col items-end gap-2">
+            <form action={toggleColaborador}>
+              <input type="hidden" name="slug" value={params.slug} />
+              <input type="hidden" name="pessoaId" value={pessoa.id} />
+              <input type="hidden" name="acao" value={pessoa.isColaborador ? 'desmarcar' : 'marcar'} />
+              <button
+                type="submit"
+                style={{ backgroundColor: gabinete.corPrimaria, color: corTextoContraste(gabinete.corPrimaria) }}
+                className="text-[11px] px-2.5 py-1 rounded-md hover:opacity-90 font-medium"
+              >
+                {pessoa.isColaborador ? 'Remover como colaborador' : 'Marcar como colaborador'}
+              </button>
+            </form>
+            {isAdmin && !pessoa.isMobilizador && (
+              <PromoverMobilizadorDialog
+                slug={params.slug}
+                pessoaId={pessoa.id}
+                nomeAbreviado={pessoa.nome.split(' ')[0]}
+                corPrimaria={gabinete.corPrimaria}
+              />
+            )}
+            {isAdmin && (
+              <BancoTalentosDialog
+                slug={params.slug}
+                pessoaId={pessoa.id}
+                primeiroNome={pessoa.nome.split(' ')[0]}
+                jaCadastrado={!!pessoa.bancoTalentos}
+                areasDisponiveis={areasColocacao}
+                corPrimaria={gabinete.corPrimaria}
+                bancoTalentos={
+                  pessoa.bancoTalentos
+                    ? {
+                        curriculoUrl: pessoa.bancoTalentos.curriculoUrl,
+                        prioridade: pessoa.bancoTalentos.prioridade,
+                        isPcd: pessoa.bancoTalentos.isPcd,
+                        observacao: pessoa.bancoTalentos.observacao,
+                        colocado: pessoa.bancoTalentos.colocado,
+                        areaIds: pessoa.bancoTalentos.areas.map((a) => a.areaColocacaoId),
+                      }
+                    : null
+                }
+              />
+            )}
+          </div>
         </div>
-      </div>
-
-      <div className="flex items-center gap-4 flex-wrap">
-        {isAdmin && !pessoa.isMobilizador && (
-          <PromoverMobilizadorDialog
-            slug={params.slug}
-            pessoaId={pessoa.id}
-            nomeAbreviado={pessoa.nome.split(' ')[0]}
-            corPrimaria={gabinete.corPrimaria}
-          />
-        )}
-        {isAdmin && (
-          <BancoTalentosDialog
-            slug={params.slug}
-            pessoaId={pessoa.id}
-            primeiroNome={pessoa.nome.split(' ')[0]}
-            jaCadastrado={!!pessoa.bancoTalentos}
-            areasDisponiveis={areasColocacao}
-            corPrimaria={gabinete.corPrimaria}
-            bancoTalentos={
-              pessoa.bancoTalentos
-                ? {
-                    curriculoUrl: pessoa.bancoTalentos.curriculoUrl,
-                    prioridade: pessoa.bancoTalentos.prioridade,
-                    isPcd: pessoa.bancoTalentos.isPcd,
-                    observacao: pessoa.bancoTalentos.observacao,
-                    colocado: pessoa.bancoTalentos.colocado,
-                    areaIds: pessoa.bancoTalentos.areas.map((a) => a.areaColocacaoId),
-                  }
-                : null
-            }
-          />
-        )}
       </div>
 
       <section className="space-y-4">

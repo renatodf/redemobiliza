@@ -86,7 +86,7 @@ export default function BancoTalentosDialog({
       <button
         type="button"
         style={{ backgroundColor: corPrimaria, color: corTexto }}
-        className="text-xs px-3 py-1.5 rounded-md hover:opacity-90 font-medium"
+        className="text-[11px] px-2.5 py-1 rounded-md hover:opacity-90 font-medium"
         onClick={() => (document.getElementById(DIALOG_ID) as HTMLDialogElement)?.showModal()}
       >
         {titulo}
