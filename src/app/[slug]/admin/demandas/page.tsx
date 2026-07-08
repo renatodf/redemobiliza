@@ -4,6 +4,9 @@ import { prisma } from '@/lib/prisma'
 import { getGabineteBySlug } from '@/lib/gabinete'
 import { corTextoContraste } from '@/lib/cor-contraste'
 import { GraficoDemandas } from '@/components/GraficoDemandas'
+import { IconeEditar } from '@/components/admin/TableIcons'
+import ExcluirDemandaButton from './ExcluirDemandaButton'
+import SortableHeader from '@/components/SortableHeader'
 
 const STATUS_CONFIG = {
   aberta: { label: 'Em aberto', cor: 'bg-yellow-100 text-yellow-800' },
@@ -13,6 +16,13 @@ const STATUS_CONFIG = {
 } as const
 
 const PAGE_SIZE = 20
+
+function buildOrderBy(sort?: string, order?: string) {
+  const direcao = order === 'asc' ? ('asc' as const) : ('desc' as const)
+  if (sort === 'prazoDesfecho') return { prazoDesfecho: direcao }
+  if (sort === 'responsavel') return { responsavel: { nome: direcao } }
+  return { criadoEm: 'desc' as const }
+}
 
 export default async function DemandasPage({
   params,
@@ -28,6 +38,8 @@ export default async function DemandasPage({
     dataInicio?: string
     dataFim?: string
     pagina?: string
+    sort?: string
+    order?: string
   }
 }) {
   const gabinete = await getGabineteBySlug(params.slug)
@@ -51,6 +63,7 @@ export default async function DemandasPage({
 
   const where = {
     gabineteId: gabinete.id,
+    deletedAt: null,
     ...(searchParams.status ? { status: searchParams.status } : {}),
     ...(searchParams.areaId ? { areaId: searchParams.areaId } : {}),
     ...(searchParams.responsavelId ? { responsavelId: searchParams.responsavelId } : {}),
@@ -69,7 +82,7 @@ export default async function DemandasPage({
   const [demandas, total, contagens, areas, colaboradores, regioes, contagensMes] = await Promise.all([
     prisma.demanda.findMany({
       where,
-      orderBy: { criadoEm: 'desc' },
+      orderBy: buildOrderBy(searchParams.sort, searchParams.order),
       skip: (pagina - 1) * PAGE_SIZE,
       take: PAGE_SIZE,
       select: {
@@ -87,7 +100,7 @@ export default async function DemandasPage({
     prisma.demanda.count({ where }),
     prisma.demanda.groupBy({
       by: ['status'],
-      where: { gabineteId: gabinete.id },
+      where: { gabineteId: gabinete.id, deletedAt: null },
       _count: { id: true },
     }),
     prisma.areaDemanda.findMany({ where: { gabineteId: gabinete.id }, orderBy: { nome: 'asc' }, select: { id: true, nome: true } }),
@@ -95,7 +108,7 @@ export default async function DemandasPage({
     prisma.regiao.findMany({ where: { gabineteId: gabinete.id, ativa: true }, orderBy: { nome: 'asc' }, select: { id: true, nome: true } }),
     prisma.demanda.groupBy({
       by: ['status'],
-      where: { gabineteId: gabinete.id, criadoEm: { gte: inicioMes, lte: fimMes } },
+      where: { gabineteId: gabinete.id, deletedAt: null, criadoEm: { gte: inicioMes, lte: fimMes } },
       _count: { id: true },
     }),
   ])
@@ -114,7 +127,7 @@ export default async function DemandasPage({
     ...b,
     href: `/${params.slug}/admin/demandas?status=${b.status}&dataInicio=${dataInicioStr}&dataFim=${dataFimStr}`,
   }))
-  const totalPrazoAlterado = await prisma.demanda.count({ where: { gabineteId: gabinete.id, prazoAlterado: true } })
+  const totalPrazoAlterado = await prisma.demanda.count({ where: { gabineteId: gabinete.id, deletedAt: null, prazoAlterado: true } })
 
   return (
     <div className="max-w-6xl mx-auto py-8 px-4 space-y-6">
@@ -207,10 +220,15 @@ export default async function DemandasPage({
             <tr>
               <th className="text-left px-4 py-3 font-medium text-gray-600">Título</th>
               <th className="text-left px-4 py-3 font-medium text-gray-600">Solicitante</th>
-              <th className="text-left px-4 py-3 font-medium text-gray-600">Responsável</th>
+              <th className="text-left px-4 py-3">
+                <SortableHeader label="Responsável" field="responsavel" />
+              </th>
               <th className="text-left px-4 py-3 font-medium text-gray-600">Área</th>
-              <th className="text-left px-4 py-3 font-medium text-gray-600">Prazo</th>
+              <th className="text-left px-4 py-3">
+                <SortableHeader label="Prazo" field="prazoDesfecho" />
+              </th>
               <th className="text-left px-4 py-3 font-medium text-gray-600">Status</th>
+              <th className="text-right px-4 py-3 font-medium text-gray-600">Ações</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
@@ -235,12 +253,20 @@ export default async function DemandasPage({
                       {cfg.label}
                     </span>
                   </td>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center justify-end gap-3">
+                      <Link href={`/${params.slug}/admin/demandas/${d.id}`} aria-label={`Editar ${d.titulo}`}>
+                        <IconeEditar />
+                      </Link>
+                      <ExcluirDemandaButton slug={params.slug} demandaId={d.id} titulo={d.titulo} />
+                    </div>
+                  </td>
                 </tr>
               )
             })}
             {demandas.length === 0 && (
               <tr>
-                <td colSpan={6} className="px-4 py-8 text-center text-gray-500">Nenhuma demanda encontrada</td>
+                <td colSpan={7} className="px-4 py-8 text-center text-gray-500">Nenhuma demanda encontrada</td>
               </tr>
             )}
           </tbody>
