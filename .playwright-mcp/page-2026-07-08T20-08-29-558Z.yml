@@ -1,0 +1,65 @@
+- generic [ref=f53e2]:
+  - generic [ref=f53e3]:
+    - generic [ref=f53e4]:
+      - text: Modo Suporte ativo — você está visualizando
+      - strong [ref=f53e5]: Rede Mobiliza
+    - button "Sair do modo suporte" [ref=f53e7] [cursor=pointer]
+  - navigation [ref=f53e8]:
+    - generic [ref=f53e9]:
+      - link "Dashboard" [ref=f53e10] [cursor=pointer]:
+        - /url: /amigos-do-izalci/admin/dashboard
+      - link "Pessoas" [ref=f53e11] [cursor=pointer]:
+        - /url: /amigos-do-izalci/admin/pessoas
+      - link "Demandas" [ref=f53e12] [cursor=pointer]:
+        - /url: /amigos-do-izalci/admin/demandas
+      - link "Configurações" [ref=f53e13] [cursor=pointer]:
+        - /url: /amigos-do-izalci/admin/configuracoes
+  - main [ref=f53e14]:
+    - generic [ref=f53e15]:
+      - generic [ref=f53e16]:
+        - link "Demandas" [ref=f53e17] [cursor=pointer]:
+          - /url: /amigos-do-izalci/admin/demandas
+        - generic [ref=f53e18]: /
+        - generic [ref=f53e19]: Pedido de poda de árvore na calçada
+      - generic [ref=f53e20]:
+        - generic [ref=f53e21]:
+          - heading "Pedido de poda de árvore na calçada" [level=1] [ref=f53e22]
+          - generic [ref=f53e23]:
+            - generic [ref=f53e24]: Expirada
+            - generic "Editar demanda" [ref=f53e25] [cursor=pointer]: ✏️
+            - button "Excluir demanda" [ref=f53e27] [cursor=pointer]: 🗑️
+        - paragraph [ref=f53e28]: Demanda de teste — status expirada
+        - generic [ref=f53e29]:
+          - generic [ref=f53e30]:
+            - text: "Área:"
+            - strong [ref=f53e31]: Saúde
+          - generic [ref=f53e32]:
+            - text: "Criado em:"
+            - strong [ref=f53e33]: 08/07/2026
+            - text: por Yasmin Teixeira
+          - generic [ref=f53e34]:
+            - text: "Prazo:"
+            - strong [ref=f53e35]: 03/07/2026, 09:00
+      - generic [ref=f53e36]:
+        - heading "Solicitante" [level=2] [ref=f53e37]
+        - paragraph [ref=f53e38]: Débora Pinto
+        - paragraph [ref=f53e39]: "5585911844788"
+        - paragraph [ref=f53e40]: "Região: SCIA/Estrutural"
+      - generic [ref=f53e41]:
+        - heading "Responsável" [level=2] [ref=f53e42]
+        - paragraph [ref=f53e43]: Yasmin Teixeira
+        - group [ref=f53e44]:
+          - generic "Reatribuir responsável" [ref=f53e45] [cursor=pointer]
+          - option "Selecionar..." [selected]
+          - option "Ana Clara Souza"
+          - option "Bruno Ferreira"
+          - option "Camila Oliveira"
+          - option "Daniel Santos"
+          - option "Eduarda Lima"
+          - option "RENATO FERNANDES FERREIRA"
+      - generic [ref=f53e46]:
+        - heading "Observação" [level=2] [ref=f53e47]
+        - paragraph [ref=f53e48]: Nenhuma observação registrada.
+      - generic [ref=f53e49]:
+        - heading "Histórico" [level=2] [ref=f53e50]
+        - list

@@ -2,12 +2,12 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 import { getGabineteBySlug } from '@/lib/gabinete'
+import { corTextoContraste } from '@/lib/cor-contraste'
 import { atualizarObservacaoDemanda as atualizarObservacaoDemandaAction } from '@/actions/admin/atualizar-observacao-demanda'
 import { alterarPrazoDemanda as alterarPrazoDemandaAction } from '@/actions/admin/alterar-prazo-demanda'
 import { alterarStatusDemanda as alterarStatusDemandaAction } from '@/actions/admin/alterar-status-demanda'
 import { editarDemanda as editarDemandaAction } from '@/actions/admin/editar-demanda'
 import { reatribuirResponsavel as reatribuirResponsavelAction } from '@/actions/admin/reatribuir-responsavel'
-import ExcluirDemandaButton from './ExcluirDemandaButton'
 
 // Wrappers para actions que retornam valores, convertendo para void para compatibilidade com form action
 async function atualizarObservacaoDemanda(formData: FormData) {
@@ -49,6 +49,7 @@ export default async function DetalheDemandaPage({
 }) {
   const gabinete = await getGabineteBySlug(params.slug)
   if (!gabinete) notFound()
+  const corTexto = corTextoContraste(gabinete.corPrimaria)
 
   const [demanda, colaboradores, areas] = await Promise.all([
     prisma.demanda.findFirst({
@@ -102,7 +103,6 @@ export default async function DetalheDemandaPage({
             <label htmlFor="modo-edicao" className="cursor-pointer text-lg leading-none" aria-label="Editar demanda" title="Editar demanda">
               ✏️
             </label>
-            <ExcluirDemandaButton slug={params.slug} demandaId={demanda.id} />
           </div>
         </div>
         <p className="text-sm text-gray-700 whitespace-pre-wrap">{demanda.descricao}</p>
@@ -155,7 +155,11 @@ export default async function DetalheDemandaPage({
               ))}
             </select>
           </div>
-          <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium">
+          <button
+            type="submit"
+            style={{ backgroundColor: gabinete.corPrimaria, color: corTexto }}
+            className="px-4 py-2 rounded-md text-sm font-medium"
+          >
             Salvar dados
           </button>
         </form>
@@ -185,7 +189,11 @@ export default async function DetalheDemandaPage({
                 <option key={c.id} value={c.id}>{c.nome}</option>
               ))}
             </select>
-            <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm">
+            <button
+              type="submit"
+              style={{ backgroundColor: gabinete.corPrimaria, color: corTexto }}
+              className="px-4 py-2 rounded-md text-sm"
+            >
               Confirmar
             </button>
           </form>
@@ -215,7 +223,11 @@ export default async function DetalheDemandaPage({
             placeholder="Adicionar ou atualizar observação..."
             className="block w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
           />
-          <button type="submit" className="bg-gray-700 text-white px-4 py-2 rounded-md text-sm font-medium">
+          <button
+            type="submit"
+            style={{ backgroundColor: gabinete.corPrimaria, color: corTexto }}
+            className="px-4 py-2 rounded-md text-sm font-medium"
+          >
             Salvar observação
           </button>
         </form>
@@ -238,7 +250,11 @@ export default async function DetalheDemandaPage({
             <option value="atendida">Atendida</option>
             <option value="nao_atendida">Não atendida</option>
           </select>
-          <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium">
+          <button
+            type="submit"
+            style={{ backgroundColor: gabinete.corPrimaria, color: corTexto }}
+            className="px-4 py-2 rounded-md text-sm font-medium"
+          >
             Salvar status
           </button>
         </form>

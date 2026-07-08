@@ -1,0 +1,162 @@
+- generic [active] [ref=f20e1]:
+  - generic [ref=f20e4]:
+    - complementary [ref=f20e5]:
+      - generic [ref=f20e6]:
+        - img "Rede Mobiliza" [ref=f20e7]
+        - generic [ref=f20e8]: Rede Mobiliza
+      - navigation [ref=f20e9]:
+        - link "Dados Gerais" [ref=f20e10] [cursor=pointer]:
+          - /url: /amigos-do-izalci/admin/dashboard
+          - img [ref=f20e11]
+          - text: Dados Gerais
+        - link "Usuários" [ref=f20e13] [cursor=pointer]:
+          - /url: /amigos-do-izalci/admin/pessoas
+          - img [ref=f20e14]
+          - text: Usuários
+        - link "Demandas" [ref=f20e19] [cursor=pointer]:
+          - /url: /amigos-do-izalci/admin/demandas
+          - img [ref=f20e20]
+          - text: Demandas
+        - generic "Em breve" [ref=f20e23]:
+          - generic [ref=f20e24]:
+            - img [ref=f20e25]
+            - text: Tarefas
+          - generic [ref=f20e28]: em breve
+        - generic "Em breve" [ref=f20e29]:
+          - generic [ref=f20e30]:
+            - img [ref=f20e31]
+            - text: Banco de Talentos
+          - generic [ref=f20e34]: em breve
+        - generic "Em breve" [ref=f20e35]:
+          - generic [ref=f20e36]:
+            - img [ref=f20e37]
+            - text: Link de Cadastro
+          - generic [ref=f20e41]: em breve
+        - generic "Em breve" [ref=f20e42]:
+          - generic [ref=f20e43]:
+            - img [ref=f20e44]
+            - text: Importar/Exportar
+          - generic [ref=f20e47]: em breve
+        - link "Configurações" [ref=f20e48] [cursor=pointer]:
+          - /url: /amigos-do-izalci/admin/configuracoes
+          - img [ref=f20e49]
+          - text: Configurações
+      - button "Sair" [ref=f20e53] [cursor=pointer]
+    - generic [ref=f20e54]:
+      - banner [ref=f20e55]:
+        - generic [ref=f20e58]:
+          - img [ref=f20e59]
+          - text: 08 de julho de 2026 | 10:26
+        - generic [ref=f20e62]:
+          - img [ref=f20e63]
+          - generic [ref=f20e66]:
+            - img [ref=f20e67]
+            - generic [ref=f20e70]: "0"
+          - generic [ref=f20e71]:
+            - generic "renato.df" [ref=f20e72]:
+              - img [ref=f20e73]
+            - generic [ref=f20e76]: renato.df
+      - main [ref=f20e77]:
+        - generic [ref=f20e79]:
+          - generic [ref=f20e80]:
+            - paragraph [ref=f20e81]: Início / Usuários
+            - link "Voltar" [ref=f20e82] [cursor=pointer]:
+              - /url: /amigos-do-izalci/admin/pessoas
+              - img [ref=f20e83]
+              - text: Voltar
+          - generic [ref=f20e85]:
+            - generic [ref=f20e86]:
+              - generic [ref=f20e87]:
+                - button "Ver foto em tamanho real" [ref=f20e88] [cursor=pointer]:
+                  - img "Foto de perfil" [ref=f20e89]
+                - generic [ref=f20e90]:
+                  - button "Alterar foto" [ref=f20e91] [cursor=pointer]
+                  - button "Remover foto" [ref=f20e92] [cursor=pointer]
+              - generic [ref=f20e93]:
+                - paragraph [ref=f20e94]: Nome
+                - paragraph [ref=f20e95]: José Francisco
+                - paragraph [ref=f20e96]: Email
+                - paragraph [ref=f20e97]: jose@gmail.com
+            - generic [ref=f20e98]:
+              - generic [ref=f20e99]:
+                - generic "Editar dados" [ref=f20e100] [cursor=pointer]:
+                  - img [ref=f20e101]
+                - button "Excluir cadastro" [ref=f20e104] [cursor=pointer]:
+                  - img [ref=f20e105]
+              - paragraph [ref=f20e108]:
+                - text: Último Acesso
+                - text: —
+          - generic [ref=f20e109]:
+            - button "Marcar como colaborador" [ref=f20e111] [cursor=pointer]
+            - button "+ Mobilizador" [ref=f20e112] [cursor=pointer]
+            - button "Incluir José no Banco de Talentos" [ref=f20e113] [cursor=pointer]
+          - generic [ref=f20e114]:
+            - generic [ref=f20e115]:
+              - generic [ref=f20e116]:
+                - paragraph [ref=f20e117]: Data de Nascimento
+                - paragraph [ref=f20e118]: —
+              - generic [ref=f20e119]:
+                - paragraph [ref=f20e120]: CPF
+                - paragraph [ref=f20e121]: —
+              - generic [ref=f20e122]:
+                - paragraph [ref=f20e123]: WhatsApp
+                - paragraph [ref=f20e124]: "5561995566767"
+              - generic [ref=f20e125]:
+                - paragraph [ref=f20e126]: Telefone Fixo
+                - paragraph [ref=f20e127]: —
+              - generic [ref=f20e128]:
+                - paragraph [ref=f20e129]: Endereço
+                - paragraph [ref=f20e130]: —
+              - generic [ref=f20e131]:
+                - paragraph [ref=f20e132]: CEP
+                - paragraph [ref=f20e133]: —
+              - generic [ref=f20e134]:
+                - paragraph [ref=f20e135]: Cidade
+                - paragraph [ref=f20e136]: Asa Norte
+              - generic [ref=f20e137]:
+                - paragraph [ref=f20e138]: Bairro
+                - paragraph [ref=f20e139]: —
+              - generic [ref=f20e140]:
+                - paragraph [ref=f20e141]: Sexo
+                - paragraph [ref=f20e142]: masculino
+              - generic [ref=f20e143]:
+                - paragraph [ref=f20e144]: Orientação Sexual
+                - paragraph [ref=f20e145]: —
+              - generic [ref=f20e146]:
+                - paragraph [ref=f20e147]: Religião
+                - paragraph [ref=f20e148]: —
+              - generic [ref=f20e149]:
+                - paragraph [ref=f20e150]: Escolaridade
+                - paragraph [ref=f20e151]: —
+              - generic [ref=f20e152]:
+                - paragraph [ref=f20e153]: Tipo de Conta
+                - paragraph [ref=f20e154]: —
+              - generic [ref=f20e155]:
+                - paragraph [ref=f20e156]: Profissão
+                - paragraph [ref=f20e157]: Autônomo(a)
+            - generic [ref=f20e159] [cursor=pointer]: Editar dados
+          - generic [ref=f20e160]:
+            - heading "Segmentos" [level=2] [ref=f20e161]
+            - text: —
+          - generic [ref=f20e162]:
+            - generic [ref=f20e163]:
+              - button "▲ Demandas do Usuário" [ref=f20e164] [cursor=pointer]:
+                - generic [ref=f20e165]: ▲
+                - text: Demandas do Usuário
+              - link "+ CRIAR NOVA DEMANDA" [ref=f20e166] [cursor=pointer]:
+                - /url: /amigos-do-izalci/admin/demandas/nova?solicitanteId=cmrc3zxej0001isz2ffhbo0q6
+            - paragraph [ref=f20e167]: Nenhuma demanda registrada.
+          - generic [ref=f20e168]:
+            - button "▲ Observações Sobre o Usuário" [ref=f20e170] [cursor=pointer]:
+              - generic [ref=f20e171]: ▲
+              - text: Observações Sobre o Usuário
+            - generic [ref=f20e172]:
+              - textbox "Adicionar observação..." [ref=f20e173]
+              - button "+ CRIAR NOVA OBSERVAÇÃO" [ref=f20e175] [cursor=pointer]
+            - paragraph [ref=f20e177]: Nenhuma observação ainda.
+          - generic [ref=f20e178]:
+            - heading "Mobilizador" [level=2] [ref=f20e179]
+            - generic [ref=f20e181]:
+              - button "Tornar mobilizador" [ref=f20e182] [cursor=pointer]
+              - paragraph [ref=f20e183]: Um e-mail com link de acesso será enviado para a pessoa.
+  - alert [ref=f20e184]

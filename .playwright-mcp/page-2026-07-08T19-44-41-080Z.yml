@@ -1,0 +1,30 @@
+- generic [ref=f45e2]:
+  - banner [ref=f45e3]:
+    - generic [ref=f45e4]: Rede Mobiliza — Super Admin
+    - button "Sair" [ref=f45e6] [cursor=pointer]
+  - main [ref=f45e7]:
+    - generic [ref=f45e8]:
+      - generic [ref=f45e9]:
+        - heading "Gabinetes" [level=1] [ref=f45e10]
+        - link "Novo gabinete" [ref=f45e11] [cursor=pointer]:
+          - /url: /super-admin/gabinetes/novo
+      - table [ref=f45e13]:
+        - rowgroup [ref=f45e14]:
+          - row "Nome Slug Pessoas Segmentos Status" [ref=f45e15]:
+            - columnheader "Nome" [ref=f45e16]
+            - columnheader "Slug" [ref=f45e17]
+            - columnheader "Pessoas" [ref=f45e18]
+            - columnheader "Segmentos" [ref=f45e19]
+            - columnheader "Status" [ref=f45e20]
+            - columnheader [ref=f45e21]
+        - rowgroup [ref=f45e22]:
+          - row "AMIGOS DO IZALCI amigos-do-izalci 33 0 Ativo Gerenciar" [ref=f45e23]:
+            - cell "AMIGOS DO IZALCI" [ref=f45e24]
+            - cell "amigos-do-izalci" [ref=f45e25]
+            - cell "33" [ref=f45e26]
+            - cell "0" [ref=f45e27]
+            - cell "Ativo" [ref=f45e28]:
+              - generic [ref=f45e29]: Ativo
+            - cell "Gerenciar" [ref=f45e30]:
+              - link "Gerenciar" [ref=f45e31] [cursor=pointer]:
+                - /url: /super-admin/gabinetes/cmqvlnwcr000001t6wkhljpcq

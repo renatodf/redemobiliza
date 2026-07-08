@@ -1,0 +1,281 @@
+- generic [ref=f18e4]:
+  - complementary [ref=f18e5]:
+    - generic [ref=f18e6]:
+      - img "Rede Mobiliza" [ref=f18e7]
+      - generic [ref=f18e8]: Rede Mobiliza
+    - navigation [ref=f18e9]:
+      - link "Dados Gerais" [ref=f18e10] [cursor=pointer]:
+        - /url: /amigos-do-izalci/admin/dashboard
+        - img [ref=f18e11]
+        - text: Dados Gerais
+      - link "Usuários" [ref=f18e13] [cursor=pointer]:
+        - /url: /amigos-do-izalci/admin/pessoas
+        - img [ref=f18e14]
+        - text: Usuários
+      - link "Demandas" [ref=f18e19] [cursor=pointer]:
+        - /url: /amigos-do-izalci/admin/demandas
+        - img [ref=f18e20]
+        - text: Demandas
+      - generic "Em breve" [ref=f18e23]:
+        - generic [ref=f18e24]:
+          - img [ref=f18e25]
+          - text: Tarefas
+        - generic [ref=f18e28]: em breve
+      - generic "Em breve" [ref=f18e29]:
+        - generic [ref=f18e30]:
+          - img [ref=f18e31]
+          - text: Banco de Talentos
+        - generic [ref=f18e34]: em breve
+      - generic "Em breve" [ref=f18e35]:
+        - generic [ref=f18e36]:
+          - img [ref=f18e37]
+          - text: Link de Cadastro
+        - generic [ref=f18e41]: em breve
+      - generic "Em breve" [ref=f18e42]:
+        - generic [ref=f18e43]:
+          - img [ref=f18e44]
+          - text: Importar/Exportar
+        - generic [ref=f18e47]: em breve
+      - link "Configurações" [ref=f18e48] [cursor=pointer]:
+        - /url: /amigos-do-izalci/admin/configuracoes
+        - img [ref=f18e49]
+        - text: Configurações
+    - button "Sair" [ref=f18e53] [cursor=pointer]
+  - generic [ref=f18e54]:
+    - banner [ref=f18e55]:
+      - generic [ref=f18e58]:
+        - img [ref=f18e59]
+        - generic [ref=f18e62]:
+          - img [ref=f18e63]
+          - generic [ref=f18e66]: "0"
+        - generic [ref=f18e67]:
+          - generic "renato.df" [ref=f18e68]:
+            - img [ref=f18e69]
+          - generic [ref=f18e72]: renato.df
+    - main [ref=f18e73]:
+      - generic [ref=f18e75]:
+        - generic [ref=f18e76]:
+          - paragraph [ref=f18e77]: Início / Usuários
+          - link "Voltar" [ref=f18e78] [cursor=pointer]:
+            - /url: /amigos-do-izalci/admin/pessoas
+            - img [ref=f18e79]
+            - text: Voltar
+        - generic [ref=f18e81]:
+          - generic [ref=f18e82]:
+            - button "Adicionar foto de perfil" [ref=f18e84] [cursor=pointer]:
+              - img [ref=f18e85]
+            - generic [ref=f18e89]:
+              - paragraph [ref=f18e90]: Nome
+              - paragraph [ref=f18e91]: Débora Pinto
+              - paragraph [ref=f18e92]: Email
+              - paragraph [ref=f18e93]: —
+          - generic [ref=f18e94]:
+            - generic [ref=f18e95]:
+              - generic "Editar dados" [ref=f18e96] [cursor=pointer]:
+                - img [ref=f18e97]
+              - button "Excluir cadastro" [ref=f18e100] [cursor=pointer]:
+                - img [ref=f18e101]
+            - paragraph [ref=f18e104]:
+              - text: Último Acesso
+              - text: —
+        - generic [ref=f18e105]:
+          - button "Marcar como colaborador" [ref=f18e107] [cursor=pointer]
+          - button "+ Mobilizador" [ref=f18e108] [cursor=pointer]
+          - button "Atualizar Banco de Talentos de Débora" [ref=f18e109] [cursor=pointer]
+        - generic [ref=f18e110]:
+          - generic [ref=f18e111]:
+            - generic [ref=f18e112]:
+              - paragraph [ref=f18e113]: Data de Nascimento
+              - paragraph [ref=f18e114]: —
+            - generic [ref=f18e115]:
+              - paragraph [ref=f18e116]: CPF
+              - paragraph [ref=f18e117]: —
+            - generic [ref=f18e118]:
+              - paragraph [ref=f18e119]: WhatsApp
+              - paragraph [ref=f18e120]: (85) 9 1184-4788
+            - generic [ref=f18e121]:
+              - paragraph [ref=f18e122]: Telefone Fixo
+              - paragraph [ref=f18e123]: —
+            - generic [ref=f18e124]:
+              - paragraph [ref=f18e125]: Endereço
+              - paragraph [ref=f18e126]: —
+            - generic [ref=f18e127]:
+              - paragraph [ref=f18e128]: CEP
+              - paragraph [ref=f18e129]: —
+            - generic [ref=f18e130]:
+              - paragraph [ref=f18e131]: Cidade
+              - paragraph [ref=f18e132]: SCIA/Estrutural
+            - generic [ref=f18e133]:
+              - paragraph [ref=f18e134]: Bairro
+              - paragraph [ref=f18e135]: —
+            - generic [ref=f18e136]:
+              - paragraph [ref=f18e137]: Sexo
+              - paragraph [ref=f18e138]: feminino
+            - generic [ref=f18e139]:
+              - paragraph [ref=f18e140]: Orientação Sexual
+              - paragraph [ref=f18e141]: —
+            - generic [ref=f18e142]:
+              - paragraph [ref=f18e143]: Religião
+              - paragraph [ref=f18e144]: —
+            - generic [ref=f18e145]:
+              - paragraph [ref=f18e146]: Escolaridade
+              - paragraph [ref=f18e147]: —
+            - generic [ref=f18e148]:
+              - paragraph [ref=f18e149]: Tipo de Conta
+              - paragraph [ref=f18e150]: —
+            - generic [ref=f18e151]:
+              - paragraph [ref=f18e152]: Profissão
+              - paragraph [ref=f18e153]: Motorista / Transporte
+          - generic [ref=f18e154]:
+            - generic [ref=f18e155] [cursor=pointer]: Fechar edição
+            - generic [ref=f18e157]:
+              - generic [ref=f18e158]:
+                - generic [ref=f18e159]: Nome *
+                - textbox [ref=f18e160]: Débora Pinto
+              - generic [ref=f18e161]:
+                - generic [ref=f18e162]:
+                  - generic [ref=f18e163]: WhatsApp *
+                  - textbox [ref=f18e164]: (85) 9 1184-4788
+                - generic [ref=f18e165]:
+                  - generic [ref=f18e166]: E-mail
+                  - textbox [ref=f18e167]
+              - generic [ref=f18e168]:
+                - generic [ref=f18e169]:
+                  - generic [ref=f18e170]: Região
+                  - combobox [ref=f18e171]:
+                    - option "Selecionar..."
+                    - option "Águas Claras"
+                    - option "Arniqueira"
+                    - option "Asa Norte"
+                    - option "Asa Sul"
+                    - option "Brazlândia"
+                    - option "Candangolândia"
+                    - option "Ceilândia"
+                    - option "Cruzeiro"
+                    - option "Estrutural"
+                    - option "Fercal"
+                    - option "Gama"
+                    - option "Guará"
+                    - option "Itapoã"
+                    - option "Jardim Botânico"
+                    - option "Lago Norte"
+                    - option "Lago Sul"
+                    - option "Noroeste"
+                    - option "Núcleo Bandeirante"
+                    - option "Paranoá"
+                    - option "Park Way"
+                    - option "Planaltina"
+                    - option "Recanto das Emas"
+                    - option "Riacho Fundo"
+                    - option "Riacho Fundo II"
+                    - option "Samambaia"
+                    - option "Santa Maria"
+                    - option "São Sebastião"
+                    - option "SCIA/Estrutural" [selected]
+                    - option "SIA"
+                    - option "Sobradinho"
+                    - option "Sobradinho II"
+                    - option "Sudoeste/Octogonal"
+                    - option "Taguatinga"
+                    - option "Varjão"
+                    - option "Vicente Pires"
+                - generic [ref=f18e172]:
+                  - generic [ref=f18e173]: Profissão
+                  - combobox [ref=f18e174]:
+                    - option "Selecionar..."
+                    - option "Advogado(a)"
+                    - option "Agricultor(a)"
+                    - option "Aposentado(a)"
+                    - option "Autônomo(a)"
+                    - option "Comerciante"
+                    - option "Comunicador(a) / Jornalista"
+                    - option "Doméstico(a)"
+                    - option "Empresário(a)"
+                    - option "Engenheiro(a)"
+                    - option "Estudante"
+                    - option "Motorista / Transporte" [selected]
+                    - option "Outros"
+                    - option "Professor(a)"
+                    - option "Profissional de Saúde"
+                    - option "Profissional de Segurança"
+                    - option "Servidor Público"
+                    - option "Trabalhador(a) da Construção Civil"
+              - generic [ref=f18e175]:
+                - generic [ref=f18e176]:
+                  - generic [ref=f18e177]: Gênero
+                  - combobox [ref=f18e178]:
+                    - option "Não informado"
+                    - option "Masculino"
+                    - option "Feminino" [selected]
+                    - option "Outro"
+                - generic [ref=f18e179]:
+                  - generic [ref=f18e180]: Orientação Sexual
+                  - textbox [ref=f18e181]
+              - generic [ref=f18e182]:
+                - generic [ref=f18e183]:
+                  - generic [ref=f18e184]: CPF
+                  - textbox [ref=f18e185]
+                - generic [ref=f18e186]:
+                  - generic [ref=f18e187]: Telefone Fixo
+                  - textbox [ref=f18e188]
+              - generic [ref=f18e189]:
+                - generic [ref=f18e190]:
+                  - generic [ref=f18e191]: Religião
+                  - textbox [ref=f18e192]
+                - generic [ref=f18e193]:
+                  - generic [ref=f18e194]: Escolaridade
+                  - textbox [ref=f18e195]
+              - button "Salvar alterações" [ref=f18e197] [cursor=pointer]
+        - generic [ref=f18e198]:
+          - generic [ref=f18e199]:
+            - generic "João Pedro Nunes" [ref=f18e200]:
+              - img [ref=f18e201]
+            - generic [ref=f18e204]:
+              - paragraph [ref=f18e205]: Cadastrado na Rede
+              - paragraph [ref=f18e206]: João Pedro Nunes
+          - generic [ref=f18e207]:
+            - paragraph [ref=f18e208]: Criador da Rede
+            - paragraph [ref=f18e209]: João Pedro Nunes
+          - generic [ref=f18e210]:
+            - paragraph [ref=f18e211]: Cadastrados na Rede
+            - paragraph [ref=f18e212]: "0"
+        - generic [ref=f18e213]:
+          - heading "Segmentos" [level=2] [ref=f18e214]
+          - text: —
+        - generic [ref=f18e215]:
+          - generic [ref=f18e216]:
+            - button "▲ Demandas do Usuário" [ref=f18e217] [cursor=pointer]:
+              - generic [ref=f18e218]: ▲
+              - text: Demandas do Usuário
+            - link "+ CRIAR NOVA DEMANDA" [ref=f18e219] [cursor=pointer]:
+              - /url: /amigos-do-izalci/admin/demandas/nova?solicitanteId=cmqz9sw6c000yx1z20epx5hg6
+          - paragraph [ref=f18e220]: Nenhuma demanda registrada.
+        - generic [ref=f18e221]:
+          - button "▲ Observações Sobre o Usuário" [ref=f18e223] [cursor=pointer]:
+            - generic [ref=f18e224]: ▲
+            - text: Observações Sobre o Usuário
+          - generic [ref=f18e225]:
+            - textbox "Adicionar observação..." [ref=f18e226]
+            - button "+ CRIAR NOVA OBSERVAÇÃO" [ref=f18e228] [cursor=pointer]
+          - generic [ref=f18e230]:
+            - generic [ref=f18e231]:
+              - generic [ref=f18e232]:
+                - generic [ref=f18e233]: renato.df@gmail.com — 07/07/2026, 10:56
+                - generic [ref=f18e234]:
+                  - generic "Editar observação" [ref=f18e235] [cursor=pointer]:
+                    - img [ref=f18e236]
+                  - button "Excluir observação" [ref=f18e239] [cursor=pointer]:
+                    - img [ref=f18e240]
+              - paragraph [ref=f18e243]: mais um teste de observação
+            - generic [ref=f18e244]:
+              - generic [ref=f18e245]:
+                - generic [ref=f18e246]: renato.df@gmail.com — 07/07/2026, 10:56
+                - generic [ref=f18e247]:
+                  - generic "Editar observação" [ref=f18e248] [cursor=pointer]:
+                    - img [ref=f18e249]
+                  - button "Excluir observação" [ref=f18e252] [cursor=pointer]:
+                    - img [ref=f18e253]
+              - paragraph [ref=f18e256]: É apenas um teste de observação
+        - generic [ref=f18e257]:
+          - heading "Mobilizador" [level=2] [ref=f18e258]
+          - paragraph [ref=f18e260]: Cadastre um e-mail para esta pessoa antes de torná-la mobilizador.

@@ -1,0 +1,228 @@
+- generic [ref=f46e2]:
+  - generic [ref=f46e3]:
+    - generic [ref=f46e4]:
+      - text: Modo Suporte ativo — você está visualizando
+      - strong [ref=f46e5]: Rede Mobiliza
+    - button "Sair do modo suporte" [ref=f46e7] [cursor=pointer]
+  - navigation [ref=f46e8]:
+    - generic [ref=f46e9]:
+      - link "Dashboard" [ref=f46e10] [cursor=pointer]:
+        - /url: /amigos-do-izalci/admin/dashboard
+      - link "Pessoas" [ref=f46e11] [cursor=pointer]:
+        - /url: /amigos-do-izalci/admin/pessoas
+      - link "Demandas" [ref=f46e12] [cursor=pointer]:
+        - /url: /amigos-do-izalci/admin/demandas
+      - link "Configurações" [ref=f46e13] [cursor=pointer]:
+        - /url: /amigos-do-izalci/admin/configuracoes
+  - main [ref=f46e14]:
+    - generic [ref=f46e15]:
+      - generic [ref=f46e16]:
+        - heading "Demandas" [level=1] [ref=f46e17]
+        - link "+ Nova demanda" [ref=f46e18] [cursor=pointer]:
+          - /url: /amigos-do-izalci/admin/demandas/nova
+      - generic [ref=f46e19]:
+        - heading "Demandas do mês" [level=2] [ref=f46e21]
+        - paragraph [ref=f46e22]: julho de 2026 — clique numa barra para filtrar
+        - generic [ref=f46e23]:
+          - link "1 Em aberto" [ref=f46e24] [cursor=pointer]:
+            - /url: /amigos-do-izalci/admin/demandas?status=aberta&dataInicio=2026-07-01&dataFim=2026-08-01
+            - generic [ref=f46e25]: "1"
+            - generic [ref=f46e26]: Em aberto
+          - link "1 Expirada" [ref=f46e27] [cursor=pointer]:
+            - /url: /amigos-do-izalci/admin/demandas?status=expirada&dataInicio=2026-07-01&dataFim=2026-08-01
+            - generic [ref=f46e28]: "1"
+            - generic [ref=f46e29]: Expirada
+          - link "1 Atendida" [ref=f46e30] [cursor=pointer]:
+            - /url: /amigos-do-izalci/admin/demandas?status=atendida&dataInicio=2026-07-01&dataFim=2026-08-01
+            - generic [ref=f46e31]: "1"
+            - generic [ref=f46e32]: Atendida
+          - link "1 Não atendida" [ref=f46e33] [cursor=pointer]:
+            - /url: /amigos-do-izalci/admin/demandas?status=nao_atendida&dataInicio=2026-07-01&dataFim=2026-08-01
+            - generic [ref=f46e34]: "1"
+            - generic [ref=f46e35]: Não atendida
+      - generic [ref=f46e36]:
+        - generic [ref=f46e37]:
+          - paragraph [ref=f46e38]: Em aberto
+          - paragraph [ref=f46e39]: "3"
+        - generic [ref=f46e40]:
+          - paragraph [ref=f46e41]: Expiradas
+          - paragraph [ref=f46e42]: "1"
+        - generic [ref=f46e43]:
+          - paragraph [ref=f46e44]: Atendidas
+          - paragraph [ref=f46e45]: "1"
+        - generic [ref=f46e46]:
+          - paragraph [ref=f46e47]: Não atendidas
+          - paragraph [ref=f46e48]: "1"
+        - generic [ref=f46e49]:
+          - paragraph [ref=f46e50]: Prazo alterado
+          - paragraph [ref=f46e51]: "0"
+      - generic [ref=f46e52]:
+        - generic [ref=f46e53]:
+          - combobox [ref=f46e54]:
+            - option "Todos os status" [selected]
+            - option "Em aberto"
+            - option "Expirada"
+            - option "Atendida"
+            - option "Não atendida"
+          - combobox [ref=f46e55]:
+            - option "Todas as áreas" [selected]
+            - option "Assistência Social"
+            - option "Educação"
+            - option "Infraestrutura"
+            - option "Saúde"
+            - option "Segurança Pública"
+          - combobox [ref=f46e56]:
+            - option "Todos os responsáveis" [selected]
+            - option "Ana Clara Souza"
+            - option "Bruno Ferreira"
+            - option "Camila Oliveira"
+            - option "Daniel Santos"
+            - option "Eduarda Lima"
+            - option "RENATO FERNANDES FERREIRA"
+          - combobox [ref=f46e57]:
+            - option "Todas as regiões" [selected]
+            - option "Águas Claras"
+            - option "Arniqueira"
+            - option "Asa Norte"
+            - option "Asa Sul"
+            - option "Brazlândia"
+            - option "Candangolândia"
+            - option "Ceilândia"
+            - option "Cruzeiro"
+            - option "Estrutural"
+            - option "Fercal"
+            - option "Gama"
+            - option "Guará"
+            - option "Itapoã"
+            - option "Jardim Botânico"
+            - option "Lago Norte"
+            - option "Lago Sul"
+            - option "Noroeste"
+            - option "Núcleo Bandeirante"
+            - option "Paranoá"
+            - option "Park Way"
+            - option "Planaltina"
+            - option "Recanto das Emas"
+            - option "Riacho Fundo"
+            - option "Riacho Fundo II"
+            - option "Samambaia"
+            - option "Santa Maria"
+            - option "São Sebastião"
+            - option "SCIA/Estrutural"
+            - option "SIA"
+            - option "Sobradinho"
+            - option "Sobradinho II"
+            - option "Sudoeste/Octogonal"
+            - option "Taguatinga"
+            - option "Varjão"
+            - option "Vicente Pires"
+          - combobox [ref=f46e58]:
+            - 'option "Prazo alterado: todos" [selected]'
+            - option "Sim"
+            - option "Não"
+          - button "Filtrar" [ref=f46e59] [cursor=pointer]
+        - generic [ref=f46e60]:
+          - textbox [ref=f46e61]
+          - textbox [ref=f46e62]
+          - link "Limpar filtros" [ref=f46e63] [cursor=pointer]:
+            - /url: /amigos-do-izalci/admin/demandas
+      - table [ref=f46e65]:
+        - rowgroup [ref=f46e66]:
+          - row "Título Solicitante Responsável Área Prazo Status" [ref=f46e67]:
+            - columnheader "Título" [ref=f46e68]
+            - columnheader "Solicitante" [ref=f46e69]
+            - columnheader "Responsável" [ref=f46e70]
+            - columnheader "Área" [ref=f46e71]
+            - columnheader "Prazo" [ref=f46e72]
+            - columnheader "Status" [ref=f46e73]
+        - rowgroup [ref=f46e74]:
+          - row "Solicitação de vaga em creche municipal Débora Pinto Yasmin Teixeira Saúde 03/07/2026, 09:00 Não atendida" [ref=f46e75]:
+            - cell "Solicitação de vaga em creche municipal" [ref=f46e76]:
+              - link "Solicitação de vaga em creche municipal" [ref=f46e77] [cursor=pointer]:
+                - /url: /amigos-do-izalci/admin/demandas/cmrc5quec0003tjz2cu4n39s3
+            - cell "Débora Pinto" [ref=f46e78]
+            - cell "Yasmin Teixeira" [ref=f46e79]
+            - cell "Saúde" [ref=f46e80]
+            - cell "03/07/2026, 09:00" [ref=f46e81]
+            - cell "Não atendida" [ref=f46e82]:
+              - generic [ref=f46e83]: Não atendida
+          - row "Regularização de documentação de terreno Débora Pinto Yasmin Teixeira Saúde 03/07/2026, 09:00 Atendida" [ref=f46e84]:
+            - cell "Regularização de documentação de terreno" [ref=f46e85]:
+              - link "Regularização de documentação de terreno" [ref=f46e86] [cursor=pointer]:
+                - /url: /amigos-do-izalci/admin/demandas/cmrc5qudg0002tjz2721lm1qw
+            - cell "Débora Pinto" [ref=f46e87]
+            - cell "Yasmin Teixeira" [ref=f46e88]
+            - cell "Saúde" [ref=f46e89]
+            - cell "03/07/2026, 09:00" [ref=f46e90]
+            - cell "Atendida" [ref=f46e91]:
+              - generic [ref=f46e92]: Atendida
+          - row "Pedido de poda de árvore na calçada Débora Pinto Yasmin Teixeira Saúde 03/07/2026, 09:00 Expirada" [ref=f46e93]:
+            - cell "Pedido de poda de árvore na calçada" [ref=f46e94]:
+              - link "Pedido de poda de árvore na calçada" [ref=f46e95] [cursor=pointer]:
+                - /url: /amigos-do-izalci/admin/demandas/cmrc5qucm0001tjz2v5h1dw5a
+            - cell "Débora Pinto" [ref=f46e96]
+            - cell "Yasmin Teixeira" [ref=f46e97]
+            - cell "Saúde" [ref=f46e98]
+            - cell "03/07/2026, 09:00" [ref=f46e99]
+            - cell "Expirada" [ref=f46e100]:
+              - generic [ref=f46e101]: Expirada
+          - row "Solicitação de reparo de iluminação pública Débora Pinto Yasmin Teixeira Saúde 13/07/2026, 09:00 Em aberto" [ref=f46e102]:
+            - cell "Solicitação de reparo de iluminação pública" [ref=f46e103]:
+              - link "Solicitação de reparo de iluminação pública" [ref=f46e104] [cursor=pointer]:
+                - /url: /amigos-do-izalci/admin/demandas/cmrc5qub70000tjz2k9h1fr4h
+            - cell "Débora Pinto" [ref=f46e105]
+            - cell "Yasmin Teixeira" [ref=f46e106]
+            - cell "Saúde" [ref=f46e107]
+            - cell "13/07/2026, 09:00" [ref=f46e108]
+            - cell "Em aberto" [ref=f46e109]:
+              - generic [ref=f46e110]: Em aberto
+          - row "Família em situação de vulnerabilidade social Daniel Santos Daniel Santos Assistência Social 26/06/2026, 10:45 resolvida" [ref=f46e111]:
+            - cell "Família em situação de vulnerabilidade social" [ref=f46e112]:
+              - link "Família em situação de vulnerabilidade social" [ref=f46e113] [cursor=pointer]:
+                - /url: /amigos-do-izalci/admin/demandas/cmqz9sxd7001wx1z20q4puvdy
+            - cell "Daniel Santos" [ref=f46e114]
+            - cell "Daniel Santos" [ref=f46e115]
+            - cell "Assistência Social" [ref=f46e116]
+            - cell "26/06/2026, 10:45" [ref=f46e117]
+            - cell "resolvida" [ref=f46e118]:
+              - generic [ref=f46e119]: resolvida
+          - row "Postes sem iluminação na quadra 14 Camila Oliveira Camila Oliveira Infraestrutura 28/06/2026, 10:45 em_andamento" [ref=f46e120]:
+            - cell "Postes sem iluminação na quadra 14" [ref=f46e121]:
+              - link "Postes sem iluminação na quadra 14" [ref=f46e122] [cursor=pointer]:
+                - /url: /amigos-do-izalci/admin/demandas/cmqz9sx9a001ux1z298wkuad6
+            - cell "Camila Oliveira" [ref=f46e123]
+            - cell "Camila Oliveira" [ref=f46e124]
+            - cell "Infraestrutura" [ref=f46e125]
+            - cell "28/06/2026, 10:45" [ref=f46e126]
+            - cell "em_andamento" [ref=f46e127]:
+              - generic [ref=f46e128]: em_andamento
+          - row "Dificuldade de agendamento pelo SUS Bruno Ferreira Bruno Ferreira Saúde 30/06/2026, 10:45 em_andamento" [ref=f46e129]:
+            - cell "Dificuldade de agendamento pelo SUS" [ref=f46e130]:
+              - link "Dificuldade de agendamento pelo SUS" [ref=f46e131] [cursor=pointer]:
+                - /url: /amigos-do-izalci/admin/demandas/cmqz9sx5e001sx1z2jj2d1knw
+            - cell "Bruno Ferreira" [ref=f46e132]
+            - cell "Bruno Ferreira" [ref=f46e133]
+            - cell "Saúde" [ref=f46e134]
+            - cell "30/06/2026, 10:45" [ref=f46e135]
+            - cell "em_andamento" [ref=f46e136]:
+              - generic [ref=f46e137]: em_andamento
+          - row "Solicitação de vaga em creche pública Ana Clara Souza Ana Clara Souza Educação 04/07/2026, 10:45 Em aberto" [ref=f46e138]:
+            - cell "Solicitação de vaga em creche pública" [ref=f46e139]:
+              - link "Solicitação de vaga em creche pública" [ref=f46e140] [cursor=pointer]:
+                - /url: /amigos-do-izalci/admin/demandas/cmqz9sx1i001qx1z2kf4crv7v
+            - cell "Ana Clara Souza" [ref=f46e141]
+            - cell "Ana Clara Souza" [ref=f46e142]
+            - cell "Educação" [ref=f46e143]
+            - cell "04/07/2026, 10:45" [ref=f46e144]
+            - cell "Em aberto" [ref=f46e145]:
+              - generic [ref=f46e146]: Em aberto
+          - row "Buraco na via pública — Setor Comercial RENATO FERNANDES FERREIRA RENATO FERNANDES FERREIRA Infraestrutura 02/07/2026, 10:45 Em aberto" [ref=f46e147]:
+            - cell "Buraco na via pública — Setor Comercial" [ref=f46e148]:
+              - link "Buraco na via pública — Setor Comercial" [ref=f46e149] [cursor=pointer]:
+                - /url: /amigos-do-izalci/admin/demandas/cmqz9swx3001ox1z2yg9qdp0u
+            - cell "RENATO FERNANDES FERREIRA" [ref=f46e150]
+            - cell "RENATO FERNANDES FERREIRA" [ref=f46e151]
+            - cell "Infraestrutura" [ref=f46e152]
+            - cell "02/07/2026, 10:45" [ref=f46e153]
+            - cell "Em aberto" [ref=f46e154]:
+              - generic [ref=f46e155]: Em aberto

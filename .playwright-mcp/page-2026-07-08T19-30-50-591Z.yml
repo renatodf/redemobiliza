@@ -1,0 +1,102 @@
+- generic [ref=f42e4]:
+  - complementary [ref=f42e5]:
+    - generic [ref=f42e6]:
+      - img "Rede Mobiliza" [ref=f42e7]
+      - generic [ref=f42e8]: Rede Mobiliza
+    - navigation [ref=f42e9]:
+      - link "Dados Gerais" [ref=f42e10] [cursor=pointer]:
+        - /url: /amigos-do-izalci/admin/dashboard
+        - img [ref=f42e11]
+        - text: Dados Gerais
+      - link "Usuários" [ref=f42e13] [cursor=pointer]:
+        - /url: /amigos-do-izalci/admin/pessoas
+        - img [ref=f42e14]
+        - text: Usuários
+      - link "Demandas" [ref=f42e19] [cursor=pointer]:
+        - /url: /amigos-do-izalci/admin/demandas
+        - img [ref=f42e20]
+        - text: Demandas
+      - generic "Em breve" [ref=f42e23]:
+        - generic [ref=f42e24]:
+          - img [ref=f42e25]
+          - text: Tarefas
+        - generic [ref=f42e28]: em breve
+      - generic "Em breve" [ref=f42e29]:
+        - generic [ref=f42e30]:
+          - img [ref=f42e31]
+          - text: Banco de Talentos
+        - generic [ref=f42e34]: em breve
+      - generic "Em breve" [ref=f42e35]:
+        - generic [ref=f42e36]:
+          - img [ref=f42e37]
+          - text: Link de Cadastro
+        - generic [ref=f42e41]: em breve
+      - generic "Em breve" [ref=f42e42]:
+        - generic [ref=f42e43]:
+          - img [ref=f42e44]
+          - text: Importar/Exportar
+        - generic [ref=f42e47]: em breve
+      - link "Configurações" [ref=f42e48] [cursor=pointer]:
+        - /url: /amigos-do-izalci/admin/configuracoes
+        - img [ref=f42e49]
+        - text: Configurações
+    - button "Sair" [ref=f42e53] [cursor=pointer]
+  - generic [ref=f42e54]:
+    - banner [ref=f42e55]:
+      - generic [ref=f42e58]:
+        - img [ref=f42e59]
+        - generic [ref=f42e62]:
+          - img [ref=f42e63]
+          - generic [ref=f42e66]: "0"
+        - generic [ref=f42e67]:
+          - generic "renato.df" [ref=f42e68]:
+            - img [ref=f42e69]
+          - generic [ref=f42e72]: renato.df
+    - main [ref=f42e73]:
+      - generic [ref=f42e75]:
+        - generic [ref=f42e76]:
+          - link "Demandas" [ref=f42e77] [cursor=pointer]:
+            - /url: /amigos-do-izalci/admin/demandas
+          - generic [ref=f42e78]: /
+          - generic [ref=f42e79]: Regularização de documentação de terreno
+        - generic [ref=f42e80]:
+          - generic [ref=f42e81]:
+            - heading "Regularização de documentação de terreno" [level=1] [ref=f42e82]
+            - generic [ref=f42e83]: Atendida
+          - paragraph [ref=f42e84]: Demanda de teste — status atendida
+          - generic [ref=f42e85]:
+            - generic [ref=f42e86]:
+              - text: "Área:"
+              - strong [ref=f42e87]: Saúde
+            - generic [ref=f42e88]:
+              - text: "Criado em:"
+              - strong [ref=f42e89]: 08/07/2026
+              - text: por Yasmin Teixeira
+            - generic [ref=f42e90]:
+              - text: "Prazo:"
+              - strong [ref=f42e91]: 03/07/2026, 09:00
+        - generic [ref=f42e92]:
+          - heading "Solicitante" [level=2] [ref=f42e93]
+          - paragraph [ref=f42e94]: Débora Pinto
+          - paragraph [ref=f42e95]: "5585911844788"
+          - paragraph [ref=f42e96]: "Região: SCIA/Estrutural"
+        - generic [ref=f42e97]:
+          - heading "Responsável" [level=2] [ref=f42e98]
+          - paragraph [ref=f42e99]: Yasmin Teixeira
+          - group [ref=f42e100]:
+            - generic "Reatribuir responsável" [ref=f42e101] [cursor=pointer]
+            - option "Selecionar..." [selected]
+            - option "Ana Clara Souza"
+            - option "Bruno Ferreira"
+            - option "Camila Oliveira"
+            - option "Daniel Santos"
+            - option "Eduarda Lima"
+            - option "RENATO FERNANDES FERREIRA"
+        - generic [ref=f42e102]:
+          - heading "Observação" [level=2] [ref=f42e103]
+          - generic [ref=f42e104]:
+            - textbox "Adicionar ou atualizar observação..." [ref=f42e105]
+            - button "Salvar observação" [ref=f42e106] [cursor=pointer]
+        - generic [ref=f42e107]:
+          - heading "Histórico" [level=2] [ref=f42e108]
+          - list

@@ -1,0 +1,151 @@
+- generic [ref=f8e4]:
+  - complementary [ref=f8e5]:
+    - generic [ref=f8e6]:
+      - generic [ref=f8e7]: R
+      - generic [ref=f8e8]: Rede Mobiliza
+    - navigation [ref=f8e9]:
+      - link "Dados Gerais" [ref=f8e10] [cursor=pointer]:
+        - /url: /amigos-do-izalci/admin/dashboard
+      - link "Usuários" [ref=f8e11] [cursor=pointer]:
+        - /url: /amigos-do-izalci/admin/pessoas
+      - link "Demandas" [ref=f8e12] [cursor=pointer]:
+        - /url: /amigos-do-izalci/admin/demandas
+      - generic "Em breve" [ref=f8e13]:
+        - text: Tarefas
+        - generic [ref=f8e14]: em breve
+      - generic "Em breve" [ref=f8e15]:
+        - text: Banco de Talentos
+        - generic [ref=f8e16]: em breve
+      - generic "Em breve" [ref=f8e17]:
+        - text: Link de Cadastro
+        - generic [ref=f8e18]: em breve
+      - generic "Em breve" [ref=f8e19]:
+        - text: Importar/Exportar
+        - generic [ref=f8e20]: em breve
+      - link "Configurações" [ref=f8e21] [cursor=pointer]:
+        - /url: /amigos-do-izalci/admin/configuracoes
+    - button "Sair" [ref=f8e23] [cursor=pointer]
+  - generic [ref=f8e24]:
+    - banner [ref=f8e25]:
+      - generic [ref=f8e28]:
+        - generic [ref=f8e29]: 🔍
+        - generic [ref=f8e30]:
+          - text: 🔔
+          - generic [ref=f8e31]: "0"
+        - generic [ref=f8e32]:
+          - generic "renato.df" [ref=f8e33]:
+            - generic [ref=f8e34]: 👤
+          - generic [ref=f8e35]: renato.df
+    - main [ref=f8e36]:
+      - generic [ref=f8e38]:
+        - generic [ref=f8e39]:
+          - paragraph [ref=f8e40]: Início / Usuários
+          - link "Voltar" [ref=f8e41] [cursor=pointer]:
+            - /url: /amigos-do-izalci/admin/pessoas
+            - img [ref=f8e42]
+            - text: Voltar
+        - generic [ref=f8e44]:
+          - generic [ref=f8e45]:
+            - button "Adicionar foto de perfil" [ref=f8e47] [cursor=pointer]:
+              - img [ref=f8e48]
+            - generic [ref=f8e52]:
+              - paragraph [ref=f8e53]: Nome
+              - paragraph [ref=f8e54]: Débora Pinto
+              - paragraph [ref=f8e55]: Email
+              - paragraph [ref=f8e56]: —
+          - generic [ref=f8e57]:
+            - generic [ref=f8e58]:
+              - generic "Editar dados" [ref=f8e59] [cursor=pointer]:
+                - img [ref=f8e60]
+              - button "Excluir cadastro" [ref=f8e63] [cursor=pointer]:
+                - img [ref=f8e64]
+            - paragraph [ref=f8e67]:
+              - text: Último Acesso
+              - text: —
+        - generic [ref=f8e68]:
+          - button "Marcar como colaborador" [ref=f8e70] [cursor=pointer]
+          - button "+ Mobilizador" [ref=f8e71] [cursor=pointer]
+          - button "Atualizar Banco de Talentos de Débora" [ref=f8e72] [cursor=pointer]
+        - generic [ref=f8e73]:
+          - generic [ref=f8e74]:
+            - generic [ref=f8e75]:
+              - paragraph [ref=f8e76]: Data de Nascimento
+              - paragraph [ref=f8e77]: —
+            - generic [ref=f8e78]:
+              - paragraph [ref=f8e79]: WhatsApp
+              - paragraph [ref=f8e80]: (85) 9 1184-4788
+            - generic [ref=f8e81]:
+              - paragraph [ref=f8e82]: Endereço
+              - paragraph [ref=f8e83]: —
+            - generic [ref=f8e84]:
+              - paragraph [ref=f8e85]: CEP
+              - paragraph [ref=f8e86]: —
+            - generic [ref=f8e87]:
+              - paragraph [ref=f8e88]: Cidade
+              - paragraph [ref=f8e89]: SCIA/Estrutural
+            - generic [ref=f8e90]:
+              - paragraph [ref=f8e91]: Bairro
+              - paragraph [ref=f8e92]: —
+            - generic [ref=f8e93]:
+              - paragraph [ref=f8e94]: Sexo
+              - paragraph [ref=f8e95]: feminino
+            - generic [ref=f8e96]:
+              - paragraph [ref=f8e97]: Tipo de Conta
+              - paragraph [ref=f8e98]: —
+            - generic [ref=f8e99]:
+              - paragraph [ref=f8e100]: Profissão
+              - paragraph [ref=f8e101]: Motorista / Transporte
+          - generic [ref=f8e103] [cursor=pointer]: Editar dados
+        - generic [ref=f8e104]:
+          - generic [ref=f8e105]:
+            - generic "João Pedro Nunes" [ref=f8e106]:
+              - generic [ref=f8e107]: 👤
+            - generic [ref=f8e108]:
+              - paragraph [ref=f8e109]: Cadastrado na Rede
+              - paragraph [ref=f8e110]: João Pedro Nunes
+          - generic [ref=f8e111]:
+            - paragraph [ref=f8e112]: Criador da Rede
+            - paragraph [ref=f8e113]: João Pedro Nunes
+          - generic [ref=f8e114]:
+            - paragraph [ref=f8e115]: Cadastrados na Rede
+            - paragraph [ref=f8e116]: "0"
+        - generic [ref=f8e117]:
+          - heading "Segmentos" [level=2] [ref=f8e118]
+          - text: —
+        - generic [ref=f8e119]:
+          - generic [ref=f8e120]:
+            - button "▲ Demandas do Usuário" [ref=f8e121] [cursor=pointer]:
+              - generic [ref=f8e122]: ▲
+              - text: Demandas do Usuário
+            - link "+ CRIAR NOVA DEMANDA" [ref=f8e123] [cursor=pointer]:
+              - /url: /amigos-do-izalci/admin/demandas/nova?solicitanteId=cmqz9sw6c000yx1z20epx5hg6
+          - paragraph [ref=f8e124]: Nenhuma demanda registrada.
+        - generic [ref=f8e125]:
+          - button "▲ Observações Sobre o Usuário" [ref=f8e127] [cursor=pointer]:
+            - generic [ref=f8e128]: ▲
+            - text: Observações Sobre o Usuário
+          - generic [ref=f8e129]:
+            - textbox "Adicionar observação..." [ref=f8e130]
+            - button "+ CRIAR NOVA OBSERVAÇÃO" [ref=f8e132] [cursor=pointer]
+          - generic [ref=f8e134]:
+            - generic [ref=f8e135]:
+              - generic [ref=f8e136]:
+                - generic [ref=f8e137]: renato.df@gmail.com — 07/07/2026, 10:56
+                - generic [ref=f8e138]:
+                  - generic "Editar observação" [ref=f8e139] [cursor=pointer]:
+                    - img [ref=f8e140]
+                  - button "Excluir observação" [ref=f8e143] [cursor=pointer]:
+                    - img [ref=f8e144]
+              - paragraph [ref=f8e147]: mais um teste de observação
+            - generic [ref=f8e148]:
+              - generic [ref=f8e149]:
+                - generic [ref=f8e150]: renato.df@gmail.com — 07/07/2026, 10:56
+                - generic [ref=f8e151]:
+                  - generic "Editar observação" [ref=f8e152] [cursor=pointer]:
+                    - img [ref=f8e153]
+                  - button "Excluir observação" [ref=f8e156] [cursor=pointer]:
+                    - img [ref=f8e157]
+              - paragraph [ref=f8e160]: É apenas um teste de observação
+        - generic [ref=f8e161]:
+          - heading "Mobilizador" [level=2] [ref=f8e162]
+          - paragraph [ref=f8e164]: Cadastre um e-mail para esta pessoa antes de torná-la mobilizador.

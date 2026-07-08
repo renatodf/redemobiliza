@@ -1,0 +1,218 @@
+- generic [ref=f37e4]:
+  - complementary [ref=f37e5]:
+    - generic [ref=f37e6]:
+      - img "Rede Mobiliza" [ref=f37e7]
+      - generic [ref=f37e8]: Rede Mobiliza
+    - navigation [ref=f37e9]:
+      - link "Dados Gerais" [ref=f37e10] [cursor=pointer]:
+        - /url: /amigos-do-izalci/admin/dashboard
+        - img [ref=f37e11]
+        - text: Dados Gerais
+      - link "Usuários" [ref=f37e13] [cursor=pointer]:
+        - /url: /amigos-do-izalci/admin/pessoas
+        - img [ref=f37e14]
+        - text: Usuários
+      - link "Demandas" [ref=f37e19] [cursor=pointer]:
+        - /url: /amigos-do-izalci/admin/demandas
+        - img [ref=f37e20]
+        - text: Demandas
+      - generic "Em breve" [ref=f37e23]:
+        - generic [ref=f37e24]:
+          - img [ref=f37e25]
+          - text: Tarefas
+        - generic [ref=f37e28]: em breve
+      - generic "Em breve" [ref=f37e29]:
+        - generic [ref=f37e30]:
+          - img [ref=f37e31]
+          - text: Banco de Talentos
+        - generic [ref=f37e34]: em breve
+      - generic "Em breve" [ref=f37e35]:
+        - generic [ref=f37e36]:
+          - img [ref=f37e37]
+          - text: Link de Cadastro
+        - generic [ref=f37e41]: em breve
+      - generic "Em breve" [ref=f37e42]:
+        - generic [ref=f37e43]:
+          - img [ref=f37e44]
+          - text: Importar/Exportar
+        - generic [ref=f37e47]: em breve
+      - link "Configurações" [ref=f37e48] [cursor=pointer]:
+        - /url: /amigos-do-izalci/admin/configuracoes
+        - img [ref=f37e49]
+        - text: Configurações
+    - button "Sair" [ref=f37e53] [cursor=pointer]
+  - generic [ref=f37e54]:
+    - banner [ref=f37e55]:
+      - generic [ref=f37e58]:
+        - img [ref=f37e59]
+        - generic [ref=f37e62]:
+          - img [ref=f37e63]
+          - generic [ref=f37e66]: "0"
+        - generic [ref=f37e67]:
+          - generic "renato.df" [ref=f37e68]:
+            - img [ref=f37e69]
+          - generic [ref=f37e72]: renato.df
+    - main [ref=f37e73]:
+      - generic [ref=f37e75]:
+        - generic [ref=f37e76]:
+          - paragraph [ref=f37e77]: Início / Usuários
+          - link "Voltar" [ref=f37e78] [cursor=pointer]:
+            - /url: /amigos-do-izalci/admin/pessoas
+            - img [ref=f37e79]
+            - text: Voltar
+        - generic [ref=f37e81]:
+          - generic [ref=f37e82]:
+            - generic [ref=f37e84]:
+              - button "Adicionar foto de perfil" [ref=f37e85] [cursor=pointer]:
+                - img [ref=f37e86]
+              - button "Editar foto" [ref=f37e90] [cursor=pointer]:
+                - img [ref=f37e91]
+            - generic [ref=f37e93]:
+              - paragraph [ref=f37e94]: Nome
+              - paragraph [ref=f37e95]: Débora Pinto
+              - paragraph [ref=f37e96]: Email
+              - paragraph [ref=f37e97]: —
+          - generic [ref=f37e98]:
+            - generic [ref=f37e99]:
+              - generic "Editar dados" [ref=f37e100] [cursor=pointer]:
+                - img [ref=f37e101]
+              - button "Excluir cadastro" [ref=f37e104] [cursor=pointer]:
+                - img [ref=f37e105]
+            - paragraph [ref=f37e108]:
+              - text: Último Acesso
+              - text: —
+            - generic [ref=f37e109]:
+              - button "Marcar como colaborador" [ref=f37e111] [cursor=pointer]
+              - button "+ Mobilizador" [ref=f37e112] [cursor=pointer]
+              - button "Atualizar Banco de Talentos de Débora" [ref=f37e113] [cursor=pointer]
+        - generic [ref=f37e114]:
+          - generic [ref=f37e115]:
+            - generic [ref=f37e116]:
+              - paragraph [ref=f37e117]: Data de Nascimento
+              - paragraph [ref=f37e118]: —
+            - generic [ref=f37e119]:
+              - paragraph [ref=f37e120]: CPF
+              - paragraph [ref=f37e121]: —
+            - generic [ref=f37e122]:
+              - paragraph [ref=f37e123]: WhatsApp
+              - paragraph [ref=f37e124]: "5585911844788"
+            - generic [ref=f37e125]:
+              - paragraph [ref=f37e126]: Telefone Fixo
+              - paragraph [ref=f37e127]: —
+          - generic [ref=f37e129]:
+            - generic [ref=f37e130]:
+              - paragraph [ref=f37e131]: Endereço
+              - paragraph [ref=f37e132]: —
+            - generic [ref=f37e133]:
+              - paragraph [ref=f37e134]: CEP
+              - paragraph [ref=f37e135]: —
+            - generic [ref=f37e136]:
+              - paragraph [ref=f37e137]: Cidade
+              - paragraph [ref=f37e138]: SCIA/Estrutural
+          - generic [ref=f37e140]:
+            - generic [ref=f37e141]:
+              - paragraph [ref=f37e142]: Bairro
+              - paragraph [ref=f37e143]: —
+            - generic [ref=f37e144]:
+              - paragraph [ref=f37e145]: Sexo
+              - paragraph [ref=f37e146]: feminino
+            - generic [ref=f37e147]:
+              - paragraph [ref=f37e148]: Orientação Sexual
+              - paragraph [ref=f37e149]: —
+            - generic [ref=f37e150]:
+              - paragraph [ref=f37e151]: Religião
+              - paragraph [ref=f37e152]: —
+          - generic [ref=f37e154]:
+            - generic [ref=f37e155]:
+              - paragraph [ref=f37e156]: Escolaridade
+              - paragraph [ref=f37e157]: —
+            - generic [ref=f37e158]:
+              - paragraph [ref=f37e159]: Tipo de Conta
+              - paragraph [ref=f37e160]: —
+            - generic [ref=f37e161]:
+              - paragraph [ref=f37e162]: Profissão
+              - paragraph [ref=f37e163]: Motorista / Transporte
+          - generic [ref=f37e165] [cursor=pointer]: Editar dados
+        - generic [ref=f37e167]:
+          - generic [ref=f37e168]:
+            - generic "João Pedro Nunes" [ref=f37e169]:
+              - img [ref=f37e170]
+            - generic [ref=f37e173]:
+              - paragraph [ref=f37e174]: Cadastrado na Rede
+              - paragraph [ref=f37e175]: João Pedro Nunes
+          - generic [ref=f37e176]:
+            - paragraph [ref=f37e177]: Criador da Rede
+            - paragraph [ref=f37e178]: João Pedro Nunes
+          - generic [ref=f37e179]:
+            - paragraph [ref=f37e180]: Cadastrados na Rede
+            - paragraph [ref=f37e181]: "0"
+        - generic [ref=f37e182]:
+          - heading "Segmentos" [level=2] [ref=f37e183]
+          - text: —
+        - generic [ref=f37e184]:
+          - generic [ref=f37e185]:
+            - button "▲ Demandas do Usuário" [ref=f37e186] [cursor=pointer]:
+              - generic [ref=f37e187]: ▲
+              - text: Demandas do Usuário
+            - link "+ CRIAR NOVA DEMANDA" [ref=f37e188] [cursor=pointer]:
+              - /url: /amigos-do-izalci/admin/demandas/nova?solicitanteId=cmqz9sw6c000yx1z20epx5hg6
+          - generic [ref=f37e189]:
+            - generic [ref=f37e190]:
+              - link "Solicitação de vaga em creche municipal" [ref=f37e191] [cursor=pointer]:
+                - /url: /amigos-do-izalci/admin/demandas/cmrc5quec0003tjz2cu4n39s3
+              - generic [ref=f37e192]: NÃO ATENDIDA
+              - generic [ref=f37e193]: NÃO
+              - generic [ref=f37e194]: 08/07/2026
+            - generic [ref=f37e195]:
+              - link "Regularização de documentação de terreno" [ref=f37e196] [cursor=pointer]:
+                - /url: /amigos-do-izalci/admin/demandas/cmrc5qudg0002tjz2721lm1qw
+              - generic [ref=f37e197]: CONCLUÍDO
+              - generic [ref=f37e198]: SIM
+              - generic [ref=f37e199]: 08/07/2026
+            - generic [ref=f37e200]:
+              - link "Pedido de poda de árvore na calçada" [ref=f37e201] [cursor=pointer]:
+                - /url: /amigos-do-izalci/admin/demandas/cmrc5qucm0001tjz2v5h1dw5a
+              - generic [ref=f37e202]: PENDENTE
+              - generic [ref=f37e203]: —
+              - generic [ref=f37e204]: 08/07/2026
+            - generic [ref=f37e205]:
+              - link "Solicitação de reparo de iluminação pública" [ref=f37e206] [cursor=pointer]:
+                - /url: /amigos-do-izalci/admin/demandas/cmrc5qub70000tjz2k9h1fr4h
+              - generic [ref=f37e207]: PENDENTE
+              - generic [ref=f37e208]: —
+              - generic [ref=f37e209]: 08/07/2026
+        - generic [ref=f37e210]:
+          - button "▲ Observações Sobre o Usuário" [ref=f37e212] [cursor=pointer]:
+            - generic [ref=f37e213]: ▲
+            - text: Observações Sobre o Usuário
+          - generic [ref=f37e214]:
+            - textbox "Adicionar observação..." [ref=f37e215]
+            - button "+ CRIAR NOVA OBSERVAÇÃO" [ref=f37e217] [cursor=pointer]
+          - generic [ref=f37e219]:
+            - generic [ref=f37e220]:
+              - generic [ref=f37e221]:
+                - generic [ref=f37e222]:
+                  - generic "renato.df@gmail.com" [ref=f37e223]:
+                    - img [ref=f37e224]
+                  - generic [ref=f37e227]: renato.df@gmail.com — 07/07/2026, 10:56
+                - generic [ref=f37e228]:
+                  - generic "Editar observação" [ref=f37e229] [cursor=pointer]:
+                    - img [ref=f37e230]
+                  - button "Excluir observação" [ref=f37e233] [cursor=pointer]:
+                    - img [ref=f37e234]
+              - paragraph [ref=f37e237]: mais um teste de observação
+            - generic [ref=f37e238]:
+              - generic [ref=f37e239]:
+                - generic [ref=f37e240]:
+                  - generic "renato.df@gmail.com" [ref=f37e241]:
+                    - img [ref=f37e242]
+                  - generic [ref=f37e245]: renato.df@gmail.com — 07/07/2026, 10:56
+                - generic [ref=f37e246]:
+                  - generic "Editar observação" [ref=f37e247] [cursor=pointer]:
+                    - img [ref=f37e248]
+                  - button "Excluir observação" [ref=f37e251] [cursor=pointer]:
+                    - img [ref=f37e252]
+              - paragraph [ref=f37e255]: É apenas um teste de observação
+        - generic [ref=f37e256]:
+          - heading "Mobilizador" [level=2] [ref=f37e257]
+          - paragraph [ref=f37e259]: Cadastre um e-mail para esta pessoa antes de torná-la mobilizador.

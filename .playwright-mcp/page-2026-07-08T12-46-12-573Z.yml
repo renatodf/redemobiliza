@@ -1,0 +1,571 @@
+- generic [ref=f19e1]:
+  - generic [ref=f19e4]:
+    - complementary [ref=f19e5]:
+      - generic [ref=f19e6]:
+        - img "Rede Mobiliza" [ref=f19e7]
+        - generic [ref=f19e8]: Rede Mobiliza
+      - navigation [ref=f19e9]:
+        - link "Dados Gerais" [ref=f19e10] [cursor=pointer]:
+          - /url: /amigos-do-izalci/admin/dashboard
+          - img [ref=f19e11]
+          - text: Dados Gerais
+        - link "Usuários" [ref=f19e13] [cursor=pointer]:
+          - /url: /amigos-do-izalci/admin/pessoas
+          - img [ref=f19e14]
+          - text: Usuários
+        - link "Demandas" [ref=f19e19] [cursor=pointer]:
+          - /url: /amigos-do-izalci/admin/demandas
+          - img [ref=f19e20]
+          - text: Demandas
+        - generic "Em breve" [ref=f19e23]:
+          - generic [ref=f19e24]:
+            - img [ref=f19e25]
+            - text: Tarefas
+          - generic [ref=f19e28]: em breve
+        - generic "Em breve" [ref=f19e29]:
+          - generic [ref=f19e30]:
+            - img [ref=f19e31]
+            - text: Banco de Talentos
+          - generic [ref=f19e34]: em breve
+        - generic "Em breve" [ref=f19e35]:
+          - generic [ref=f19e36]:
+            - img [ref=f19e37]
+            - text: Link de Cadastro
+          - generic [ref=f19e41]: em breve
+        - generic "Em breve" [ref=f19e42]:
+          - generic [ref=f19e43]:
+            - img [ref=f19e44]
+            - text: Importar/Exportar
+          - generic [ref=f19e47]: em breve
+        - link "Configurações" [ref=f19e48] [cursor=pointer]:
+          - /url: /amigos-do-izalci/admin/configuracoes
+          - img [ref=f19e49]
+          - text: Configurações
+      - button "Sair" [ref=f19e53] [cursor=pointer]
+    - generic [ref=f19e54]:
+      - banner [ref=f19e55]:
+        - generic [ref=f19e573]:
+          - img [ref=f19e574]
+          - text: 08 de julho de 2026 | 09:45
+        - generic [ref=f19e58]:
+          - img [ref=f19e59]
+          - generic [ref=f19e62]:
+            - img [ref=f19e63]
+            - generic [ref=f19e66]: "0"
+          - generic [ref=f19e67]:
+            - generic "renato.df" [ref=f19e68]:
+              - img [ref=f19e69]
+            - generic [ref=f19e72]: renato.df
+      - main [ref=f19e73]:
+        - generic [ref=f19e75]:
+          - paragraph [ref=f19e76]: Início / Usuários
+          - generic [ref=f19e77]:
+            - heading "Usuários" [level=1] [ref=f19e78]
+            - button "CADASTRAR USUÁRIO" [ref=f19e79] [cursor=pointer]:
+              - img [ref=f19e80]
+              - text: CADASTRAR USUÁRIO
+            - generic [ref=f19e579]:
+              - generic [ref=f19e580]:
+                - heading "Cadastrar usuário" [level=2] [ref=f19e581]
+                - button "×" [ref=f19e582] [cursor=pointer]
+              - generic [ref=f19e583]:
+                - generic [ref=f19e584]:
+                  - generic [ref=f19e585]: Foto (opcional)
+                  - generic [ref=f19e586]:
+                    - img "Pré-visualização" [ref=f19e613]
+                    - generic [ref=f19e589]:
+                      - button "Choose File" [active] [ref=f19e590]
+                      - paragraph [ref=f19e591]: Imagem quadrada, mínimo 200×200px. Fotos grandes são reduzidas automaticamente.
+                - generic [ref=f19e592]:
+                  - generic [ref=f19e593]: Nome *
+                  - textbox [ref=f19e594]
+                - generic [ref=f19e595]:
+                  - generic [ref=f19e596]:
+                    - generic [ref=f19e597]: WhatsApp *
+                    - textbox "(61) 9 9999-9999" [ref=f19e598]
+                  - generic [ref=f19e599]:
+                    - generic [ref=f19e600]: E-mail
+                    - textbox [ref=f19e601]
+                - generic [ref=f19e602]:
+                  - generic [ref=f19e603]:
+                    - generic [ref=f19e604]: Região
+                    - combobox [ref=f19e605]:
+                      - option "Selecionar..." [selected]
+                      - option "Águas Claras"
+                      - option "Arniqueira"
+                      - option "Asa Norte"
+                      - option "Asa Sul"
+                      - option "Brazlândia"
+                      - option "Candangolândia"
+                      - option "Ceilândia"
+                      - option "Cruzeiro"
+                      - option "Estrutural"
+                      - option "Fercal"
+                      - option "Gama"
+                      - option "Guará"
+                      - option "Itapoã"
+                      - option "Jardim Botânico"
+                      - option "Lago Norte"
+                      - option "Lago Sul"
+                      - option "Noroeste"
+                      - option "Núcleo Bandeirante"
+                      - option "Paranoá"
+                      - option "Park Way"
+                      - option "Planaltina"
+                      - option "Recanto das Emas"
+                      - option "Riacho Fundo"
+                      - option "Riacho Fundo II"
+                      - option "Samambaia"
+                      - option "Santa Maria"
+                      - option "São Sebastião"
+                      - option "SCIA/Estrutural"
+                      - option "SIA"
+                      - option "Sobradinho"
+                      - option "Sobradinho II"
+                      - option "Sudoeste/Octogonal"
+                      - option "Taguatinga"
+                      - option "Varjão"
+                      - option "Vicente Pires"
+                  - generic [ref=f19e606]:
+                    - generic [ref=f19e607]: Profissão
+                    - combobox [ref=f19e608]:
+                      - option "Selecionar..." [selected]
+                      - option "Advogado(a)"
+                      - option "Agricultor(a)"
+                      - option "Aposentado(a)"
+                      - option "Autônomo(a)"
+                      - option "Comerciante"
+                      - option "Comunicador(a) / Jornalista"
+                      - option "Doméstico(a)"
+                      - option "Empresário(a)"
+                      - option "Engenheiro(a)"
+                      - option "Estudante"
+                      - option "Motorista / Transporte"
+                      - option "Outros"
+                      - option "Professor(a)"
+                      - option "Profissional de Saúde"
+                      - option "Profissional de Segurança"
+                      - option "Servidor Público"
+                      - option "Trabalhador(a) da Construção Civil"
+                - generic [ref=f19e609]:
+                  - generic [ref=f19e610]: Gênero
+                  - combobox [ref=f19e611]:
+                    - option "Prefiro não informar" [selected]
+                    - option "Masculino"
+                    - option "Feminino"
+                    - option "Outro"
+                - button "Cadastrar" [ref=f19e612] [cursor=pointer]
+          - generic [ref=f19e84]:
+            - link "Todos os Usuários" [ref=f19e85] [cursor=pointer]:
+              - /url: /amigos-do-izalci/admin/pessoas
+              - text: Todos os Usuários
+            - link "Redes de Usuários" [ref=f19e87] [cursor=pointer]:
+              - /url: /amigos-do-izalci/admin/pessoas/redes
+          - generic [ref=f19e88]:
+            - textbox "Buscar por nome, WhatsApp ou e-mail..." [ref=f19e89]
+            - button "Buscar" [ref=f19e90] [cursor=pointer]
+          - generic [ref=f19e91]:
+            - table [ref=f19e93]:
+              - rowgroup [ref=f19e94]:
+                - row "Selecionar todos Nome ↕ Email Tipo de Conta Segmentos Ações" [ref=f19e95]:
+                  - columnheader "Selecionar todos" [ref=f19e96]:
+                    - checkbox "Selecionar todos" [ref=f19e97]
+                  - columnheader [ref=f19e98]
+                  - columnheader "Nome ↕" [ref=f19e99]:
+                    - button "Nome ↕" [ref=f19e100] [cursor=pointer]:
+                      - text: Nome
+                      - generic [ref=f19e101]: ↕
+                  - columnheader "Email" [ref=f19e102]
+                  - columnheader "Tipo de Conta" [ref=f19e103]
+                  - columnheader "Segmentos" [ref=f19e104]
+                  - columnheader "Ações" [ref=f19e105]
+              - rowgroup [ref=f19e106]:
+                - row "Selecionar Débora Pinto Débora Pinto Débora Pinto — — — Editar Débora Pinto Excluir Débora Pinto" [ref=f19e107]:
+                  - cell "Selecionar Débora Pinto" [ref=f19e108]:
+                    - checkbox "Selecionar Débora Pinto" [ref=f19e109]
+                  - cell "Débora Pinto" [ref=f19e110]:
+                    - generic "Débora Pinto" [ref=f19e111]:
+                      - img [ref=f19e112]
+                  - cell "Débora Pinto" [ref=f19e115]:
+                    - link "Débora Pinto" [ref=f19e116] [cursor=pointer]:
+                      - /url: /amigos-do-izalci/admin/pessoas/cmqz9sw6c000yx1z20epx5hg6
+                  - cell "—" [ref=f19e117]
+                  - cell "—" [ref=f19e118]
+                  - cell "—" [ref=f19e119]
+                  - cell "Editar Débora Pinto Excluir Débora Pinto" [ref=f19e120]:
+                    - generic [ref=f19e121]:
+                      - link "Editar Débora Pinto" [ref=f19e122] [cursor=pointer]:
+                        - /url: /amigos-do-izalci/admin/pessoas/cmqz9sw6c000yx1z20epx5hg6?editar=1
+                        - img [ref=f19e123]
+                      - button "Excluir Débora Pinto" [ref=f19e126] [cursor=pointer]:
+                        - img [ref=f19e127]
+                - row "Selecionar Caio Fernandes Caio Fernandes Caio Fernandes — — — Editar Caio Fernandes Excluir Caio Fernandes" [ref=f19e130]:
+                  - cell "Selecionar Caio Fernandes" [ref=f19e131]:
+                    - checkbox "Selecionar Caio Fernandes" [ref=f19e132]
+                  - cell "Caio Fernandes" [ref=f19e133]:
+                    - generic "Caio Fernandes" [ref=f19e134]:
+                      - img [ref=f19e135]
+                  - cell "Caio Fernandes" [ref=f19e138]:
+                    - link "Caio Fernandes" [ref=f19e139] [cursor=pointer]:
+                      - /url: /amigos-do-izalci/admin/pessoas/cmqz9sw5g000xx1z21uuz73lg
+                  - cell "—" [ref=f19e140]
+                  - cell "—" [ref=f19e141]
+                  - cell "—" [ref=f19e142]
+                  - cell "Editar Caio Fernandes Excluir Caio Fernandes" [ref=f19e143]:
+                    - generic [ref=f19e144]:
+                      - link "Editar Caio Fernandes" [ref=f19e145] [cursor=pointer]:
+                        - /url: /amigos-do-izalci/admin/pessoas/cmqz9sw5g000xx1z21uuz73lg?editar=1
+                        - img [ref=f19e146]
+                      - button "Excluir Caio Fernandes" [ref=f19e149] [cursor=pointer]:
+                        - img [ref=f19e150]
+                - row "Selecionar Beatriz Ramos Beatriz Ramos Beatriz Ramos — — — Editar Beatriz Ramos Excluir Beatriz Ramos" [ref=f19e153]:
+                  - cell "Selecionar Beatriz Ramos" [ref=f19e154]:
+                    - checkbox "Selecionar Beatriz Ramos" [ref=f19e155]
+                  - cell "Beatriz Ramos" [ref=f19e156]:
+                    - generic "Beatriz Ramos" [ref=f19e157]:
+                      - img [ref=f19e158]
+                  - cell "Beatriz Ramos" [ref=f19e161]:
+                    - link "Beatriz Ramos" [ref=f19e162] [cursor=pointer]:
+                      - /url: /amigos-do-izalci/admin/pessoas/cmqz9sw4k000wx1z2d9igb2tu
+                  - cell "—" [ref=f19e163]
+                  - cell "—" [ref=f19e164]
+                  - cell "—" [ref=f19e165]
+                  - cell "Editar Beatriz Ramos Excluir Beatriz Ramos" [ref=f19e166]:
+                    - generic [ref=f19e167]:
+                      - link "Editar Beatriz Ramos" [ref=f19e168] [cursor=pointer]:
+                        - /url: /amigos-do-izalci/admin/pessoas/cmqz9sw4k000wx1z2d9igb2tu?editar=1
+                        - img [ref=f19e169]
+                      - button "Excluir Beatriz Ramos" [ref=f19e172] [cursor=pointer]:
+                        - img [ref=f19e173]
+                - row "Selecionar Alexandre Cunha Alexandre Cunha Alexandre Cunha — — — Editar Alexandre Cunha Excluir Alexandre Cunha" [ref=f19e176]:
+                  - cell "Selecionar Alexandre Cunha" [ref=f19e177]:
+                    - checkbox "Selecionar Alexandre Cunha" [ref=f19e178]
+                  - cell "Alexandre Cunha" [ref=f19e179]:
+                    - generic "Alexandre Cunha" [ref=f19e180]:
+                      - img [ref=f19e181]
+                  - cell "Alexandre Cunha" [ref=f19e184]:
+                    - link "Alexandre Cunha" [ref=f19e185] [cursor=pointer]:
+                      - /url: /amigos-do-izalci/admin/pessoas/cmqz9sw3p000vx1z2h5osetln
+                  - cell "—" [ref=f19e186]
+                  - cell "—" [ref=f19e187]
+                  - cell "—" [ref=f19e188]
+                  - cell "Editar Alexandre Cunha Excluir Alexandre Cunha" [ref=f19e189]:
+                    - generic [ref=f19e190]:
+                      - link "Editar Alexandre Cunha" [ref=f19e191] [cursor=pointer]:
+                        - /url: /amigos-do-izalci/admin/pessoas/cmqz9sw3p000vx1z2h5osetln?editar=1
+                        - img [ref=f19e192]
+                      - button "Excluir Alexandre Cunha" [ref=f19e195] [cursor=pointer]:
+                        - img [ref=f19e196]
+                - row "Selecionar Zuleide Vieira Zuleide Vieira Zuleide Vieira — — — Editar Zuleide Vieira Excluir Zuleide Vieira" [ref=f19e199]:
+                  - cell "Selecionar Zuleide Vieira" [ref=f19e200]:
+                    - checkbox "Selecionar Zuleide Vieira" [ref=f19e201]
+                  - cell "Zuleide Vieira" [ref=f19e202]:
+                    - generic "Zuleide Vieira" [ref=f19e203]:
+                      - img [ref=f19e204]
+                  - cell "Zuleide Vieira" [ref=f19e207]:
+                    - link "Zuleide Vieira" [ref=f19e208] [cursor=pointer]:
+                      - /url: /amigos-do-izalci/admin/pessoas/cmqz9sw2s000ux1z26ylh4gyh
+                  - cell "—" [ref=f19e209]
+                  - cell "—" [ref=f19e210]
+                  - cell "—" [ref=f19e211]
+                  - cell "Editar Zuleide Vieira Excluir Zuleide Vieira" [ref=f19e212]:
+                    - generic [ref=f19e213]:
+                      - link "Editar Zuleide Vieira" [ref=f19e214] [cursor=pointer]:
+                        - /url: /amigos-do-izalci/admin/pessoas/cmqz9sw2s000ux1z26ylh4gyh?editar=1
+                        - img [ref=f19e215]
+                      - button "Excluir Zuleide Vieira" [ref=f19e218] [cursor=pointer]:
+                        - img [ref=f19e219]
+                - row "Selecionar Yasmin Teixeira Yasmin Teixeira Yasmin Teixeira yasmin@yasmin.com.br Mobilizador — Editar Yasmin Teixeira Excluir Yasmin Teixeira" [ref=f19e222]:
+                  - cell "Selecionar Yasmin Teixeira" [ref=f19e223]:
+                    - checkbox "Selecionar Yasmin Teixeira" [ref=f19e224]
+                  - cell "Yasmin Teixeira" [ref=f19e225]:
+                    - generic "Yasmin Teixeira" [ref=f19e226]:
+                      - img [ref=f19e227]
+                  - cell "Yasmin Teixeira" [ref=f19e230]:
+                    - link "Yasmin Teixeira" [ref=f19e231] [cursor=pointer]:
+                      - /url: /amigos-do-izalci/admin/pessoas/cmqz9sw1w000tx1z27jjgpfhx
+                  - cell "yasmin@yasmin.com.br" [ref=f19e232]
+                  - cell "Mobilizador" [ref=f19e233]
+                  - cell "—" [ref=f19e234]
+                  - cell "Editar Yasmin Teixeira Excluir Yasmin Teixeira" [ref=f19e235]:
+                    - generic [ref=f19e236]:
+                      - link "Editar Yasmin Teixeira" [ref=f19e237] [cursor=pointer]:
+                        - /url: /amigos-do-izalci/admin/pessoas/cmqz9sw1w000tx1z27jjgpfhx?editar=1
+                        - img [ref=f19e238]
+                      - button "Excluir Yasmin Teixeira" [ref=f19e241] [cursor=pointer]:
+                        - img [ref=f19e242]
+                - row "Selecionar Xavier Moura Xavier Moura Xavier Moura — — — Editar Xavier Moura Excluir Xavier Moura" [ref=f19e245]:
+                  - cell "Selecionar Xavier Moura" [ref=f19e246]:
+                    - checkbox "Selecionar Xavier Moura" [ref=f19e247]
+                  - cell "Xavier Moura" [ref=f19e248]:
+                    - generic "Xavier Moura" [ref=f19e249]:
+                      - img [ref=f19e250]
+                  - cell "Xavier Moura" [ref=f19e253]:
+                    - link "Xavier Moura" [ref=f19e254] [cursor=pointer]:
+                      - /url: /amigos-do-izalci/admin/pessoas/cmqz9sw10000sx1z2cvl5remy
+                  - cell "—" [ref=f19e255]
+                  - cell "—" [ref=f19e256]
+                  - cell "—" [ref=f19e257]
+                  - cell "Editar Xavier Moura Excluir Xavier Moura" [ref=f19e258]:
+                    - generic [ref=f19e259]:
+                      - link "Editar Xavier Moura" [ref=f19e260] [cursor=pointer]:
+                        - /url: /amigos-do-izalci/admin/pessoas/cmqz9sw10000sx1z2cvl5remy?editar=1
+                        - img [ref=f19e261]
+                      - button "Excluir Xavier Moura" [ref=f19e264] [cursor=pointer]:
+                        - img [ref=f19e265]
+                - row "Selecionar Wanessa Cardoso Wanessa Cardoso Wanessa Cardoso — — — Editar Wanessa Cardoso Excluir Wanessa Cardoso" [ref=f19e268]:
+                  - cell "Selecionar Wanessa Cardoso" [ref=f19e269]:
+                    - checkbox "Selecionar Wanessa Cardoso" [ref=f19e270]
+                  - cell "Wanessa Cardoso" [ref=f19e271]:
+                    - generic "Wanessa Cardoso" [ref=f19e272]:
+                      - img [ref=f19e273]
+                  - cell "Wanessa Cardoso" [ref=f19e276]:
+                    - link "Wanessa Cardoso" [ref=f19e277] [cursor=pointer]:
+                      - /url: /amigos-do-izalci/admin/pessoas/cmqz9sw04000rx1z2hkt2wioq
+                  - cell "—" [ref=f19e278]
+                  - cell "—" [ref=f19e279]
+                  - cell "—" [ref=f19e280]
+                  - cell "Editar Wanessa Cardoso Excluir Wanessa Cardoso" [ref=f19e281]:
+                    - generic [ref=f19e282]:
+                      - link "Editar Wanessa Cardoso" [ref=f19e283] [cursor=pointer]:
+                        - /url: /amigos-do-izalci/admin/pessoas/cmqz9sw04000rx1z2hkt2wioq?editar=1
+                        - img [ref=f19e284]
+                      - button "Excluir Wanessa Cardoso" [ref=f19e287] [cursor=pointer]:
+                        - img [ref=f19e288]
+                - row "Selecionar Vitor Hugo Silva Vitor Hugo Silva Vitor Hugo Silva — — — Editar Vitor Hugo Silva Excluir Vitor Hugo Silva" [ref=f19e291]:
+                  - cell "Selecionar Vitor Hugo Silva" [ref=f19e292]:
+                    - checkbox "Selecionar Vitor Hugo Silva" [ref=f19e293]
+                  - cell "Vitor Hugo Silva" [ref=f19e294]:
+                    - generic "Vitor Hugo Silva" [ref=f19e295]:
+                      - img [ref=f19e296]
+                  - cell "Vitor Hugo Silva" [ref=f19e299]:
+                    - link "Vitor Hugo Silva" [ref=f19e300] [cursor=pointer]:
+                      - /url: /amigos-do-izalci/admin/pessoas/cmqz9svz8000qx1z2363xm6la
+                  - cell "—" [ref=f19e301]
+                  - cell "—" [ref=f19e302]
+                  - cell "—" [ref=f19e303]
+                  - cell "Editar Vitor Hugo Silva Excluir Vitor Hugo Silva" [ref=f19e304]:
+                    - generic [ref=f19e305]:
+                      - link "Editar Vitor Hugo Silva" [ref=f19e306] [cursor=pointer]:
+                        - /url: /amigos-do-izalci/admin/pessoas/cmqz9svz8000qx1z2363xm6la?editar=1
+                        - img [ref=f19e307]
+                      - button "Excluir Vitor Hugo Silva" [ref=f19e310] [cursor=pointer]:
+                        - img [ref=f19e311]
+                - row "Selecionar Ursula Freitas Ursula Freitas Ursula Freitas — — — Editar Ursula Freitas Excluir Ursula Freitas" [ref=f19e314]:
+                  - cell "Selecionar Ursula Freitas" [ref=f19e315]:
+                    - checkbox "Selecionar Ursula Freitas" [ref=f19e316]
+                  - cell "Ursula Freitas" [ref=f19e317]:
+                    - generic "Ursula Freitas" [ref=f19e318]:
+                      - img [ref=f19e319]
+                  - cell "Ursula Freitas" [ref=f19e322]:
+                    - link "Ursula Freitas" [ref=f19e323] [cursor=pointer]:
+                      - /url: /amigos-do-izalci/admin/pessoas/cmqz9svyc000px1z2nld8p7eh
+                  - cell "—" [ref=f19e324]
+                  - cell "—" [ref=f19e325]
+                  - cell "—" [ref=f19e326]
+                  - cell "Editar Ursula Freitas Excluir Ursula Freitas" [ref=f19e327]:
+                    - generic [ref=f19e328]:
+                      - link "Editar Ursula Freitas" [ref=f19e329] [cursor=pointer]:
+                        - /url: /amigos-do-izalci/admin/pessoas/cmqz9svyc000px1z2nld8p7eh?editar=1
+                        - img [ref=f19e330]
+                      - button "Excluir Ursula Freitas" [ref=f19e333] [cursor=pointer]:
+                        - img [ref=f19e334]
+                - row "Selecionar Thiago Nascimento Thiago Nascimento Thiago Nascimento — — — Editar Thiago Nascimento Excluir Thiago Nascimento" [ref=f19e337]:
+                  - cell "Selecionar Thiago Nascimento" [ref=f19e338]:
+                    - checkbox "Selecionar Thiago Nascimento" [ref=f19e339]
+                  - cell "Thiago Nascimento" [ref=f19e340]:
+                    - generic "Thiago Nascimento" [ref=f19e341]:
+                      - img [ref=f19e342]
+                  - cell "Thiago Nascimento" [ref=f19e345]:
+                    - link "Thiago Nascimento" [ref=f19e346] [cursor=pointer]:
+                      - /url: /amigos-do-izalci/admin/pessoas/cmqz9svxi000ox1z2b3rj00mo
+                  - cell "—" [ref=f19e347]
+                  - cell "—" [ref=f19e348]
+                  - cell "—" [ref=f19e349]
+                  - cell "Editar Thiago Nascimento Excluir Thiago Nascimento" [ref=f19e350]:
+                    - generic [ref=f19e351]:
+                      - link "Editar Thiago Nascimento" [ref=f19e352] [cursor=pointer]:
+                        - /url: /amigos-do-izalci/admin/pessoas/cmqz9svxi000ox1z2b3rj00mo?editar=1
+                        - img [ref=f19e353]
+                      - button "Excluir Thiago Nascimento" [ref=f19e356] [cursor=pointer]:
+                        - img [ref=f19e357]
+                - row "Selecionar Sabrina Lopes Sabrina Lopes Sabrina Lopes — — — Editar Sabrina Lopes Excluir Sabrina Lopes" [ref=f19e360]:
+                  - cell "Selecionar Sabrina Lopes" [ref=f19e361]:
+                    - checkbox "Selecionar Sabrina Lopes" [ref=f19e362]
+                  - cell "Sabrina Lopes" [ref=f19e363]:
+                    - generic "Sabrina Lopes" [ref=f19e364]:
+                      - img [ref=f19e365]
+                  - cell "Sabrina Lopes" [ref=f19e368]:
+                    - link "Sabrina Lopes" [ref=f19e369] [cursor=pointer]:
+                      - /url: /amigos-do-izalci/admin/pessoas/cmqz9svwk000nx1z2i2z04m24
+                  - cell "—" [ref=f19e370]
+                  - cell "—" [ref=f19e371]
+                  - cell "—" [ref=f19e372]
+                  - cell "Editar Sabrina Lopes Excluir Sabrina Lopes" [ref=f19e373]:
+                    - generic [ref=f19e374]:
+                      - link "Editar Sabrina Lopes" [ref=f19e375] [cursor=pointer]:
+                        - /url: /amigos-do-izalci/admin/pessoas/cmqz9svwk000nx1z2i2z04m24?editar=1
+                        - img [ref=f19e376]
+                      - button "Excluir Sabrina Lopes" [ref=f19e379] [cursor=pointer]:
+                        - img [ref=f19e380]
+                - row "Selecionar Rafael Dias Rafael Dias Rafael Dias — — — Editar Rafael Dias Excluir Rafael Dias" [ref=f19e383]:
+                  - cell "Selecionar Rafael Dias" [ref=f19e384]:
+                    - checkbox "Selecionar Rafael Dias" [ref=f19e385]
+                  - cell "Rafael Dias" [ref=f19e386]:
+                    - generic "Rafael Dias" [ref=f19e387]:
+                      - img [ref=f19e388]
+                  - cell "Rafael Dias" [ref=f19e391]:
+                    - link "Rafael Dias" [ref=f19e392] [cursor=pointer]:
+                      - /url: /amigos-do-izalci/admin/pessoas/cmqz9svvl000mx1z2ltpeyssn
+                  - cell "—" [ref=f19e393]
+                  - cell "—" [ref=f19e394]
+                  - cell "—" [ref=f19e395]
+                  - cell "Editar Rafael Dias Excluir Rafael Dias" [ref=f19e396]:
+                    - generic [ref=f19e397]:
+                      - link "Editar Rafael Dias" [ref=f19e398] [cursor=pointer]:
+                        - /url: /amigos-do-izalci/admin/pessoas/cmqz9svvl000mx1z2ltpeyssn?editar=1
+                        - img [ref=f19e399]
+                      - button "Excluir Rafael Dias" [ref=f19e402] [cursor=pointer]:
+                        - img [ref=f19e403]
+                - row "Selecionar Quezia Araújo Quezia Araújo Quezia Araújo — — — Editar Quezia Araújo Excluir Quezia Araújo" [ref=f19e406]:
+                  - cell "Selecionar Quezia Araújo" [ref=f19e407]:
+                    - checkbox "Selecionar Quezia Araújo" [ref=f19e408]
+                  - cell "Quezia Araújo" [ref=f19e409]:
+                    - generic "Quezia Araújo" [ref=f19e410]:
+                      - img [ref=f19e411]
+                  - cell "Quezia Araújo" [ref=f19e414]:
+                    - link "Quezia Araújo" [ref=f19e415] [cursor=pointer]:
+                      - /url: /amigos-do-izalci/admin/pessoas/cmqz9svuq000lx1z25yfu4nn9
+                  - cell "—" [ref=f19e416]
+                  - cell "—" [ref=f19e417]
+                  - cell "—" [ref=f19e418]
+                  - cell "Editar Quezia Araújo Excluir Quezia Araújo" [ref=f19e419]:
+                    - generic [ref=f19e420]:
+                      - link "Editar Quezia Araújo" [ref=f19e421] [cursor=pointer]:
+                        - /url: /amigos-do-izalci/admin/pessoas/cmqz9svuq000lx1z25yfu4nn9?editar=1
+                        - img [ref=f19e422]
+                      - button "Excluir Quezia Araújo" [ref=f19e425] [cursor=pointer]:
+                        - img [ref=f19e426]
+                - row "Selecionar Paulo Mendes Paulo Mendes Paulo Mendes — — — Editar Paulo Mendes Excluir Paulo Mendes" [ref=f19e429]:
+                  - cell "Selecionar Paulo Mendes" [ref=f19e430]:
+                    - checkbox "Selecionar Paulo Mendes" [ref=f19e431]
+                  - cell "Paulo Mendes" [ref=f19e432]:
+                    - generic "Paulo Mendes" [ref=f19e433]:
+                      - img [ref=f19e434]
+                  - cell "Paulo Mendes" [ref=f19e437]:
+                    - link "Paulo Mendes" [ref=f19e438] [cursor=pointer]:
+                      - /url: /amigos-do-izalci/admin/pessoas/cmqz9svts000kx1z21i6y92nu
+                  - cell "—" [ref=f19e439]
+                  - cell "—" [ref=f19e440]
+                  - cell "—" [ref=f19e441]
+                  - cell "Editar Paulo Mendes Excluir Paulo Mendes" [ref=f19e442]:
+                    - generic [ref=f19e443]:
+                      - link "Editar Paulo Mendes" [ref=f19e444] [cursor=pointer]:
+                        - /url: /amigos-do-izalci/admin/pessoas/cmqz9svts000kx1z21i6y92nu?editar=1
+                        - img [ref=f19e445]
+                      - button "Excluir Paulo Mendes" [ref=f19e448] [cursor=pointer]:
+                        - img [ref=f19e449]
+                - row "Selecionar Olivia Carvalho Olivia Carvalho Olivia Carvalho — — — Editar Olivia Carvalho Excluir Olivia Carvalho" [ref=f19e452]:
+                  - cell "Selecionar Olivia Carvalho" [ref=f19e453]:
+                    - checkbox "Selecionar Olivia Carvalho" [ref=f19e454]
+                  - cell "Olivia Carvalho" [ref=f19e455]:
+                    - generic "Olivia Carvalho" [ref=f19e456]:
+                      - img [ref=f19e457]
+                  - cell "Olivia Carvalho" [ref=f19e460]:
+                    - link "Olivia Carvalho" [ref=f19e461] [cursor=pointer]:
+                      - /url: /amigos-do-izalci/admin/pessoas/cmqz9svsy000jx1z25v5lmdvd
+                  - cell "—" [ref=f19e462]
+                  - cell "—" [ref=f19e463]
+                  - cell "—" [ref=f19e464]
+                  - cell "Editar Olivia Carvalho Excluir Olivia Carvalho" [ref=f19e465]:
+                    - generic [ref=f19e466]:
+                      - link "Editar Olivia Carvalho" [ref=f19e467] [cursor=pointer]:
+                        - /url: /amigos-do-izalci/admin/pessoas/cmqz9svsy000jx1z25v5lmdvd?editar=1
+                        - img [ref=f19e468]
+                      - button "Excluir Olivia Carvalho" [ref=f19e471] [cursor=pointer]:
+                        - img [ref=f19e472]
+                - row "Selecionar Nicolas Barbosa Nicolas Barbosa Nicolas Barbosa — — — Editar Nicolas Barbosa Excluir Nicolas Barbosa" [ref=f19e475]:
+                  - cell "Selecionar Nicolas Barbosa" [ref=f19e476]:
+                    - checkbox "Selecionar Nicolas Barbosa" [ref=f19e477]
+                  - cell "Nicolas Barbosa" [ref=f19e478]:
+                    - generic "Nicolas Barbosa" [ref=f19e479]:
+                      - img [ref=f19e480]
+                  - cell "Nicolas Barbosa" [ref=f19e483]:
+                    - link "Nicolas Barbosa" [ref=f19e484] [cursor=pointer]:
+                      - /url: /amigos-do-izalci/admin/pessoas/cmqz9svs1000ix1z26r4d1rof
+                  - cell "—" [ref=f19e485]
+                  - cell "—" [ref=f19e486]
+                  - cell "—" [ref=f19e487]
+                  - cell "Editar Nicolas Barbosa Excluir Nicolas Barbosa" [ref=f19e488]:
+                    - generic [ref=f19e489]:
+                      - link "Editar Nicolas Barbosa" [ref=f19e490] [cursor=pointer]:
+                        - /url: /amigos-do-izalci/admin/pessoas/cmqz9svs1000ix1z26r4d1rof?editar=1
+                        - img [ref=f19e491]
+                      - button "Excluir Nicolas Barbosa" [ref=f19e494] [cursor=pointer]:
+                        - img [ref=f19e495]
+                - row "Selecionar Mariana Gomes Mariana Gomes Mariana Gomes — — — Editar Mariana Gomes Excluir Mariana Gomes" [ref=f19e498]:
+                  - cell "Selecionar Mariana Gomes" [ref=f19e499]:
+                    - checkbox "Selecionar Mariana Gomes" [ref=f19e500]
+                  - cell "Mariana Gomes" [ref=f19e501]:
+                    - generic "Mariana Gomes" [ref=f19e502]:
+                      - img [ref=f19e503]
+                  - cell "Mariana Gomes" [ref=f19e506]:
+                    - link "Mariana Gomes" [ref=f19e507] [cursor=pointer]:
+                      - /url: /amigos-do-izalci/admin/pessoas/cmqz9svr5000hx1z2csoecc69
+                  - cell "—" [ref=f19e508]
+                  - cell "—" [ref=f19e509]
+                  - cell "—" [ref=f19e510]
+                  - cell "Editar Mariana Gomes Excluir Mariana Gomes" [ref=f19e511]:
+                    - generic [ref=f19e512]:
+                      - link "Editar Mariana Gomes" [ref=f19e513] [cursor=pointer]:
+                        - /url: /amigos-do-izalci/admin/pessoas/cmqz9svr5000hx1z2csoecc69?editar=1
+                        - img [ref=f19e514]
+                      - button "Excluir Mariana Gomes" [ref=f19e517] [cursor=pointer]:
+                        - img [ref=f19e518]
+                - row "Selecionar Lucas Pereira Lucas Pereira Lucas Pereira — — — Editar Lucas Pereira Excluir Lucas Pereira" [ref=f19e521]:
+                  - cell "Selecionar Lucas Pereira" [ref=f19e522]:
+                    - checkbox "Selecionar Lucas Pereira" [ref=f19e523]
+                  - cell "Lucas Pereira" [ref=f19e524]:
+                    - generic "Lucas Pereira" [ref=f19e525]:
+                      - img [ref=f19e526]
+                  - cell "Lucas Pereira" [ref=f19e529]:
+                    - link "Lucas Pereira" [ref=f19e530] [cursor=pointer]:
+                      - /url: /amigos-do-izalci/admin/pessoas/cmqz9svq8000gx1z28qcnsgrg
+                  - cell "—" [ref=f19e531]
+                  - cell "—" [ref=f19e532]
+                  - cell "—" [ref=f19e533]
+                  - cell "Editar Lucas Pereira Excluir Lucas Pereira" [ref=f19e534]:
+                    - generic [ref=f19e535]:
+                      - link "Editar Lucas Pereira" [ref=f19e536] [cursor=pointer]:
+                        - /url: /amigos-do-izalci/admin/pessoas/cmqz9svq8000gx1z28qcnsgrg?editar=1
+                        - img [ref=f19e537]
+                      - button "Excluir Lucas Pereira" [ref=f19e540] [cursor=pointer]:
+                        - img [ref=f19e541]
+                - row "Selecionar Karen Ribeiro Karen Ribeiro Karen Ribeiro — — — Editar Karen Ribeiro Excluir Karen Ribeiro" [ref=f19e544]:
+                  - cell "Selecionar Karen Ribeiro" [ref=f19e545]:
+                    - checkbox "Selecionar Karen Ribeiro" [ref=f19e546]
+                  - cell "Karen Ribeiro" [ref=f19e547]:
+                    - generic "Karen Ribeiro" [ref=f19e548]:
+                      - img [ref=f19e549]
+                  - cell "Karen Ribeiro" [ref=f19e552]:
+                    - link "Karen Ribeiro" [ref=f19e553] [cursor=pointer]:
+                      - /url: /amigos-do-izalci/admin/pessoas/cmqz9svpd000fx1z26yix33kt
+                  - cell "—" [ref=f19e554]
+                  - cell "—" [ref=f19e555]
+                  - cell "—" [ref=f19e556]
+                  - cell "Editar Karen Ribeiro Excluir Karen Ribeiro" [ref=f19e557]:
+                    - generic [ref=f19e558]:
+                      - link "Editar Karen Ribeiro" [ref=f19e559] [cursor=pointer]:
+                        - /url: /amigos-do-izalci/admin/pessoas/cmqz9svpd000fx1z26yix33kt?editar=1
+                        - img [ref=f19e560]
+                      - button "Excluir Karen Ribeiro" [ref=f19e563] [cursor=pointer]:
+                        - img [ref=f19e564]
+            - generic [ref=f19e567]:
+              - generic [ref=f19e568]: Exibindo 20 de 31
+              - generic [ref=f19e569]:
+                - link "1" [ref=f19e570] [cursor=pointer]:
+                  - /url: /amigos-do-izalci/admin/pessoas?page=1
+                - link "2" [ref=f19e571] [cursor=pointer]:
+                  - /url: /amigos-do-izalci/admin/pessoas?page=2
+                - generic [ref=f19e572]: de 2
+  - alert [ref=f19e577]

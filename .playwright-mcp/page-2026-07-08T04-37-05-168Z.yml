@@ -1,0 +1,218 @@
+- generic [ref=f3e4]:
+  - complementary [ref=f3e5]:
+    - generic [ref=f3e6]:
+      - generic [ref=f3e7]: R
+      - generic [ref=f3e8]: Rede Mobiliza
+    - navigation [ref=f3e9]:
+      - link "Dados Gerais" [ref=f3e10] [cursor=pointer]:
+        - /url: /amigos-do-izalci/admin/dashboard
+      - link "Usuários" [ref=f3e11] [cursor=pointer]:
+        - /url: /amigos-do-izalci/admin/pessoas
+      - link "Demandas" [ref=f3e12] [cursor=pointer]:
+        - /url: /amigos-do-izalci/admin/demandas
+      - generic "Em breve" [ref=f3e13]:
+        - text: Tarefas
+        - generic [ref=f3e14]: em breve
+      - generic "Em breve" [ref=f3e15]:
+        - text: Banco de Talentos
+        - generic [ref=f3e16]: em breve
+      - generic "Em breve" [ref=f3e17]:
+        - text: Link de Cadastro
+        - generic [ref=f3e18]: em breve
+      - generic "Em breve" [ref=f3e19]:
+        - text: Importar/Exportar
+        - generic [ref=f3e20]: em breve
+      - link "Configurações" [ref=f3e21] [cursor=pointer]:
+        - /url: /amigos-do-izalci/admin/configuracoes
+    - button "Sair" [ref=f3e23] [cursor=pointer]
+  - generic [ref=f3e24]:
+    - banner [ref=f3e25]:
+      - generic [ref=f3e28]:
+        - generic [ref=f3e29]: 🔍
+        - generic [ref=f3e30]:
+          - text: 🔔
+          - generic [ref=f3e31]: "0"
+        - generic [ref=f3e32]:
+          - generic "renato.df" [ref=f3e33]:
+            - generic [ref=f3e34]: 👤
+          - generic [ref=f3e35]: renato.df
+    - main [ref=f3e36]:
+      - generic [ref=f3e38]:
+        - generic [ref=f3e39]:
+          - paragraph [ref=f3e40]: Início / Usuários
+          - link "Voltar" [ref=f3e41] [cursor=pointer]:
+            - /url: /amigos-do-izalci/admin/pessoas
+            - img [ref=f3e42]
+            - text: Voltar
+        - generic [ref=f3e44]:
+          - generic [ref=f3e45]:
+            - button "Adicionar foto de perfil" [ref=f3e47] [cursor=pointer]:
+              - img [ref=f3e48]
+            - generic [ref=f3e52]:
+              - paragraph [ref=f3e53]: Nome
+              - paragraph [ref=f3e54]: Yasmin Teixeira
+              - paragraph [ref=f3e55]: Email
+              - paragraph [ref=f3e56]: yasmin@yasmin.com.br
+          - generic [ref=f3e57]:
+            - generic [ref=f3e58]:
+              - generic "Editar dados" [ref=f3e59] [cursor=pointer]:
+                - img [ref=f3e60]
+              - button "Excluir cadastro" [ref=f3e63] [cursor=pointer]:
+                - img [ref=f3e64]
+            - paragraph [ref=f3e67]:
+              - text: Último Acesso
+              - text: 08/07/2026, 01:25
+        - generic [ref=f3e68]:
+          - button "Marcar como colaborador" [ref=f3e70] [cursor=pointer]
+          - button "Incluir Yasmin no Banco de Talentos" [ref=f3e71] [cursor=pointer]
+        - generic [ref=f3e72]:
+          - generic [ref=f3e73]:
+            - generic [ref=f3e74]:
+              - paragraph [ref=f3e75]: Data de Nascimento
+              - paragraph [ref=f3e76]: —
+            - generic [ref=f3e77]:
+              - paragraph [ref=f3e78]: WhatsApp
+              - paragraph [ref=f3e79]: "5585911805193"
+            - generic [ref=f3e80]:
+              - paragraph [ref=f3e81]: Endereço
+              - paragraph [ref=f3e82]: —
+            - generic [ref=f3e83]:
+              - paragraph [ref=f3e84]: CEP
+              - paragraph [ref=f3e85]: —
+            - generic [ref=f3e86]:
+              - paragraph [ref=f3e87]: Cidade
+              - paragraph [ref=f3e88]: Santa Maria
+            - generic [ref=f3e89]:
+              - paragraph [ref=f3e90]: Bairro
+              - paragraph [ref=f3e91]: —
+            - generic [ref=f3e92]:
+              - paragraph [ref=f3e93]: Sexo
+              - paragraph [ref=f3e94]: feminino
+            - generic [ref=f3e95]:
+              - paragraph [ref=f3e96]: Tipo de Conta
+              - paragraph [ref=f3e97]: Mobilizador
+            - generic [ref=f3e98]:
+              - paragraph [ref=f3e99]: Profissão
+              - paragraph [ref=f3e100]: Autônomo(a)
+          - generic [ref=f3e101]:
+            - generic [ref=f3e102] [cursor=pointer]: Fechar edição
+            - generic [ref=f3e104]:
+              - generic [ref=f3e105]:
+                - generic [ref=f3e106]: Nome *
+                - textbox [ref=f3e107]: Yasmin Teixeira
+              - generic [ref=f3e108]:
+                - generic [ref=f3e109]:
+                  - generic [ref=f3e110]: WhatsApp *
+                  - textbox [ref=f3e111]: "5585911805193"
+                - generic [ref=f3e112]:
+                  - generic [ref=f3e113]: E-mail
+                  - textbox [ref=f3e114]: yasmin@yasmin.com.br
+              - generic [ref=f3e115]:
+                - generic [ref=f3e116]:
+                  - generic [ref=f3e117]: Região
+                  - combobox [ref=f3e118]:
+                    - option "Selecionar..."
+                    - option "Águas Claras"
+                    - option "Arniqueira"
+                    - option "Asa Norte"
+                    - option "Asa Sul"
+                    - option "Brazlândia"
+                    - option "Candangolândia"
+                    - option "Ceilândia"
+                    - option "Cruzeiro"
+                    - option "Estrutural"
+                    - option "Fercal"
+                    - option "Gama"
+                    - option "Guará"
+                    - option "Itapoã"
+                    - option "Jardim Botânico"
+                    - option "Lago Norte"
+                    - option "Lago Sul"
+                    - option "Noroeste"
+                    - option "Núcleo Bandeirante"
+                    - option "Paranoá"
+                    - option "Park Way"
+                    - option "Planaltina"
+                    - option "Recanto das Emas"
+                    - option "Riacho Fundo"
+                    - option "Riacho Fundo II"
+                    - option "Samambaia"
+                    - option "Santa Maria" [selected]
+                    - option "São Sebastião"
+                    - option "SCIA/Estrutural"
+                    - option "SIA"
+                    - option "Sobradinho"
+                    - option "Sobradinho II"
+                    - option "Sudoeste/Octogonal"
+                    - option "Taguatinga"
+                    - option "Varjão"
+                    - option "Vicente Pires"
+                - generic [ref=f3e119]:
+                  - generic [ref=f3e120]: Profissão
+                  - combobox [ref=f3e121]:
+                    - option "Selecionar..."
+                    - option "Advogado(a)"
+                    - option "Agricultor(a)"
+                    - option "Aposentado(a)"
+                    - option "Autônomo(a)" [selected]
+                    - option "Comerciante"
+                    - option "Comunicador(a) / Jornalista"
+                    - option "Doméstico(a)"
+                    - option "Empresário(a)"
+                    - option "Engenheiro(a)"
+                    - option "Estudante"
+                    - option "Motorista / Transporte"
+                    - option "Outros"
+                    - option "Professor(a)"
+                    - option "Profissional de Saúde"
+                    - option "Profissional de Segurança"
+                    - option "Servidor Público"
+                    - option "Trabalhador(a) da Construção Civil"
+              - generic [ref=f3e122]:
+                - generic [ref=f3e123]: Gênero
+                - combobox [ref=f3e124]:
+                  - option "Não informado"
+                  - option "Masculino"
+                  - option "Feminino" [selected]
+                  - option "Outro"
+              - button "Salvar alterações" [ref=f3e126] [cursor=pointer]
+        - generic [ref=f3e127]:
+          - generic [ref=f3e128]:
+            - generic "Lucas Pereira" [ref=f3e129]:
+              - generic [ref=f3e130]: 👤
+            - generic [ref=f3e131]:
+              - paragraph [ref=f3e132]: Cadastrado na Rede
+              - paragraph [ref=f3e133]: Lucas Pereira
+          - generic [ref=f3e134]:
+            - paragraph [ref=f3e135]: Criador da Rede
+            - paragraph [ref=f3e136]: Lucas Pereira
+          - generic [ref=f3e137]:
+            - paragraph [ref=f3e138]: Cadastrados na Rede
+            - paragraph [ref=f3e139]: "0"
+        - generic [ref=f3e140]:
+          - heading "Segmentos" [level=2] [ref=f3e141]
+          - text: —
+        - generic [ref=f3e142]:
+          - generic [ref=f3e143]:
+            - button "▲ Demandas do Usuário" [ref=f3e144] [cursor=pointer]:
+              - generic [ref=f3e145]: ▲
+              - text: Demandas do Usuário
+            - link "+ CRIAR NOVA DEMANDA" [ref=f3e146] [cursor=pointer]:
+              - /url: /amigos-do-izalci/admin/demandas/nova?solicitanteId=cmqz9sw1w000tx1z27jjgpfhx
+          - paragraph [ref=f3e147]: Nenhuma demanda registrada.
+        - generic [ref=f3e148]:
+          - button "▲ Observações Sobre o Usuário" [ref=f3e150] [cursor=pointer]:
+            - generic [ref=f3e151]: ▲
+            - text: Observações Sobre o Usuário
+          - generic [ref=f3e152]:
+            - textbox "Adicionar observação..." [ref=f3e153]
+            - button "+ CRIAR NOVA OBSERVAÇÃO" [ref=f3e155] [cursor=pointer]
+          - paragraph [ref=f3e157]: Nenhuma observação ainda.
+        - generic [ref=f3e158]:
+          - heading "Mobilizador" [level=2] [ref=f3e159]
+          - generic [ref=f3e160]:
+            - generic [ref=f3e162]: Mobilizador ativo
+            - generic [ref=f3e163]:
+              - paragraph [ref=f3e164]: Link base do mobilizador
+              - paragraph [ref=f3e165]: http://localhost:3000/amigos-do-izalci/cadastro/[segmento]?m=10fef95f2c494284baeecd0db55787b7
+            - button "Revogar status de mobilizador" [ref=f3e167] [cursor=pointer]

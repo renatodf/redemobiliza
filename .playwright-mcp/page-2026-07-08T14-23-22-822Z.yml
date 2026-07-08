@@ -1,0 +1,174 @@
+- generic [ref=f36e4]:
+  - complementary [ref=f36e5]:
+    - generic [ref=f36e6]:
+      - img "Rede Mobiliza" [ref=f36e7]
+      - generic [ref=f36e8]: Rede Mobiliza
+    - navigation [ref=f36e9]:
+      - link "Dados Gerais" [ref=f36e10] [cursor=pointer]:
+        - /url: /amigos-do-izalci/admin/dashboard
+        - img [ref=f36e11]
+        - text: Dados Gerais
+      - link "Usuários" [ref=f36e13] [cursor=pointer]:
+        - /url: /amigos-do-izalci/admin/pessoas
+        - img [ref=f36e14]
+        - text: Usuários
+      - link "Demandas" [ref=f36e19] [cursor=pointer]:
+        - /url: /amigos-do-izalci/admin/demandas
+        - img [ref=f36e20]
+        - text: Demandas
+      - generic "Em breve" [ref=f36e23]:
+        - generic [ref=f36e24]:
+          - img [ref=f36e25]
+          - text: Tarefas
+        - generic [ref=f36e28]: em breve
+      - generic "Em breve" [ref=f36e29]:
+        - generic [ref=f36e30]:
+          - img [ref=f36e31]
+          - text: Banco de Talentos
+        - generic [ref=f36e34]: em breve
+      - generic "Em breve" [ref=f36e35]:
+        - generic [ref=f36e36]:
+          - img [ref=f36e37]
+          - text: Link de Cadastro
+        - generic [ref=f36e41]: em breve
+      - generic "Em breve" [ref=f36e42]:
+        - generic [ref=f36e43]:
+          - img [ref=f36e44]
+          - text: Importar/Exportar
+        - generic [ref=f36e47]: em breve
+      - link "Configurações" [ref=f36e48] [cursor=pointer]:
+        - /url: /amigos-do-izalci/admin/configuracoes
+        - img [ref=f36e49]
+        - text: Configurações
+    - button "Sair" [ref=f36e53] [cursor=pointer]
+  - generic [ref=f36e54]:
+    - banner [ref=f36e55]:
+      - generic [ref=f36e58]:
+        - img [ref=f36e59]
+        - generic [ref=f36e62]:
+          - img [ref=f36e63]
+          - generic [ref=f36e66]: "0"
+        - generic [ref=f36e67]:
+          - generic "renato.df" [ref=f36e68]:
+            - img [ref=f36e69]
+          - generic [ref=f36e72]: renato.df
+    - main [ref=f36e73]:
+      - generic [ref=f36e75]:
+        - generic [ref=f36e76]:
+          - paragraph [ref=f36e77]: Início / Usuários
+          - link "Voltar" [ref=f36e78] [cursor=pointer]:
+            - /url: /amigos-do-izalci/admin/pessoas
+            - img [ref=f36e79]
+            - text: Voltar
+        - generic [ref=f36e81]:
+          - generic [ref=f36e82]:
+            - generic [ref=f36e84]:
+              - button "Adicionar foto de perfil" [ref=f36e85] [cursor=pointer]:
+                - img [ref=f36e86]
+              - button "Editar foto" [ref=f36e90] [cursor=pointer]:
+                - img [ref=f36e91]
+            - generic [ref=f36e93]:
+              - paragraph [ref=f36e94]: Nome
+              - paragraph [ref=f36e95]: Yasmin Teixeira
+              - paragraph [ref=f36e96]: Email
+              - paragraph [ref=f36e97]: yasmin@yasmin.com.br
+          - generic [ref=f36e98]:
+            - generic [ref=f36e99]:
+              - generic "Editar dados" [ref=f36e100] [cursor=pointer]:
+                - img [ref=f36e101]
+              - button "Excluir cadastro" [ref=f36e104] [cursor=pointer]:
+                - img [ref=f36e105]
+            - paragraph [ref=f36e108]:
+              - text: Último Acesso
+              - text: 08/07/2026, 01:25
+            - generic [ref=f36e109]:
+              - button "Marcar como colaborador" [ref=f36e111] [cursor=pointer]
+              - button "Revogar Mobilizador" [ref=f36e112] [cursor=pointer]
+              - button "Incluir Yasmin no Banco de Talentos" [ref=f36e113] [cursor=pointer]
+        - generic [ref=f36e114]:
+          - generic [ref=f36e115]:
+            - generic [ref=f36e116]:
+              - paragraph [ref=f36e117]: Data de Nascimento
+              - paragraph [ref=f36e118]: —
+            - generic [ref=f36e119]:
+              - paragraph [ref=f36e120]: CPF
+              - paragraph [ref=f36e121]: —
+            - generic [ref=f36e122]:
+              - paragraph [ref=f36e123]: WhatsApp
+              - paragraph [ref=f36e124]: "5585911805193"
+            - generic [ref=f36e125]:
+              - paragraph [ref=f36e126]: Telefone Fixo
+              - paragraph [ref=f36e127]: —
+          - generic [ref=f36e129]:
+            - generic [ref=f36e130]:
+              - paragraph [ref=f36e131]: Endereço
+              - paragraph [ref=f36e132]: —
+            - generic [ref=f36e133]:
+              - paragraph [ref=f36e134]: CEP
+              - paragraph [ref=f36e135]: —
+            - generic [ref=f36e136]:
+              - paragraph [ref=f36e137]: Cidade
+              - paragraph [ref=f36e138]: Santa Maria
+          - generic [ref=f36e140]:
+            - generic [ref=f36e141]:
+              - paragraph [ref=f36e142]: Bairro
+              - paragraph [ref=f36e143]: —
+            - generic [ref=f36e144]:
+              - paragraph [ref=f36e145]: Sexo
+              - paragraph [ref=f36e146]: feminino
+            - generic [ref=f36e147]:
+              - paragraph [ref=f36e148]: Orientação Sexual
+              - paragraph [ref=f36e149]: —
+            - generic [ref=f36e150]:
+              - paragraph [ref=f36e151]: Religião
+              - paragraph [ref=f36e152]: —
+          - generic [ref=f36e154]:
+            - generic [ref=f36e155]:
+              - paragraph [ref=f36e156]: Escolaridade
+              - paragraph [ref=f36e157]: —
+            - generic [ref=f36e158]:
+              - paragraph [ref=f36e159]: Tipo de Conta
+              - paragraph [ref=f36e160]: Mobilizador
+            - generic [ref=f36e161]:
+              - paragraph [ref=f36e162]: Profissão
+              - paragraph [ref=f36e163]: Autônomo(a)
+          - generic [ref=f36e165] [cursor=pointer]: Editar dados
+        - generic [ref=f36e167]:
+          - generic [ref=f36e168]:
+            - generic "Lucas Pereira" [ref=f36e169]:
+              - img [ref=f36e170]
+            - generic [ref=f36e173]:
+              - paragraph [ref=f36e174]: Cadastrado na Rede
+              - paragraph [ref=f36e175]: Lucas Pereira
+          - generic [ref=f36e176]:
+            - paragraph [ref=f36e177]: Criador da Rede
+            - paragraph [ref=f36e178]: Lucas Pereira
+          - generic [ref=f36e179]:
+            - paragraph [ref=f36e180]: Cadastrados na Rede
+            - paragraph [ref=f36e181]: "0"
+        - generic [ref=f36e182]:
+          - heading "Segmentos" [level=2] [ref=f36e183]
+          - text: —
+        - generic [ref=f36e184]:
+          - generic [ref=f36e185]:
+            - button "▲ Demandas do Usuário" [ref=f36e186] [cursor=pointer]:
+              - generic [ref=f36e187]: ▲
+              - text: Demandas do Usuário
+            - link "+ CRIAR NOVA DEMANDA" [ref=f36e188] [cursor=pointer]:
+              - /url: /amigos-do-izalci/admin/demandas/nova?solicitanteId=cmqz9sw1w000tx1z27jjgpfhx
+          - paragraph [ref=f36e189]: Nenhuma demanda registrada.
+        - generic [ref=f36e190]:
+          - button "▲ Observações Sobre o Usuário" [ref=f36e192] [cursor=pointer]:
+            - generic [ref=f36e193]: ▲
+            - text: Observações Sobre o Usuário
+          - generic [ref=f36e194]:
+            - textbox "Adicionar observação..." [ref=f36e195]
+            - button "+ CRIAR NOVA OBSERVAÇÃO" [ref=f36e197] [cursor=pointer]
+          - paragraph [ref=f36e199]: Nenhuma observação ainda.
+        - generic [ref=f36e200]:
+          - heading "Mobilizador" [level=2] [ref=f36e201]
+          - generic [ref=f36e202]:
+            - generic [ref=f36e204]: Mobilizador ativo
+            - generic [ref=f36e205]:
+              - paragraph [ref=f36e206]: Link base do mobilizador
+              - paragraph [ref=f36e207]: http://localhost:3000/amigos-do-izalci/cadastro/[segmento]?m=10fef95f2c494284baeecd0db55787b7
