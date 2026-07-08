@@ -159,29 +159,18 @@ export default async function FichaPessoaPage({
             Último Acesso<br />
             <span className="text-[#757575]">{ultimoAcesso ?? '—'}</span>
           </p>
+          <form action={toggleColaborador}>
+            <input type="hidden" name="slug" value={params.slug} />
+            <input type="hidden" name="pessoaId" value={pessoa.id} />
+            <input type="hidden" name="acao" value={pessoa.isColaborador ? 'desmarcar' : 'marcar'} />
+            <button type="submit" className="text-xs text-[#686868] hover:underline">
+              {pessoa.isColaborador ? 'Remover como colaborador' : 'Marcar como colaborador'}
+            </button>
+          </form>
         </div>
       </div>
 
       <div className="flex items-center gap-4 flex-wrap">
-        {pessoa.isColaborador ? (
-          <form action={toggleColaborador}>
-            <input type="hidden" name="slug" value={params.slug} />
-            <input type="hidden" name="pessoaId" value={pessoa.id} />
-            <input type="hidden" name="acao" value="desmarcar" />
-            <button type="submit" className="text-sm text-red-600 hover:underline">
-              Remover como colaborador
-            </button>
-          </form>
-        ) : (
-          <form action={toggleColaborador}>
-            <input type="hidden" name="slug" value={params.slug} />
-            <input type="hidden" name="pessoaId" value={pessoa.id} />
-            <input type="hidden" name="acao" value="marcar" />
-            <button type="submit" className="text-sm text-green-700 hover:underline">
-              Marcar como colaborador
-            </button>
-          </form>
-        )}
         {isAdmin && !pessoa.isMobilizador && (
           <PromoverMobilizadorDialog
             slug={params.slug}

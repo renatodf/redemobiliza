@@ -18,9 +18,9 @@ export default function FotoPerfilAvatar({ fotoUrl, pessoaId, slug, canEdit }: F
   const router = useRouter()
   const inputRef = useRef<HTMLInputElement>(null)
   const [lightboxOpen, setLightboxOpen] = useState(false)
+  const [menuAberto, setMenuAberto] = useState(false)
   const [isPending, startTransition] = useTransition()
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
-  const [confirmandoRemocao, setConfirmandoRemocao] = useState(false)
 
   function handleAvatarClick() {
     if (fotoUrl) {
@@ -52,6 +52,8 @@ export default function FotoPerfilAvatar({ fotoUrl, pessoaId, slug, canEdit }: F
   }
 
   function handleRemover() {
+    setMenuAberto(false)
+    if (!confirm('Remover a foto de perfil?')) return
     setErrorMsg(null)
     const formData = new FormData()
     formData.set('slug', slug)
@@ -60,10 +62,8 @@ export default function FotoPerfilAvatar({ fotoUrl, pessoaId, slug, canEdit }: F
     startTransition(async () => {
       try {
         await removerFotoPessoa(formData)
-        setConfirmandoRemocao(false)
         router.refresh()
       } catch (err) {
-        setConfirmandoRemocao(false)
         setErrorMsg(err instanceof Error ? err.message : 'Erro ao remover foto')
       }
     })
@@ -73,73 +73,79 @@ export default function FotoPerfilAvatar({ fotoUrl, pessoaId, slug, canEdit }: F
 
   return (
     <div className="flex flex-col items-center gap-1">
-      <button
-        type="button"
-        onClick={isPending ? undefined : handleAvatarClick}
-        aria-disabled={isPending}
-        tabIndex={isClickable ? undefined : -1}
-        className={[
-          'w-[87px] h-[87px] rounded-full overflow-hidden border-2 border-gray-200 flex-shrink-0',
-          isClickable && !isPending ? 'cursor-pointer' : 'cursor-default',
-          isPending ? 'opacity-50 cursor-wait' : '',
-        ].join(' ')}
-        aria-label={fotoUrl ? 'Ver foto em tamanho real' : canEdit ? 'Adicionar foto de perfil' : 'Sem foto'}
-      >
-        {fotoUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={fotoUrl} alt="Foto de perfil" className="w-full h-full object-cover" />
-        ) : (
-          <svg viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
-            <circle cx="48" cy="48" r="48" fill="#D8D8D8" />
-            <circle cx="48" cy="38" r="15" stroke="#FFFFFF" strokeWidth="7" />
-            <path d="M14 84c0-18.778 15.222-34 34-34s34 15.222 34 34" stroke="#FFFFFF" strokeWidth="7" strokeLinecap="round" fill="none" />
-          </svg>
-        )}
-      </button>
+      <div className="relative">
+        <button
+          type="button"
+          onClick={isPending ? undefined : handleAvatarClick}
+          aria-disabled={isPending}
+          tabIndex={isClickable ? undefined : -1}
+          className={[
+            'w-[87px] h-[87px] rounded-full overflow-hidden border-2 border-gray-200 flex-shrink-0',
+            isClickable && !isPending ? 'cursor-pointer' : 'cursor-default',
+            isPending ? 'opacity-50 cursor-wait' : '',
+          ].join(' ')}
+          aria-label={fotoUrl ? 'Ver foto em tamanho real' : canEdit ? 'Adicionar foto de perfil' : 'Sem foto'}
+        >
+          {fotoUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={fotoUrl} alt="Foto de perfil" className="w-full h-full object-cover" />
+          ) : (
+            <svg viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+              <circle cx="48" cy="48" r="48" fill="#D8D8D8" />
+              <circle cx="48" cy="38" r="15" stroke="#FFFFFF" strokeWidth="7" />
+              <path d="M14 84c0-18.778 15.222-34 34-34s34 15.222 34 34" stroke="#FFFFFF" strokeWidth="7" strokeLinecap="round" fill="none" />
+            </svg>
+          )}
+        </button>
 
-      {canEdit && fotoUrl && (
-        confirmandoRemocao ? (
-          <div className="flex items-center gap-2 text-xs">
-            <span className="text-gray-600">Remover foto?</span>
+        {canEdit && (
+          <>
             <button
               type="button"
-              onClick={isPending ? undefined : handleRemover}
+              onClick={isPending ? undefined : () => setMenuAberto((v) => !v)}
               aria-disabled={isPending}
-              aria-label="Confirmar remoção de foto"
-              className={`text-red-600 font-medium hover:underline${isPending ? ' opacity-50' : ''}`}
+              aria-label="Editar foto"
+              className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-white border border-gray-300 shadow-sm flex items-center justify-center hover:bg-gray-50"
             >
-              Sim
+              <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden>
+                <path
+                  d="M11.3 2.3a1.5 1.5 0 0 1 2.1 2.1L5.5 12.3l-2.8.7.7-2.8 7.9-7.9Z"
+                  stroke="#686868"
+                  strokeWidth="1.4"
+                  strokeLinejoin="round"
+                />
+              </svg>
             </button>
-            <button
-              type="button"
-              onClick={isPending ? undefined : () => setConfirmandoRemocao(false)}
-              aria-disabled={isPending}
-              className={`text-gray-500 hover:underline${isPending ? ' opacity-50' : ''}`}
-            >
-              Cancelar
-            </button>
-          </div>
-        ) : (
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={isPending ? undefined : () => inputRef.current?.click()}
-              aria-disabled={isPending}
-              className={`text-xs text-blue-600 hover:underline${isPending ? ' opacity-50' : ''}`}
-            >
-              Alterar foto
-            </button>
-            <button
-              type="button"
-              onClick={isPending ? undefined : () => { setConfirmandoRemocao(true); setErrorMsg(null) }}
-              aria-disabled={isPending}
-              className={`text-xs text-red-500 hover:underline${isPending ? ' opacity-50' : ''}`}
-            >
-              Remover foto
-            </button>
-          </div>
-        )
-      )}
+
+            {menuAberto && (
+              <>
+                <div className="fixed inset-0 z-10" onClick={() => setMenuAberto(false)} />
+                <div className="absolute top-7 right-0 z-20 bg-white rounded-md shadow-lg border border-gray-200 py-1 w-36">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMenuAberto(false)
+                      inputRef.current?.click()
+                    }}
+                    className="block w-full text-left px-3 py-1.5 text-xs text-gray-700 hover:bg-gray-50"
+                  >
+                    {fotoUrl ? 'Alterar foto' : 'Adicionar foto'}
+                  </button>
+                  {fotoUrl && (
+                    <button
+                      type="button"
+                      onClick={handleRemover}
+                      className="block w-full text-left px-3 py-1.5 text-xs text-red-600 hover:bg-gray-50"
+                    >
+                      Remover foto
+                    </button>
+                  )}
+                </div>
+              </>
+            )}
+          </>
+        )}
+      </div>
 
       {errorMsg && (
         <p className="text-xs text-red-600 text-center max-w-[96px]">{errorMsg}</p>
