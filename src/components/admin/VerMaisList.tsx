@@ -2,14 +2,12 @@
 
 import { useState } from 'react'
 
-export default function VerMaisList<T>({
+export default function VerMaisList({
   itens,
   porPagina = 5,
-  renderItem,
 }: {
-  itens: T[]
+  itens: React.ReactNode[]
   porPagina?: number
-  renderItem: (item: T, index: number) => React.ReactNode
 }) {
   const [quantidadeVisivel, setQuantidadeVisivel] = useState(porPagina)
   const visiveis = itens.slice(0, quantidadeVisivel)
@@ -17,7 +15,7 @@ export default function VerMaisList<T>({
 
   return (
     <div className="space-y-3">
-      {visiveis.map((item, i) => renderItem(item, i))}
+      {visiveis}
       {itens.length > porPagina && (
         <div className="text-center pt-2">
           {temMais ? (

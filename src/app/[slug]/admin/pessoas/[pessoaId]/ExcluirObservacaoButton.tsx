@@ -1,6 +1,7 @@
 'use client'
 
 import { excluirObservacao } from '@/actions/admin/excluir-observacao'
+import { IconeExcluir } from '@/components/admin/TableIcons'
 
 export default function ExcluirObservacaoButton({
   slug,
@@ -24,7 +25,7 @@ export default function ExcluirObservacaoButton({
       <input type="hidden" name="pessoaId" value={pessoaId} />
       <input type="hidden" name="observacaoId" value={observacaoId} />
       <button type="submit" aria-label="Excluir observação">
-        🗑️
+        <IconeExcluir />
       </button>
     </form>
   )

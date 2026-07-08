@@ -22,6 +22,7 @@ import { statusDemandaPill, foiAtendidaPill } from '@/lib/status-demanda'
 import CollapsibleSection from '@/components/admin/CollapsibleSection'
 import { corTextoContraste } from '@/lib/cor-contraste'
 import BancoTalentosDialog from './BancoTalentosDialog'
+import { IconeEditar } from '@/components/admin/TableIcons'
 
 export default async function FichaPessoaPage({
   params,
@@ -117,6 +118,19 @@ export default async function FichaPessoaPage({
 
   return (
     <div className="max-w-2xl mx-auto py-8 px-4 space-y-8">
+      <div className="flex items-center justify-between flex-wrap gap-2">
+        <p className="text-[13px] text-[rgba(113,113,113,0.65)]">Início / Usuários</p>
+        <Link
+          href={`/${params.slug}/admin/pessoas`}
+          className="text-sm text-black/40 hover:text-black/70 flex items-center gap-1.5"
+        >
+          <svg width="8" height="10" viewBox="0 0 8 10" fill="none" aria-hidden>
+            <path d="M7 1 2 5l5 4" stroke="#979797" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+          Voltar
+        </Link>
+      </div>
+
       <div className="flex items-start justify-between flex-wrap gap-4">
         <div className="flex items-center gap-4">
           <FotoPerfilAvatar
@@ -126,22 +140,24 @@ export default async function FichaPessoaPage({
             canEdit={isAdmin || pessoa.userId === session.user.id}
           />
           <div>
-            <p className="text-xs text-gray-500">Nome</p>
+            <p className="text-xs text-[#686868]">Nome</p>
             <p className="text-2xl font-bold text-gray-900">{pessoa.nome}</p>
-            <p className="text-xs text-gray-500 mt-2">Email</p>
-            <p className="text-sm text-gray-700">{pessoa.email ?? '—'}</p>
+            <p className="text-xs text-[#686868] mt-2">Email</p>
+            <p className="text-sm text-[#757575]">{pessoa.email ?? '—'}</p>
           </div>
         </div>
         <div className="text-right space-y-2">
           <div className="flex items-center gap-3 justify-end">
             {isAdmin && (
-              <label htmlFor="editar-dados-toggle" aria-label="Editar dados" className="cursor-pointer">✏️</label>
+              <label htmlFor="editar-dados-toggle" aria-label="Editar dados" className="cursor-pointer">
+                <IconeEditar />
+              </label>
             )}
             {isAdmin && <ExcluirPessoaButton slug={params.slug} pessoaId={params.pessoaId} iconOnly />}
           </div>
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-[#686868]">
             Último Acesso<br />
-            <span className="text-gray-700">{ultimoAcesso ?? '—'}</span>
+            <span className="text-[#757575]">{ultimoAcesso ?? '—'}</span>
           </p>
         </div>
       </div>
@@ -199,40 +215,70 @@ export default async function FichaPessoaPage({
       <section className="space-y-4">
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
           <div>
-            <p className="text-xs text-gray-500">Data de Nascimento</p>
-            <p>{pessoa.nascimento ? pessoa.nascimento.toLocaleDateString('pt-BR') : '—'}</p>
+            <p className="text-xs text-[#686868]">Data de Nascimento</p>
+            <p className="text-[#757575]">{pessoa.nascimento ? pessoa.nascimento.toLocaleDateString('pt-BR') : '—'}</p>
           </div>
+          {pessoa.cpf && (
+            <div>
+              <p className="text-xs text-[#686868]">CPF</p>
+              <p className="text-[#757575]">{pessoa.cpf}</p>
+            </div>
+          )}
           <div>
-            <p className="text-xs text-gray-500">WhatsApp</p>
-            <p>{pessoa.whatsapp}</p>
+            <p className="text-xs text-[#686868]">WhatsApp</p>
+            <p className="text-[#757575]">{pessoa.whatsapp}</p>
           </div>
+          {pessoa.telefoneFixo && (
+            <div>
+              <p className="text-xs text-[#686868]">Telefone Fixo</p>
+              <p className="text-[#757575]">{pessoa.telefoneFixo}</p>
+            </div>
+          )}
           <div className="col-span-2">
-            <p className="text-xs text-gray-500">Endereço</p>
-            <p>{[pessoa.logradouro, pessoa.numero, pessoa.complemento].filter(Boolean).join(', ') || '—'}</p>
+            <p className="text-xs text-[#686868]">Endereço</p>
+            <p className="text-[#757575]">{[pessoa.logradouro, pessoa.numero, pessoa.complemento].filter(Boolean).join(', ') || '—'}</p>
           </div>
           <div>
-            <p className="text-xs text-gray-500">CEP</p>
-            <p>{pessoa.cep ?? '—'}</p>
+            <p className="text-xs text-[#686868]">CEP</p>
+            <p className="text-[#757575]">{pessoa.cep ?? '—'}</p>
           </div>
           <div>
-            <p className="text-xs text-gray-500">Cidade</p>
-            <p>{pessoa.regiao?.nome ?? '—'}</p>
+            <p className="text-xs text-[#686868]">Cidade</p>
+            <p className="text-[#757575]">{pessoa.regiao?.nome ?? '—'}</p>
           </div>
           <div>
-            <p className="text-xs text-gray-500">Bairro</p>
-            <p>{pessoa.bairro ?? '—'}</p>
+            <p className="text-xs text-[#686868]">Bairro</p>
+            <p className="text-[#757575]">{pessoa.bairro ?? '—'}</p>
           </div>
           <div>
-            <p className="text-xs text-gray-500">Sexo</p>
-            <p className="capitalize">{pessoa.genero ?? '—'}</p>
+            <p className="text-xs text-[#686868]">Sexo</p>
+            <p className="text-[#757575] capitalize">{pessoa.genero ?? '—'}</p>
+          </div>
+          {pessoa.orientacaoSexual && (
+            <div>
+              <p className="text-xs text-[#686868]">Orientação Sexual</p>
+              <p className="text-[#757575]">{pessoa.orientacaoSexual}</p>
+            </div>
+          )}
+          {pessoa.religiao && (
+            <div>
+              <p className="text-xs text-[#686868]">Religião</p>
+              <p className="text-[#757575]">{pessoa.religiao}</p>
+            </div>
+          )}
+          {pessoa.escolaridade && (
+            <div>
+              <p className="text-xs text-[#686868]">Escolaridade</p>
+              <p className="text-[#757575]">{pessoa.escolaridade}</p>
+            </div>
+          )}
+          <div>
+            <p className="text-xs text-[#686868]">Tipo de Conta</p>
+            <p className="text-[#757575]">{tipoConta}</p>
           </div>
           <div>
-            <p className="text-xs text-gray-500">Tipo de Conta</p>
-            <p>{tipoConta}</p>
-          </div>
-          <div>
-            <p className="text-xs text-gray-500">Profissão</p>
-            <p>{pessoa.profissao?.nome ?? '—'}</p>
+            <p className="text-xs text-[#686868]">Profissão</p>
+            <p className="text-[#757575]">{pessoa.profissao?.nome ?? '—'}</p>
           </div>
         </div>
 
@@ -280,20 +326,21 @@ export default async function FichaPessoaPage({
           <div className="flex items-center gap-2">
             {redeInfo && <Avatar fotoUrl={redeInfo.fotoUrl} nome={redeInfo.nome} size={28} />}
             <div>
-              <p className="text-xs text-gray-500">Cadastrado na Rede</p>
-              <p>{redeInfo?.nome ?? '—'}</p>
+              <p className="text-xs text-[#686868]">Cadastrado na Rede</p>
+              <p className="text-[#757575]">{redeInfo?.nome ?? '—'}</p>
             </div>
           </div>
           <div>
-            <p className="text-xs text-gray-500">Criador da Rede</p>
-            <p>{redeInfo?.nome ?? '—'}</p>
+            <p className="text-xs text-[#686868]">Criador da Rede</p>
+            <p className="text-[#757575]">{redeInfo?.nome ?? '—'}</p>
           </div>
           <div>
-            <p className="text-xs text-gray-500">Cadastrados na Rede que Criou</p>
+            <p className="text-xs text-[#686868]">Cadastrados na Rede</p>
             {totalRede > 0 ? (
               <Link
                 href={`/${params.slug}/admin/pessoas?rede=${pessoa.id}`}
-                className="text-lg font-semibold text-blue-600 hover:underline"
+                className="text-lg font-semibold hover:underline"
+                style={{ color: gabinete.corPrimaria }}
               >
                 {totalRede}
               </Link>
@@ -325,9 +372,8 @@ export default async function FichaPessoaPage({
           <p className="text-sm text-gray-500">Nenhuma demanda registrada.</p>
         ) : (
           <VerMaisList
-            itens={demandas}
             porPagina={5}
-            renderItem={(d) => {
+            itens={demandas.map((d) => {
               const status = statusDemandaPill(d.status)
               const atendida = foiAtendidaPill(d.status)
               return (
@@ -346,7 +392,7 @@ export default async function FichaPessoaPage({
                   </span>
                 </div>
               )
-            }}
+            })}
           />
         )}
       </CollapsibleSection>
@@ -378,9 +424,8 @@ export default async function FichaPessoaPage({
             <p className="text-sm text-gray-500">Nenhuma observação ainda.</p>
           ) : (
             <VerMaisList
-              itens={pessoa.observacoes}
               porPagina={5}
-              renderItem={(obs) => {
+              itens={pessoa.observacoes.map((obs) => {
                 const podeEditar = isAdmin || obs.autorUserId === session.user.id
                 return (
                   <div key={obs.id} className="border border-gray-200 rounded-md p-3 space-y-2">
@@ -395,7 +440,7 @@ export default async function FichaPessoaPage({
                       {podeEditar && (
                         <div className="flex items-center gap-2">
                           <label htmlFor={`editar-obs-${obs.id}`} className="cursor-pointer" aria-label="Editar observação">
-                            ✏️
+                            <IconeEditar />
                           </label>
                           <ExcluirObservacaoButton slug={params.slug} pessoaId={pessoa.id} observacaoId={obs.id} />
                         </div>
@@ -424,7 +469,7 @@ export default async function FichaPessoaPage({
                     )}
                   </div>
                 )
-              }}
+              })}
             />
           )}
         </div>

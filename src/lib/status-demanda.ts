@@ -1,6 +1,6 @@
-const CONCLUIDO = { label: 'CONCLUÍDO', corClasse: 'bg-green-100 text-green-800' }
-const PENDENTE = { label: 'PENDENTE', corClasse: 'bg-yellow-100 text-yellow-800' }
-const NAO_ATENDIDA = { label: 'NÃO ATENDIDA', corClasse: 'bg-red-100 text-red-800' }
+const CONCLUIDO = { label: 'CONCLUÍDO', corClasse: 'bg-[#6E9924] text-white' }
+const PENDENTE = { label: 'PENDENTE', corClasse: 'bg-[#CBB100] text-white' }
+const NAO_ATENDIDA = { label: 'NÃO ATENDIDA', corClasse: 'bg-[#B80000] text-white' }
 
 export function statusDemandaPill(status: string): { label: string; corClasse: string } {
   if (status === 'atendida') return CONCLUIDO
@@ -9,7 +9,7 @@ export function statusDemandaPill(status: string): { label: string; corClasse: s
 }
 
 export function foiAtendidaPill(status: string): { label: string; corClasse: string } {
-  if (status === 'atendida') return { label: 'SIM', corClasse: 'bg-green-100 text-green-800' }
-  if (status === 'nao_atendida') return { label: 'NÃO', corClasse: 'bg-red-100 text-red-800' }
+  if (status === 'atendida') return { label: 'SIM', corClasse: 'bg-[#6E9924] text-white' }
+  if (status === 'nao_atendida') return { label: 'NÃO', corClasse: 'bg-[#B80000] text-white' }
   return { label: '—', corClasse: 'bg-gray-100 text-gray-500' }
 }

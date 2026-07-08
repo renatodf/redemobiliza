@@ -100,6 +100,11 @@ model Pessoa {
   numero           String?
   complemento      String?
   cep              String?
+  cpf              String?
+  telefoneFixo     String?
+  orientacaoSexual String?
+  religiao         String?
+  escolaridade     String?
   isColaborador    Boolean   @default(false)
   isMobilizador    Boolean   @default(false)
   tokenMobilizador String?

@@ -79,7 +79,7 @@ export default function FotoPerfilAvatar({ fotoUrl, pessoaId, slug, canEdit }: F
         aria-disabled={isPending}
         tabIndex={isClickable ? undefined : -1}
         className={[
-          'w-24 h-24 rounded-full overflow-hidden border-2 border-gray-200 flex-shrink-0',
+          'w-[87px] h-[87px] rounded-full overflow-hidden border-2 border-gray-200 flex-shrink-0',
           isClickable && !isPending ? 'cursor-pointer' : 'cursor-default',
           isPending ? 'opacity-50 cursor-wait' : '',
         ].join(' ')}

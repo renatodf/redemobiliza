@@ -1,6 +1,7 @@
 'use client'
 
 import { softDeletePessoa } from '@/actions/admin/soft-delete-pessoa'
+import { IconeExcluir } from '@/components/admin/TableIcons'
 
 export default function ExcluirPessoaButton({
   slug,
@@ -22,8 +23,12 @@ export default function ExcluirPessoaButton({
     >
       <input type="hidden" name="slug" value={slug} />
       <input type="hidden" name="pessoaId" value={pessoaId} />
-      <button type="submit" className="text-sm text-red-600 hover:underline" aria-label="Excluir cadastro">
-        {iconOnly ? '🗑️' : 'Excluir cadastro'}
+      <button
+        type="submit"
+        className={iconOnly ? '' : 'text-sm text-red-600 hover:underline'}
+        aria-label="Excluir cadastro"
+      >
+        {iconOnly ? <IconeExcluir /> : 'Excluir cadastro'}
       </button>
     </form>
   )
