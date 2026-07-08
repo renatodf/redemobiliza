@@ -3,6 +3,7 @@
 import { useRef, useState } from 'react'
 import { useFormState } from 'react-dom'
 import { salvarBancoTalentos } from '@/actions/admin/salvar-banco-talentos'
+import { corTextoContraste } from '@/lib/cor-contraste'
 
 interface Area {
   id: string
@@ -15,6 +16,7 @@ interface Props {
   primeiroNome: string
   jaCadastrado: boolean
   areasDisponiveis: Area[]
+  corPrimaria: string
   bancoTalentos: {
     curriculoUrl: string | null
     prioridade: number
@@ -39,8 +41,10 @@ export default function BancoTalentosDialog({
   primeiroNome,
   jaCadastrado,
   areasDisponiveis,
+  corPrimaria,
   bancoTalentos,
 }: Props) {
+  const corTexto = corTextoContraste(corPrimaria)
   const [state, action, pending] = useFormState(salvarBancoTalentos, {})
   const [areasSelecionadas, setAreasSelecionadas] = useState<Set<string>>(
     new Set(bancoTalentos?.areaIds ?? [])
@@ -81,13 +85,18 @@ export default function BancoTalentosDialog({
     <>
       <button
         type="button"
-        className="bg-blue-600 text-white text-xs px-3 py-1.5 rounded-md hover:bg-blue-700 font-medium"
+        style={{ backgroundColor: corPrimaria, color: corTexto }}
+        className="text-xs px-3 py-1.5 rounded-md hover:opacity-90 font-medium"
         onClick={() => (document.getElementById(DIALOG_ID) as HTMLDialogElement)?.showModal()}
       >
         {titulo}
       </button>
 
-      <dialog id={DIALOG_ID} className="rounded-sm shadow-xl p-0 w-full max-w-2xl backdrop:bg-black/40">
+      <dialog
+        id={DIALOG_ID}
+        style={{ ['--cp' as string]: corPrimaria }}
+        className="rounded-sm shadow-xl p-0 w-full max-w-2xl backdrop:bg-black/40"
+      >
         <div className="flex items-center justify-between px-6 pt-5 pb-3 border-b border-gray-100">
           <h2 className="text-lg text-[#757575]">{titulo}</h2>
           <button type="button" onClick={fechar} aria-label="Fechar" className="text-gray-400 hover:text-gray-600 text-xl leading-none">
@@ -104,7 +113,7 @@ export default function BancoTalentosDialog({
           ))}
 
           <div
-            className={`rounded-sm border-2 border-dashed ${arrastando ? 'border-[#244F99] bg-blue-50' : 'border-[#B5B5B5] bg-[#F2F2F2]'} px-6 py-8 text-center cursor-pointer transition-colors`}
+            className={`rounded-sm border-2 border-dashed ${arrastando ? 'border-[var(--cp)] bg-blue-50' : 'border-[#B5B5B5] bg-[#F2F2F2]'} px-6 py-8 text-center cursor-pointer transition-colors`}
             onClick={() => inputArquivoRef.current?.click()}
             onDragOver={(e) => { e.preventDefault(); setArrastando(true) }}
             onDragLeave={() => setArrastando(false)}
@@ -115,12 +124,12 @@ export default function BancoTalentosDialog({
             }}
           >
             <svg width="31" height="39" viewBox="0 0 31 39" fill="none" className="mx-auto mb-2" aria-hidden>
-              <path d="M2 2h16l11 11v24H2V2Z" fill="#244F99" opacity="0.15" stroke="#244F99" strokeWidth="1.6" />
-              <path d="M18 2v11h11" stroke="#244F99" strokeWidth="1.6" fill="none" />
+              <path d="M2 2h16l11 11v24H2V2Z" fill={corPrimaria} opacity="0.15" stroke={corPrimaria} strokeWidth="1.6" />
+              <path d="M18 2v11h11" stroke={corPrimaria} strokeWidth="1.6" fill="none" />
             </svg>
             {nomeArquivo ? (
               <>
-                <p className="text-lg text-[#244F99]">Currículo selecionado</p>
+                <p className="text-lg" style={{ color: corPrimaria }}>Currículo selecionado</p>
                 <p className="text-xs text-[#757575] mt-1">{nomeArquivo}</p>
               </>
             ) : bancoTalentos?.curriculoUrl ? (
@@ -132,7 +141,8 @@ export default function BancoTalentosDialog({
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={(e) => e.stopPropagation()}
-                    className="text-[#244F99] hover:underline"
+                    className="hover:underline"
+                    style={{ color: corPrimaria }}
                   >
                     Ver currículo atual
                   </a>
@@ -162,8 +172,9 @@ export default function BancoTalentosDialog({
                     key={area.id}
                     type="button"
                     onClick={() => toggleArea(area.id)}
+                    style={selecionada ? { backgroundColor: corPrimaria, color: corTexto } : undefined}
                     className={`px-3 py-1 rounded-[3px] text-[10px] uppercase font-medium ${
-                      selecionada ? 'bg-[#244F99] text-white' : 'bg-[#757575] text-white opacity-70 hover:opacity-100'
+                      selecionada ? '' : 'bg-[#757575] text-white opacity-70 hover:opacity-100'
                     }`}
                   >
                     {area.nome}
@@ -187,8 +198,9 @@ export default function BancoTalentosDialog({
                   type="button"
                   title={p.descricao}
                   onClick={() => setPrioridade(p.valor)}
+                  style={prioridade === p.valor ? { backgroundColor: corPrimaria, color: corTexto } : undefined}
                   className={`w-9 h-9 rounded-[3px] text-sm font-medium ${
-                    prioridade === p.valor ? 'bg-[#244F99] text-white' : 'bg-[#757575] text-white opacity-70 hover:opacity-100'
+                    prioridade === p.valor ? '' : 'bg-[#757575] text-white opacity-70 hover:opacity-100'
                   }`}
                 >
                   {p.valor}
@@ -231,7 +243,8 @@ export default function BancoTalentosDialog({
             <button
               type="submit"
               disabled={pending}
-              className="bg-[#244F99] text-white px-6 py-2.5 rounded-sm text-sm font-medium tracking-wide disabled:opacity-50 shadow-[0_12px_35px_rgba(212,212,212,1)]"
+              style={{ backgroundColor: corPrimaria, color: corTexto }}
+              className="px-6 py-2.5 rounded-sm text-sm font-medium tracking-wide disabled:opacity-50 shadow-[0_12px_35px_rgba(212,212,212,1)]"
             >
               {pending ? 'ENVIANDO...' : 'ENVIAR ARQUIVO'}
             </button>

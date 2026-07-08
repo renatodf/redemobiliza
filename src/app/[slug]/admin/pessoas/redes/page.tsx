@@ -94,7 +94,7 @@ export default async function RedesUsuariosPage({
       <UsuariosTabs slug={params.slug} corPrimaria={gabinete.corPrimaria} />
 
       <div className="bg-white rounded-lg overflow-x-auto">
-        <RedesTable slug={params.slug} redes={redes} />
+        <RedesTable slug={params.slug} redes={redes} corPrimaria={gabinete.corPrimaria} />
         <Pagination
           totalItens={totalItens}
           paginaAtual={paginaAtual}

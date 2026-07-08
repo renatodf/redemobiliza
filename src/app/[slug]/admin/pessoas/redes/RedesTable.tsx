@@ -16,7 +16,15 @@ export type RedeRow = {
   cadastrados: number
 }
 
-export default function RedesTable({ slug, redes }: { slug: string; redes: RedeRow[] }) {
+export default function RedesTable({
+  slug,
+  redes,
+  corPrimaria,
+}: {
+  slug: string
+  redes: RedeRow[]
+  corPrimaria: string
+}) {
   const [selecionados, setSelecionados] = useState<Set<string>>(new Set())
 
   function toggleTodos(marcar: boolean) {
@@ -35,7 +43,7 @@ export default function RedesTable({ slug, redes }: { slug: string; redes: RedeR
   const nomesSelecionados = redes.filter((r) => selecionados.has(r.id)).map((r) => r.nome)
 
   return (
-    <div>
+    <div style={{ ['--cp' as string]: corPrimaria }}>
       {selecionados.size > 0 && (
         <div className="flex items-center justify-end px-4 py-2 border-b border-gray-100">
           <form
@@ -54,7 +62,7 @@ export default function RedesTable({ slug, redes }: { slug: string; redes: RedeR
             {Array.from(selecionados).map((id) => (
               <input key={id} type="hidden" name="pessoaIds" value={id} />
             ))}
-            <button type="submit" className="flex items-center gap-2 text-sm" style={{ color: '#244F99' }}>
+            <button type="submit" className="flex items-center gap-2 text-sm" style={{ color: corPrimaria }}>
               <IconeExcluir />
               Excluir Todos
             </button>
@@ -85,7 +93,7 @@ export default function RedesTable({ slug, redes }: { slug: string; redes: RedeR
           {redes.map((r) => (
             <tr
               key={r.id}
-              className="border-2 border-transparent border-b-gray-100 hover:border-[#244F99] hover:shadow-[0_8px_19px_#E5E5E5] transition-colors"
+              className="border-2 border-transparent border-b-gray-100 hover:border-[var(--cp)] hover:shadow-[0_8px_19px_#E5E5E5] transition-colors"
               style={{ height: 72 }}
             >
               <td className="px-4 py-3">
@@ -114,7 +122,7 @@ export default function RedesTable({ slug, redes }: { slug: string; redes: RedeR
               </td>
               <td className="px-4 py-3">
                 {r.cadastrados > 0 ? (
-                  <Link href={`/${slug}/admin/pessoas?rede=${r.id}`} className="text-[#244F99] hover:underline">
+                  <Link href={`/${slug}/admin/pessoas?rede=${r.id}`} className="hover:underline" style={{ color: corPrimaria }}>
                     {r.cadastrados}
                   </Link>
                 ) : (

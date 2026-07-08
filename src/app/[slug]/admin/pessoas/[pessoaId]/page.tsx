@@ -196,6 +196,7 @@ export default async function FichaPessoaPage({
             primeiroNome={pessoa.nome.split(' ')[0]}
             jaCadastrado={!!pessoa.bancoTalentos}
             areasDisponiveis={areasColocacao}
+            corPrimaria={gabinete.corPrimaria}
             bancoTalentos={
               pessoa.bancoTalentos
                 ? {
