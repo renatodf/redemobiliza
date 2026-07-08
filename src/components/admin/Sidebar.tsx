@@ -6,7 +6,7 @@ import { corTextoContraste } from '@/lib/cor-contraste'
 
 type ItemMenu = { label: string; href?: string; emBreve?: boolean }
 
-function buildItens(slug: string): ItemMenu[] {
+function buildItensAdmin(slug: string): ItemMenu[] {
   return [
     { label: 'Dados Gerais', href: `/${slug}/admin/dashboard` },
     { label: 'Usuários', href: `/${slug}/admin/pessoas` },
@@ -19,19 +19,28 @@ function buildItens(slug: string): ItemMenu[] {
   ]
 }
 
+function buildItensMobilizador(slug: string): ItemMenu[] {
+  return [
+    { label: 'Início', href: `/${slug}/mobilizador` },
+    { label: 'Minha Rede', href: `/${slug}/mobilizador/rede` },
+  ]
+}
+
 export default function Sidebar({
   slug,
   gabineteNome,
   logoUrl,
   corPrimaria,
+  variante = 'admin',
 }: {
   slug: string
   gabineteNome: string
   logoUrl: string | null
   corPrimaria: string
+  variante?: 'admin' | 'mobilizador'
 }) {
   const pathname = usePathname()
-  const itens = buildItens(slug)
+  const itens = variante === 'mobilizador' ? buildItensMobilizador(slug) : buildItensAdmin(slug)
   const corTexto = corTextoContraste(corPrimaria)
 
   return (
@@ -53,7 +62,11 @@ export default function Sidebar({
 
       <nav className="flex-1 flex flex-col gap-1 px-3">
         {itens.map((item) => {
-          const ativo = item.href ? pathname.startsWith(item.href) : false
+          const hrefsComMatch = itens
+            .map((i) => i.href)
+            .filter((h): h is string => !!h && (pathname === h || pathname.startsWith(`${h}/`)))
+          const hrefAtivo = hrefsComMatch.sort((a, b) => b.length - a.length)[0]
+          const ativo = item.href ? item.href === hrefAtivo : false
           if (item.emBreve) {
             return (
               <span
