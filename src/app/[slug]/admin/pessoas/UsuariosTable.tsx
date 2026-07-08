@@ -7,6 +7,7 @@ import SegmentPills from '@/components/admin/SegmentPills'
 import SortableHeader from '@/components/SortableHeader'
 import { IconeEditar, IconeExcluir } from '@/components/admin/TableIcons'
 import { softDeletePessoa } from '@/actions/admin/soft-delete-pessoa'
+import { excluirPessoasEmMassa } from '@/actions/admin/excluir-pessoas-em-massa'
 
 export type UsuarioRow = {
   id: string
@@ -41,31 +42,63 @@ export default function UsuariosTable({
     })
   }
 
+  const nomesSelecionados = usuarios.filter((u) => selecionados.has(u.id)).map((u) => u.nome)
+
   return (
-    <table className="w-full text-sm">
-      <thead className="border-b border-gray-200">
-        <tr>
-          <th className="w-10 px-4 py-3">
-            <input
-              type="checkbox"
-              checked={usuarios.length > 0 && selecionados.size === usuarios.length}
-              onChange={(e) => toggleTodos(e.target.checked)}
-              aria-label="Selecionar todos"
-            />
-          </th>
-          <th className="w-12 px-2 py-3" />
-          <th className="text-left px-2 py-3">
-            <SortableHeader label="Nome" field="nome" />
-          </th>
-          <th className="text-left px-4 py-3 font-medium text-[#686868]">Email</th>
-          <th className="text-left px-4 py-3 font-medium text-[#686868]">Tipo de Conta</th>
-          <th className="text-left px-4 py-3 font-medium text-[#686868]">Segmentos</th>
-          <th className="text-right px-4 py-3 font-medium text-[#686868]">Ações</th>
-        </tr>
-      </thead>
-      <tbody className="divide-y divide-gray-100">
+    <div>
+      {selecionados.size > 0 && (
+        <div className="flex items-center justify-end px-4 py-2 border-b border-gray-100">
+          <form
+            action={excluirPessoasEmMassa}
+            onSubmit={(e) => {
+              if (
+                !confirm(
+                  `Excluir ${selecionados.size} usuário(s) — ${nomesSelecionados.join(', ')}? A ação pode ser revertida pelo super-admin.`
+                )
+              ) {
+                e.preventDefault()
+              }
+            }}
+          >
+            <input type="hidden" name="slug" value={slug} />
+            {Array.from(selecionados).map((id) => (
+              <input key={id} type="hidden" name="pessoaIds" value={id} />
+            ))}
+            <button type="submit" className="flex items-center gap-2 text-sm" style={{ color: '#244F99' }}>
+              <IconeExcluir />
+              Excluir Todos
+            </button>
+          </form>
+        </div>
+      )}
+      <table className="w-full text-sm">
+        <thead className="border-b border-gray-200">
+          <tr>
+            <th className="w-10 px-4 py-3">
+              <input
+                type="checkbox"
+                checked={usuarios.length > 0 && selecionados.size === usuarios.length}
+                onChange={(e) => toggleTodos(e.target.checked)}
+                aria-label="Selecionar todos"
+              />
+            </th>
+            <th className="w-16 px-2 py-3" />
+            <th className="text-left px-2 py-3">
+              <SortableHeader label="Nome" field="nome" />
+            </th>
+            <th className="text-left px-4 py-3 font-medium text-[#686868]">Email</th>
+            <th className="text-left px-4 py-3 font-medium text-[#686868]">Tipo de Conta</th>
+            <th className="text-left px-4 py-3 font-medium text-[#686868]">Segmentos</th>
+            <th className="text-right px-4 py-3 font-medium text-[#686868]">Ações</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-gray-100">
         {usuarios.map((u) => (
-          <tr key={u.id} className="hover:bg-gray-50" style={{ height: 56 }}>
+          <tr
+            key={u.id}
+            className="border-2 border-transparent hover:border-[#244F99] hover:shadow-[0_8px_19px_#E5E5E5] transition-colors"
+            style={{ height: 72 }}
+          >
             <td className="px-4 py-3">
               <input
                 type="checkbox"
@@ -75,7 +108,7 @@ export default function UsuariosTable({
               />
             </td>
             <td className="px-2 py-3">
-              <Avatar fotoUrl={u.fotoUrl} nome={u.nome} size={36} />
+              <Avatar fotoUrl={u.fotoUrl} nome={u.nome} size={57} />
             </td>
             <td className="px-2 py-3">
               <Link href={`/${slug}/admin/pessoas/${u.id}`} className="font-medium text-gray-900 hover:underline">
@@ -118,6 +151,7 @@ export default function UsuariosTable({
           </tr>
         )}
       </tbody>
-    </table>
+      </table>
+    </div>
   )
 }
