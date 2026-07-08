@@ -15,7 +15,7 @@ export default function CollapsibleSection({
 
   return (
     <section className="space-y-3">
-      <div className="flex items-center justify-between border-b border-gray-100 pb-2">
+      <div className="flex items-center justify-between flex-wrap gap-2 border-b border-gray-100 pb-2">
         <button
           type="button"
           onClick={() => setAberto((v) => !v)}
