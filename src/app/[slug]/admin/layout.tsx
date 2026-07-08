@@ -38,7 +38,17 @@ export default async function AdminLayout({
   let modoSuporteAtivo = false
   let sairAction: (() => Promise<void>) | null = null
 
-  if (role === 'super-admin') {
+  const usuarioGabinete = await prisma.usuarioGabinete.findUnique({
+    where: {
+      userId_gabineteId: { userId: session.user.id, gabineteId: gabinete.id },
+    },
+    select: { papel: true },
+  })
+
+  if (usuarioGabinete?.papel === 'admin') {
+    // Acesso direto de admin no gabinete — mesmo que a conta também seja
+    // super-admin, entra direto, sem exigir sessão de Modo Suporte.
+  } else if (role === 'super-admin') {
     let sessao: { gabineteId: string; sessaoId: string } | null = null
     try {
       sessao = readSuporteSessao(role, suporteCookieValue)
@@ -51,15 +61,7 @@ export default async function AdminLayout({
     modoSuporteAtivo = true
     sairAction = sairModoSuporte.bind(null, sessao.gabineteId, sessao.sessaoId)
   } else {
-    const usuarioGabinete = await prisma.usuarioGabinete.findUnique({
-      where: {
-        userId_gabineteId: { userId: session.user.id, gabineteId: gabinete.id },
-      },
-      select: { papel: true },
-    })
-    if (!usuarioGabinete || usuarioGabinete.papel !== 'admin') {
-      redirect(`/${params.slug}/login?erro=sem_acesso`)
-    }
+    redirect(`/${params.slug}/login?erro=sem_acesso`)
   }
 
   const pessoaLogada = await prisma.pessoa.findFirst({
