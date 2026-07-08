@@ -219,22 +219,18 @@ export default async function FichaPessoaPage({
             <p className="text-xs text-[#686868]">Data de Nascimento</p>
             <p className="text-[#757575]">{pessoa.nascimento ? pessoa.nascimento.toLocaleDateString('pt-BR') : '—'}</p>
           </div>
-          {pessoa.cpf && (
-            <div>
-              <p className="text-xs text-[#686868]">CPF</p>
-              <p className="text-[#757575]">{pessoa.cpf}</p>
-            </div>
-          )}
+          <div>
+            <p className="text-xs text-[#686868]">CPF</p>
+            <p className="text-[#757575]">{pessoa.cpf ?? '—'}</p>
+          </div>
           <div>
             <p className="text-xs text-[#686868]">WhatsApp</p>
             <p className="text-[#757575]">{pessoa.whatsapp}</p>
           </div>
-          {pessoa.telefoneFixo && (
-            <div>
-              <p className="text-xs text-[#686868]">Telefone Fixo</p>
-              <p className="text-[#757575]">{pessoa.telefoneFixo}</p>
-            </div>
-          )}
+          <div>
+            <p className="text-xs text-[#686868]">Telefone Fixo</p>
+            <p className="text-[#757575]">{pessoa.telefoneFixo ?? '—'}</p>
+          </div>
           <div className="col-span-2">
             <p className="text-xs text-[#686868]">Endereço</p>
             <p className="text-[#757575]">{[pessoa.logradouro, pessoa.numero, pessoa.complemento].filter(Boolean).join(', ') || '—'}</p>
@@ -255,24 +251,18 @@ export default async function FichaPessoaPage({
             <p className="text-xs text-[#686868]">Sexo</p>
             <p className="text-[#757575] capitalize">{pessoa.genero ?? '—'}</p>
           </div>
-          {pessoa.orientacaoSexual && (
-            <div>
-              <p className="text-xs text-[#686868]">Orientação Sexual</p>
-              <p className="text-[#757575]">{pessoa.orientacaoSexual}</p>
-            </div>
-          )}
-          {pessoa.religiao && (
-            <div>
-              <p className="text-xs text-[#686868]">Religião</p>
-              <p className="text-[#757575]">{pessoa.religiao}</p>
-            </div>
-          )}
-          {pessoa.escolaridade && (
-            <div>
-              <p className="text-xs text-[#686868]">Escolaridade</p>
-              <p className="text-[#757575]">{pessoa.escolaridade}</p>
-            </div>
-          )}
+          <div>
+            <p className="text-xs text-[#686868]">Orientação Sexual</p>
+            <p className="text-[#757575]">{pessoa.orientacaoSexual ?? '—'}</p>
+          </div>
+          <div>
+            <p className="text-xs text-[#686868]">Religião</p>
+            <p className="text-[#757575]">{pessoa.religiao ?? '—'}</p>
+          </div>
+          <div>
+            <p className="text-xs text-[#686868]">Escolaridade</p>
+            <p className="text-[#757575]">{pessoa.escolaridade ?? '—'}</p>
+          </div>
           <div>
             <p className="text-xs text-[#686868]">Tipo de Conta</p>
             <p className="text-[#757575]">{tipoConta}</p>
@@ -313,6 +303,11 @@ export default async function FichaPessoaPage({
                 regiaoId: pessoa.regiaoId,
                 profissaoId: pessoa.profissaoId,
                 genero: pessoa.genero,
+                cpf: pessoa.cpf,
+                telefoneFixo: pessoa.telefoneFixo,
+                orientacaoSexual: pessoa.orientacaoSexual,
+                religiao: pessoa.religiao,
+                escolaridade: pessoa.escolaridade,
               }}
               regioes={regioes}
               profissoes={profissoes}

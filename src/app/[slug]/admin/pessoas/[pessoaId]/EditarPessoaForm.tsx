@@ -18,6 +18,11 @@ interface Props {
     regiaoId: string | null
     profissaoId: string | null
     genero: string | null
+    cpf: string | null
+    telefoneFixo: string | null
+    orientacaoSexual: string | null
+    religiao: string | null
+    escolaridade: string | null
   }
   regioes: Regiao[]
   profissoes: Profissao[]
@@ -120,18 +125,64 @@ export default function EditarPessoaForm({ slug, pessoaId, pessoa, regioes, prof
           </select>
         </div>
       </div>
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Gênero</label>
-        <select
-          name="genero"
-          defaultValue={pessoa.genero ?? ''}
-          className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
-        >
-          <option value="">Não informado</option>
-          <option value="masculino">Masculino</option>
-          <option value="feminino">Feminino</option>
-          <option value="outro">Outro</option>
-        </select>
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Gênero</label>
+          <select
+            name="genero"
+            defaultValue={pessoa.genero ?? ''}
+            className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+          >
+            <option value="">Não informado</option>
+            <option value="masculino">Masculino</option>
+            <option value="feminino">Feminino</option>
+            <option value="outro">Outro</option>
+          </select>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Orientação Sexual</label>
+          <input
+            name="orientacaoSexual"
+            defaultValue={pessoa.orientacaoSexual ?? ''}
+            className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+          />
+        </div>
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <label className="block text-sm font-medium text-gray-700">CPF</label>
+          <input
+            name="cpf"
+            defaultValue={pessoa.cpf ?? ''}
+            className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Telefone Fixo</label>
+          <input
+            name="telefoneFixo"
+            defaultValue={pessoa.telefoneFixo ?? ''}
+            className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+          />
+        </div>
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Religião</label>
+          <input
+            name="religiao"
+            defaultValue={pessoa.religiao ?? ''}
+            className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Escolaridade</label>
+          <input
+            name="escolaridade"
+            defaultValue={pessoa.escolaridade ?? ''}
+            className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+          />
+        </div>
       </div>
       {state?.erro && (
         <p className="text-sm text-red-600">{state.erro}</p>

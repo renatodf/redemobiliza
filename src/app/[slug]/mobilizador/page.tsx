@@ -37,6 +37,11 @@ export default async function MobilizadorPage({
       regiaoId: true,
       profissaoId: true,
       tokenMobilizador: true,
+      cpf: true,
+      telefoneFixo: true,
+      orientacaoSexual: true,
+      religiao: true,
+      escolaridade: true,
     },
   })
   if (!pessoa || !pessoa.tokenMobilizador) notFound()
@@ -189,6 +194,11 @@ export default async function MobilizadorPage({
             regiaoId: pessoa.regiaoId,
             profissaoId: pessoa.profissaoId,
             genero: pessoa.genero,
+            cpf: pessoa.cpf,
+            telefoneFixo: pessoa.telefoneFixo,
+            orientacaoSexual: pessoa.orientacaoSexual,
+            religiao: pessoa.religiao,
+            escolaridade: pessoa.escolaridade,
           }}
           regioes={regioes}
           profissoes={profissoes}

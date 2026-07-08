@@ -18,6 +18,11 @@ export async function editarPessoa(
   const regiaoId = (formData.get('regiaoId') as string | null) || null
   const profissaoId = (formData.get('profissaoId') as string | null) || null
   const genero = (formData.get('genero') as string | null) || null
+  const cpf = (formData.get('cpf') as string | null)?.trim() || null
+  const telefoneFixo = (formData.get('telefoneFixo') as string | null)?.trim() || null
+  const orientacaoSexual = (formData.get('orientacaoSexual') as string | null)?.trim() || null
+  const religiao = (formData.get('religiao') as string | null)?.trim() || null
+  const escolaridade = (formData.get('escolaridade') as string | null)?.trim() || null
 
   if (!nome) return { ok: false, erro: 'Nome é obrigatório' }
   if (!whatsappRaw) return { ok: false, erro: 'WhatsApp é obrigatório' }
@@ -63,7 +68,19 @@ export async function editarPessoa(
 
   await prisma.pessoa.updateMany({
     where: { id: pessoaId, gabineteId: gabinete.id },
-    data: { nome, whatsapp, email, genero, regiaoId, profissaoId },
+    data: {
+      nome,
+      whatsapp,
+      email,
+      genero,
+      regiaoId,
+      profissaoId,
+      cpf,
+      telefoneFixo,
+      orientacaoSexual,
+      religiao,
+      escolaridade,
+    },
   })
 
   revalidatePath(`/${slug}/admin/pessoas/${pessoaId}`)
