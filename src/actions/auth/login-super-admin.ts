@@ -3,6 +3,7 @@
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
+import { listarDestinosAcesso, caminhoDestino } from '@/lib/auth-destino'
 
 export async function loginSuperAdmin(formData: FormData) {
   const email = formData.get('email') as string
@@ -37,5 +38,11 @@ export async function loginSuperAdmin(formData: FormData) {
     redirect('/super-admin/login?erro=nao_autorizado')
   }
 
-  redirect('/super-admin/')
+  const destinos = await listarDestinosAcesso(session.user.id, true)
+
+  if (destinos.length > 1) {
+    redirect('/escolher-acesso')
+  }
+
+  redirect(caminhoDestino(destinos[0]))
 }
