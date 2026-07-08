@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
 
   // 1. Marcar demandas expiradas
   const demandasExpiradas = await prisma.demanda.findMany({
-    where: { status: 'aberta', prazoDesfecho: { lt: agora } },
+    where: { status: 'aberta', deletedAt: null, prazoDesfecho: { lt: agora } },
     include: {
       gabinete: { select: { slug: true } },
       responsavel: { select: { nome: true, email: true } },
@@ -86,6 +86,7 @@ export async function POST(req: NextRequest) {
       where: {
         gabineteId: config.gabineteId,
         status: 'aberta',
+        deletedAt: null,
         alertaEnviadoEm: null,
         prazoDesfecho: { gte: agora, lte: limiteAlerta },
       },

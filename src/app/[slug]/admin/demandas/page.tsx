@@ -86,7 +86,7 @@ export default async function DemandasPage({
     prisma.demanda.count({ where }),
     prisma.demanda.groupBy({
       by: ['status'],
-      where: { gabineteId: gabinete.id },
+      where: { gabineteId: gabinete.id, deletedAt: null },
       _count: { id: true },
     }),
     prisma.areaDemanda.findMany({ where: { gabineteId: gabinete.id }, orderBy: { nome: 'asc' }, select: { id: true, nome: true } }),
@@ -94,7 +94,7 @@ export default async function DemandasPage({
     prisma.regiao.findMany({ where: { gabineteId: gabinete.id, ativa: true }, orderBy: { nome: 'asc' }, select: { id: true, nome: true } }),
     prisma.demanda.groupBy({
       by: ['status'],
-      where: { gabineteId: gabinete.id, criadoEm: { gte: inicioMes, lte: fimMes } },
+      where: { gabineteId: gabinete.id, deletedAt: null, criadoEm: { gte: inicioMes, lte: fimMes } },
       _count: { id: true },
     }),
   ])
@@ -113,7 +113,7 @@ export default async function DemandasPage({
     ...b,
     href: `/${params.slug}/admin/demandas?status=${b.status}&dataInicio=${dataInicioStr}&dataFim=${dataFimStr}`,
   }))
-  const totalPrazoAlterado = await prisma.demanda.count({ where: { gabineteId: gabinete.id, prazoAlterado: true } })
+  const totalPrazoAlterado = await prisma.demanda.count({ where: { gabineteId: gabinete.id, deletedAt: null, prazoAlterado: true } })
 
   return (
     <div className="max-w-6xl mx-auto py-8 px-4 space-y-6">

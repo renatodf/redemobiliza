@@ -150,7 +150,7 @@ export default async function DashboardPage({
     }),
     prisma.demanda.groupBy({
       by: ['status'],
-      where: { gabineteId: gabinete.id, criadoEm: { gte: inicioMes, lte: fimMes } },
+      where: { gabineteId: gabinete.id, deletedAt: null, criadoEm: { gte: inicioMes, lte: fimMes } },
       _count: { id: true },
     }),
   ])
