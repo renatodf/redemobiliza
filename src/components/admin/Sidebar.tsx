@@ -14,7 +14,6 @@ type IconeTipo =
   | 'importar-exportar'
   | 'configuracoes'
   | 'inicio'
-  | 'minha-rede'
 
 type ItemMenu = { label: string; href?: string; emBreve?: boolean; icone: IconeTipo }
 
@@ -34,7 +33,7 @@ function buildItensAdmin(slug: string): ItemMenu[] {
 function buildItensMobilizador(slug: string): ItemMenu[] {
   return [
     { label: 'Início', href: `/${slug}/mobilizador`, icone: 'inicio' },
-    { label: 'Minha Rede', href: `/${slug}/mobilizador/rede`, icone: 'minha-rede' },
+    { label: 'Demandas', href: `/${slug}/mobilizador/demandas`, icone: 'demandas' },
   ]
 }
 
@@ -112,15 +111,6 @@ function IconeMenu({ tipo }: { tipo: IconeTipo }) {
         <svg {...props}>
           <path d="M2.5 8 8.5 2.5 14.5 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
           <path d="M4 6.8V14h9V6.8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      )
-    case 'minha-rede':
-      return (
-        <svg {...props}>
-          <circle cx="4" cy="4.5" r="1.8" stroke="currentColor" strokeWidth="1.4" />
-          <circle cx="13" cy="4.5" r="1.8" stroke="currentColor" strokeWidth="1.4" />
-          <circle cx="8.5" cy="13" r="1.8" stroke="currentColor" strokeWidth="1.4" />
-          <path d="M5.5 5.5 7.3 11.3M11.5 5.5 9.7 11.3M5.8 4.5h5.4" stroke="currentColor" strokeWidth="1.2" />
         </svg>
       )
   }
