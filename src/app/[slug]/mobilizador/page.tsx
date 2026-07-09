@@ -2,10 +2,8 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { cookies } from 'next/headers'
 import { createServerClient } from '@supabase/ssr'
-import QRCode from 'qrcode'
 import { prisma } from '@/lib/prisma'
 import { getGabineteBySlug } from '@/lib/gabinete'
-import { getAppUrl } from '@/lib/app-url'
 import { mapPapelParaTipoConta } from '@/lib/tipo-conta'
 import UsuariosTable, { type UsuarioRow } from '../admin/pessoas/UsuariosTable'
 
@@ -40,22 +38,6 @@ export default async function MobilizadorPage({
     select: { id: true, nome: true, tokenMobilizador: true },
   })
   if (!pessoa || !pessoa.tokenMobilizador) notFound()
-
-  const segmentos = await prisma.segmento.findMany({
-    where: { gabineteId: gabinete.id, status: 'ativo' },
-    orderBy: { nome: 'asc' },
-    select: { id: true, nome: true, slug: true },
-  })
-
-  const appUrl = getAppUrl()
-
-  const linksSegmentos = await Promise.all(
-    segmentos.map(async (seg) => {
-      const link = `${appUrl}/${params.slug}/cadastro/${seg.slug}?m=${pessoa.tokenMobilizador}`
-      const qrDataUrl = await QRCode.toDataURL(link, { width: 200, margin: 2 })
-      return { ...seg, link, qrDataUrl }
-    })
-  )
 
   const { sort, order, rede, path } = searchParams
 
@@ -136,44 +118,9 @@ export default async function MobilizadorPage({
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Olá, {pessoa.nome}!</h1>
         <p className="text-sm text-gray-600 mt-1">
-          Compartilhe seu link personalizado para convidar pessoas.
+          Acompanhe aqui as pessoas cadastradas na sua rede.
         </p>
       </div>
-
-      {linksSegmentos.length === 0 ? (
-        <p className="text-sm text-gray-500">Nenhum segmento ativo no momento.</p>
-      ) : (
-        <div className="space-y-6">
-          {linksSegmentos.map((seg) => (
-            <div key={seg.id} className="bg-white rounded-lg p-6 shadow-sm space-y-4">
-              <h2 className="text-base font-semibold text-gray-800">{seg.nome}</h2>
-              <div>
-                <p className="text-xs text-gray-500 mb-1">Seu link personalizado</p>
-                <p className="text-sm text-blue-600 break-all">{seg.link}</p>
-                <a
-                  href={seg.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-block mt-1 text-xs text-blue-600 underline"
-                >
-                  Abrir link
-                </a>
-              </div>
-              <div className="flex flex-col items-center gap-3">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={seg.qrDataUrl} alt={`QR Code — ${seg.nome}`} className="w-48 h-48" />
-                <a
-                  href={seg.qrDataUrl}
-                  download={`qr-${params.slug}-${seg.slug}.png`}
-                  className="text-xs text-blue-600 underline"
-                >
-                  Baixar QR Code
-                </a>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
 
       <section className="space-y-3">
         <h2 className="text-lg font-semibold text-gray-900">Minha Rede</h2>
