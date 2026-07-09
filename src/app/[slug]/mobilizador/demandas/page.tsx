@@ -1,7 +1,6 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
-import { getGabineteBySlug } from '@/lib/gabinete'
 import { corTextoContraste } from '@/lib/cor-contraste'
 import { assertMobilizadorAccess } from '@/lib/assert-mobilizador-access'
 
@@ -19,11 +18,10 @@ export default async function MobilizadorDemandasPage({
   params: { slug: string }
   searchParams: { status?: string }
 }) {
-  const gabinete = await getGabineteBySlug(params.slug)
-  if (!gabinete) notFound()
+  const resultado = await assertMobilizadorAccess(params.slug).catch(() => null)
+  if (!resultado) notFound()
+  const { gabinete, pessoa } = resultado
   const corTexto = corTextoContraste(gabinete.corPrimaria)
-
-  const { pessoa } = await assertMobilizadorAccess(params.slug)
 
   const demandas = await prisma.demanda.findMany({
     where: {
