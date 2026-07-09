@@ -6,13 +6,22 @@ import QRCode from 'qrcode'
 import { prisma } from '@/lib/prisma'
 import { getGabineteBySlug } from '@/lib/gabinete'
 import { getAppUrl } from '@/lib/app-url'
-import EditarPessoaForm from '../admin/pessoas/[pessoaId]/EditarPessoaForm'
-import AlterarSenhaDialog from './AlterarSenhaDialog'
+import { mapPapelParaTipoConta } from '@/lib/tipo-conta'
+import UsuariosTable, { type UsuarioRow } from '../admin/pessoas/UsuariosTable'
+
+function buildOrderBy(sort?: string, order?: string) {
+  if (sort === 'nome') {
+    return { nome: (order === 'desc' ? 'desc' : 'asc') as 'asc' | 'desc' }
+  }
+  return { criadoEm: 'desc' as const }
+}
 
 export default async function MobilizadorPage({
   params,
+  searchParams,
 }: {
   params: { slug: string }
+  searchParams: { sort?: string; order?: string; rede?: string; path?: string }
 }) {
   const gabinete = await getGabineteBySlug(params.slug)
   if (!gabinete) notFound()
@@ -28,36 +37,9 @@ export default async function MobilizadorPage({
 
   const pessoa = await prisma.pessoa.findFirst({
     where: { userId: session.user.id, gabineteId: gabinete.id, isMobilizador: true },
-    select: {
-      id: true,
-      nome: true,
-      whatsapp: true,
-      email: true,
-      genero: true,
-      regiaoId: true,
-      profissaoId: true,
-      tokenMobilizador: true,
-      cpf: true,
-      telefoneFixo: true,
-      orientacaoSexual: true,
-      religiao: true,
-      escolaridade: true,
-    },
+    select: { id: true, nome: true, tokenMobilizador: true },
   })
   if (!pessoa || !pessoa.tokenMobilizador) notFound()
-
-  const [regioes, profissoes] = await Promise.all([
-    prisma.regiao.findMany({
-      where: { gabineteId: gabinete.id, ativa: true },
-      orderBy: { nome: 'asc' },
-      select: { id: true, nome: true },
-    }),
-    prisma.profissao.findMany({
-      where: { gabineteId: gabinete.id, ativa: true },
-      orderBy: { nome: 'asc' },
-      select: { id: true, nome: true },
-    }),
-  ])
 
   const segmentos = await prisma.segmento.findMany({
     where: { gabineteId: gabinete.id, status: 'ativo' },
@@ -67,7 +49,6 @@ export default async function MobilizadorPage({
 
   const appUrl = getAppUrl()
 
-  // Gerar links e QR codes por segmento
   const linksSegmentos = await Promise.all(
     segmentos.map(async (seg) => {
       const link = `${appUrl}/${params.slug}/cadastro/${seg.slug}?m=${pessoa.tokenMobilizador}`
@@ -76,21 +57,79 @@ export default async function MobilizadorPage({
     })
   )
 
-  const totalConvidados = await prisma.vinculoRede.count({
-    where: { gabineteId: gabinete.id, indicadoPorId: pessoa.id, deletedAt: null },
-  })
+  const { sort, order, rede, path } = searchParams
 
-  const minhasDemandas = await prisma.demanda.findMany({
-    where: { gabineteId: gabinete.id, responsavelId: pessoa.id },
-    orderBy: { prazoDesfecho: 'asc' },
-    select: {
-      id: true,
-      titulo: true,
-      status: true,
-      prazoDesfecho: true,
-      area: { select: { nome: true } },
-    },
+  // Verifica se ?rede pertence à sub-árvore do mobilizador logado
+  if (rede && rede !== pessoa.id) {
+    let currentId: string | null = rede
+    let authorized = false
+    const visited = new Set<string>()
+    while (currentId && !visited.has(currentId)) {
+      visited.add(currentId)
+      const vinculo: { indicadoPorId: string | null } | null = await prisma.vinculoRede.findFirst({
+        where: { pessoaId: currentId, gabineteId: gabinete.id, deletedAt: null },
+        select: { indicadoPorId: true },
+      })
+      const parentId: string | null = vinculo?.indicadoPorId ?? null
+      if (parentId === pessoa.id) { authorized = true; break }
+      currentId = parentId
+    }
+    if (!authorized) notFound()
+  }
+
+  const orderBy = buildOrderBy(sort, order)
+  const pathIds = path ? path.split(',').filter(Boolean) : []
+  const indicadorId = rede ?? pessoa.id
+
+  const vinculos = await prisma.vinculoRede.findMany({
+    where: { indicadoPorId: indicadorId, gabineteId: gabinete.id, deletedAt: null },
+    select: { pessoaId: true },
   })
+  const ids = vinculos.map((v) => v.pessoaId)
+
+  const pessoasRaw = ids.length > 0
+    ? await prisma.pessoa.findMany({
+        where: { id: { in: ids }, gabineteId: gabinete.id, deletedAt: null },
+        orderBy,
+        take: 50,
+        select: {
+          id: true,
+          nome: true,
+          email: true,
+          fotoUrl: true,
+          userId: true,
+          segmentos: { select: { segmento: { select: { id: true, nome: true } } } },
+        },
+      })
+    : []
+
+  const userIds = pessoasRaw.map((p) => p.userId).filter((id): id is string => !!id)
+  const papeis = userIds.length
+    ? await prisma.usuarioGabinete.findMany({
+        where: { userId: { in: userIds }, gabineteId: gabinete.id },
+        select: { userId: true, papel: true },
+      })
+    : []
+  const papelPorUserId = new Map(papeis.map((p) => [p.userId, p.papel]))
+
+  const usuariosRede: UsuarioRow[] = pessoasRaw.map((p) => ({
+    id: p.id,
+    nome: p.nome,
+    email: p.email,
+    fotoUrl: p.fotoUrl,
+    tipoConta: mapPapelParaTipoConta(p.userId ? papelPorUserId.get(p.userId) : null),
+    segmentos: p.segmentos.map((s) => s.segmento),
+  }))
+
+  const breadcrumbPessoas = pathIds.length > 0
+    ? await prisma.pessoa.findMany({
+        where: { id: { in: pathIds }, gabineteId: gabinete.id, deletedAt: null },
+        select: { id: true, nome: true },
+      })
+    : []
+  const breadcrumb = pathIds
+    .map((id) => breadcrumbPessoas.find((p) => p.id === id))
+    .filter(Boolean) as { id: string; nome: string }[]
 
   return (
     <div className="space-y-8">
@@ -136,76 +175,44 @@ export default async function MobilizadorPage({
         </div>
       )}
 
-      <section className="bg-white rounded-lg p-6 shadow-sm space-y-3">
-        <div className="flex items-center justify-between">
-          <h2 className="text-base font-semibold text-gray-800">
-            Minha rede ({totalConvidados})
-          </h2>
-          {totalConvidados > 0 && (
-            <Link
-              href={`/${params.slug}/mobilizador/rede`}
-              className="text-sm text-blue-600 hover:underline"
-            >
-              Ver rede →
-            </Link>
-          )}
-        </div>
-        {totalConvidados === 0 && (
-          <p className="text-sm text-gray-500">Nenhuma pessoa convidada ainda.</p>
-        )}
-      </section>
+      <section className="space-y-3">
+        <h2 className="text-lg font-semibold text-gray-900">Minha Rede</h2>
 
-      <section className="bg-white rounded-lg p-6 shadow-sm space-y-4">
-        <h2 className="text-base font-semibold text-gray-800">
-          Minhas Demandas ({minhasDemandas.length})
-        </h2>
-        {minhasDemandas.length === 0 ? (
-          <p className="text-sm text-gray-500">Nenhuma demanda atribuída.</p>
-        ) : (
-          <ul className="divide-y divide-gray-100">
-            {minhasDemandas.map((d) => {
-              const statusCor = { aberta: 'text-yellow-600', expirada: 'text-orange-600', atendida: 'text-green-600', nao_atendida: 'text-red-600' }[d.status] ?? 'text-gray-600'
-              const statusLabel = { aberta: 'Em aberto', expirada: 'Expirada', atendida: 'Atendida', nao_atendida: 'Não atendida' }[d.status] ?? d.status
+        {breadcrumb.length > 0 && (
+          <nav className="text-sm text-gray-500 flex items-center gap-1 flex-wrap">
+            <Link href={`/${params.slug}/mobilizador`} className="hover:text-gray-900">
+              Minha Rede
+            </Link>
+            {breadcrumb.map((item, i) => {
+              const isLast = i === breadcrumb.length - 1
+              const crumbPath = pathIds.slice(0, i + 1).join(',')
               return (
-                <li key={d.id} className="py-3">
-                  <a href={`/${params.slug}/mobilizador/demandas/${d.id}`} className="flex items-center justify-between hover:bg-gray-50 -mx-2 px-2 py-1 rounded">
-                    <div>
-                      <p className="text-sm font-medium text-gray-900">{d.titulo}</p>
-                      <p className="text-xs text-gray-500">{d.area.nome} · Prazo: {d.prazoDesfecho.toLocaleDateString('pt-BR')}</p>
-                    </div>
-                    <span className={`text-xs font-medium ${statusCor}`}>{statusLabel}</span>
-                  </a>
-                </li>
+                <span key={item.id} className="flex items-center gap-1">
+                  <span>›</span>
+                  {isLast ? (
+                    <span className="text-gray-900 font-medium">Rede de {item.nome}</span>
+                  ) : (
+                    <Link
+                      href={`/${params.slug}/mobilizador?rede=${item.id}&path=${crumbPath}`}
+                      className="hover:text-gray-900"
+                    >
+                      Rede de {item.nome}
+                    </Link>
+                  )}
+                </span>
               )
             })}
-          </ul>
+          </nav>
         )}
-      </section>
 
-      <section className="bg-white rounded-lg p-6 shadow-sm space-y-4">
-        <h2 className="text-base font-semibold text-gray-800">Meu Perfil</h2>
-        <EditarPessoaForm
-          slug={params.slug}
-          pessoaId={pessoa.id}
-          pessoa={{
-            nome: pessoa.nome,
-            whatsapp: pessoa.whatsapp,
-            email: pessoa.email,
-            regiaoId: pessoa.regiaoId,
-            profissaoId: pessoa.profissaoId,
-            genero: pessoa.genero,
-            cpf: pessoa.cpf,
-            telefoneFixo: pessoa.telefoneFixo,
-            orientacaoSexual: pessoa.orientacaoSexual,
-            religiao: pessoa.religiao,
-            escolaridade: pessoa.escolaridade,
-          }}
-          regioes={regioes}
-          profissoes={profissoes}
-          corPrimaria={gabinete.corPrimaria}
-        />
-        <div className="pt-2">
-          <AlterarSenhaDialog />
+        <div className="bg-white rounded-lg shadow-sm overflow-x-auto">
+          <UsuariosTable
+            slug={params.slug}
+            usuarios={usuariosRede}
+            corPrimaria={gabinete.corPrimaria}
+            baseHref={`/${params.slug}/mobilizador/pessoas`}
+            somenteLeitura
+          />
         </div>
       </section>
     </div>
