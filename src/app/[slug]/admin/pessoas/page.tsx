@@ -36,12 +36,14 @@ export default async function PessoasPage({
   const pathIds = path ? path.split(',').filter(Boolean) : []
   const paginaSolicitada = Number(searchParams.page ?? '1') || 1
 
-  const donaDaRede = rede
-    ? await prisma.pessoa.findFirst({
-        where: { id: rede, gabineteId: gabinete.id },
-        select: { nome: true },
-      })
-    : null
+  const donaDaRede = rede === 'raiz'
+    ? { nome: 'Rede Raiz' }
+    : rede
+      ? await prisma.pessoa.findFirst({
+          where: { id: rede, gabineteId: gabinete.id },
+          select: { nome: true },
+        })
+      : null
 
   const searchFilter = q
     ? {
@@ -54,7 +56,13 @@ export default async function PessoasPage({
     : {}
 
   let idsFiltro: string[] | null = null
-  if (rede) {
+  if (rede === 'raiz') {
+    const vinculos = await prisma.vinculoRede.findMany({
+      where: { indicadoPorId: null, gabineteId: gabinete.id, deletedAt: null },
+      select: { pessoaId: true },
+    })
+    idsFiltro = vinculos.map((v) => v.pessoaId)
+  } else if (rede) {
     const vinculos = await prisma.vinculoRede.findMany({
       where: { indicadoPorId: rede, gabineteId: gabinete.id, deletedAt: null },
       select: { pessoaId: true },
@@ -140,7 +148,7 @@ export default async function PessoasPage({
           Usuários
           {donaDaRede && (
             <span className="font-normal text-gray-500">
-              {' '}<span className="mx-1 text-gray-500">-</span> Rede de {donaDaRede.nome}
+              {' '}<span className="mx-1 text-gray-500">-</span> {rede === 'raiz' ? 'Rede Raiz' : `Rede de ${donaDaRede.nome}`}
             </span>
           )}
         </h1>
@@ -178,23 +186,31 @@ export default async function PessoasPage({
         </nav>
       )}
 
-      <form method="GET" className="flex gap-2">
-        {rede && <input type="hidden" name="rede" value={rede} />}
-        {path && <input type="hidden" name="path" value={path} />}
-        <input
-          name="q"
-          defaultValue={q}
-          placeholder="Buscar por nome, WhatsApp ou e-mail..."
-          className="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm"
-        />
-        <button
-          type="submit"
-          style={{ backgroundColor: gabinete.corPrimaria, color: corTexto }}
-          className="px-4 py-2 rounded-md text-sm font-medium"
+      <div className="flex gap-3 items-center">
+        <form method="GET" className="flex gap-2 flex-1">
+          {rede && <input type="hidden" name="rede" value={rede} />}
+          {path && <input type="hidden" name="path" value={path} />}
+          <input
+            name="q"
+            defaultValue={q}
+            placeholder="Buscar por nome, WhatsApp ou e-mail..."
+            className="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm"
+          />
+          <button
+            type="submit"
+            style={{ backgroundColor: gabinete.corPrimaria, color: corTexto }}
+            className="px-4 py-2 rounded-md text-sm font-medium"
+          >
+            Buscar
+          </button>
+        </form>
+        <Link
+          href={`/${params.slug}/admin/pessoas?rede=raiz`}
+          className="text-sm text-gray-500 hover:text-gray-900 whitespace-nowrap"
         >
-          Buscar
-        </button>
-      </form>
+          Ver Rede Raiz
+        </Link>
+      </div>
 
       <div className="bg-white rounded-lg overflow-x-auto">
         <UsuariosTable slug={params.slug} usuarios={usuarios} corPrimaria={gabinete.corPrimaria} />
