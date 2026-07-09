@@ -32,7 +32,7 @@ export async function promoverMobilizador(
 
     const resultado = await criarOuReaproveitarUsuarioMobilizador(getSupabaseAdmin(), pessoa.email, senha)
     if ('erro' in resultado) return { erro: resultado.erro }
-    const { userId, criadoAgora } = resultado
+    const { userId } = resultado
 
     const tokenMobilizador = crypto.randomUUID().replace(/-/g, '')
 
@@ -47,8 +47,8 @@ export async function promoverMobilizador(
         }),
       ])
     } catch (txError) {
-      // Só remove o usuário do Supabase se fomos nós que acabamos de criá-lo agora
-      if (criadoAgora) await getSupabaseAdmin().auth.admin.deleteUser(userId)
+      // Cleanup orphaned Supabase user
+      await getSupabaseAdmin().auth.admin.deleteUser(userId)
       throw txError
     }
 

@@ -16,23 +16,25 @@ async function buscarUsuarioPorEmail(supabaseAdmin: SupabaseClient, email: strin
 
 /**
  * Cria um usuário no Supabase Auth para promoção a mobilizador. Se o e-mail já
- * estiver cadastrado — caso comum de uma promoção anterior que criou o usuário
- * mas falhou antes de vincular ao Pessoa/UsuarioGabinete — localiza a conta
- * órfã e a reaproveita (redefinindo a senha) em vez de falhar. Só reaproveita
- * se a conta não estiver vinculada a nenhum Pessoa; caso contrário, é um
- * conflito real e retorna erro.
+ * estiver cadastrado, diagnostica a causa mais comum (uma promoção anterior
+ * que criou o usuário mas falhou antes de vincular ao Pessoa/UsuarioGabinete)
+ * e retorna um erro específico e acionável — mas nunca reaproveita a conta
+ * automaticamente: redefinir a senha de uma conta existente sem confirmação
+ * do dono do e-mail seria uma forma de sequestro de conta (um admin poderia
+ * apontar o e-mail de qualquer Pessoa para o de outra pessoa real e assumir
+ * a senha dela). A limpeza de contas órfãs exige ação humana explícita.
  */
 export async function criarOuReaproveitarUsuarioMobilizador(
   supabaseAdmin: SupabaseClient,
   email: string,
   senha: string
-): Promise<{ userId: string; criadoAgora: boolean } | { erro: string }> {
+): Promise<{ userId: string } | { erro: string }> {
   const { data, error } = await supabaseAdmin.auth.admin.createUser({
     email,
     password: senha,
     email_confirm: true,
   })
-  if (!error && data.user) return { userId: data.user.id, criadoAgora: true }
+  if (!error && data.user) return { userId: data.user.id }
 
   if (!error?.message.includes('already been registered')) {
     return { erro: 'Erro ao criar acesso: ' + (error?.message ?? 'desconhecido') }
@@ -51,11 +53,11 @@ export async function criarOuReaproveitarUsuarioMobilizador(
     return { erro: 'Já existe uma conta com este e-mail vinculada a outra pessoa. Verifique com o suporte.' }
   }
 
-  const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(usuarioExistente.id, {
-    password: senha,
-    email_confirm: true,
-  })
-  if (updateError) return { erro: 'Erro ao reaproveitar acesso existente: ' + updateError.message }
-
-  return { userId: usuarioExistente.id, criadoAgora: false }
+  return {
+    erro:
+      `Este e-mail já tem uma conta de acesso, mas sem vínculo com nenhuma pessoa cadastrada — ` +
+      `provavelmente sobrou de uma promoção anterior que não terminou. Por segurança, essa conta não é ` +
+      `reaproveitada automaticamente. Peça a um super-admin para excluir a conta órfã (ID ${usuarioExistente.id}) ` +
+      `no Supabase Auth e tente promover novamente.`,
+  }
 }
