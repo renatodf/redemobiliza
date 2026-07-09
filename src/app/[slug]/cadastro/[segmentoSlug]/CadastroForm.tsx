@@ -9,8 +9,9 @@ type Profissao = { id: string; nome: string }
 
 type Props = {
   slug: string
-  segmentoSlug: string
+  segmentoSlugs: string[]
   mobilizadorToken?: string
+  sucessoUrl: string
   regioes: Regiao[]
   profissoes: Profissao[]
 }
@@ -19,8 +20,9 @@ type Passo = 'whatsapp' | 'dados' | 'confirmacao'
 
 export default function CadastroForm({
   slug,
-  segmentoSlug,
+  segmentoSlugs,
   mobilizadorToken,
+  sucessoUrl,
   regioes,
   profissoes,
 }: Props) {
@@ -49,7 +51,7 @@ export default function CadastroForm({
     startTransition(async () => {
       const resultado = await submeterCadastro({
         slug,
-        segmentoSlug,
+        segmentoSlugs,
         whatsapp,
         nome: fd.get('nome') as string,
         email: fd.get('email') as string,
@@ -57,6 +59,7 @@ export default function CadastroForm({
         profissaoId: fd.get('profissaoId') as string,
         genero: fd.get('genero') as string,
         mobilizadorToken,
+        sucessoUrl,
       })
       if (resultado && 'erro' in resultado) {
         setErro(resultado.erro)
@@ -70,10 +73,11 @@ export default function CadastroForm({
     startTransition(async () => {
       const resultado = await submeterCadastro({
         slug,
-        segmentoSlug,
+        segmentoSlugs,
         whatsapp,
         nome: '',
         mobilizadorToken,
+        sucessoUrl,
       })
       if (resultado && 'erro' in resultado) {
         setErro(resultado.erro)

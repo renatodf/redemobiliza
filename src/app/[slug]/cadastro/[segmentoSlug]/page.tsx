@@ -52,8 +52,9 @@ export default async function CadastroPage({
 
         <CadastroForm
           slug={params.slug}
-          segmentoSlug={params.segmentoSlug}
+          segmentoSlugs={[params.segmentoSlug]}
           mobilizadorToken={searchParams.m}
+          sucessoUrl={`/${params.slug}/cadastro/${params.segmentoSlug}/sucesso`}
           regioes={regioes}
           profissoes={profissoes}
         />
