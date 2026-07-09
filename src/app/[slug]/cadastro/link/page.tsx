@@ -22,6 +22,9 @@ export default async function CadastroLinkPage({
   // se não há segmento E não há token de mobilizador (link vazio, sem sentido).
   if (segmentoSlugs.length === 0 && !searchParams.m) notFound()
 
+  // Se todos os slugs informados forem inválidos/obsoletos mas houver ?m=,
+  // segue mesmo assim com lista vazia — o vínculo com o mobilizador é o que
+  // importa nesse caso, não os segmentos obsoletos.
   const segmentosValidos = segmentoSlugs.length > 0
     ? await prisma.segmento.findMany({
         where: { gabineteId: gabinete.id, slug: { in: segmentoSlugs }, status: 'ativo' },
