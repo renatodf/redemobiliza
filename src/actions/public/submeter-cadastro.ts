@@ -7,7 +7,7 @@ import { normalizeWhatsApp } from '@/lib/whatsapp'
 
 type SubmeterCadastroInput = {
   slug: string
-  segmentoSlug: string
+  segmentoSlugs: string[]
   whatsapp: string
   nome: string
   email?: string
@@ -15,12 +15,13 @@ type SubmeterCadastroInput = {
   profissaoId?: string
   genero?: string
   mobilizadorToken?: string
+  sucessoUrl: string
 }
 
 export async function submeterCadastro(input: SubmeterCadastroInput): Promise<{ erro: string } | never> {
   const {
     slug,
-    segmentoSlug,
+    segmentoSlugs,
     whatsapp: whatsappRaw,
     nome,
     email,
@@ -28,16 +29,17 @@ export async function submeterCadastro(input: SubmeterCadastroInput): Promise<{ 
     profissaoId,
     genero,
     mobilizadorToken,
+    sucessoUrl,
   } = input
 
   const gabinete = await getGabineteBySlug(slug)
   if (!gabinete || !gabinete.ativo) return { erro: 'Gabinete não encontrado' }
 
-  const segmento = await prisma.segmento.findFirst({
-    where: { gabineteId: gabinete.id, slug: segmentoSlug, status: 'ativo' },
+  const segmentos = await prisma.segmento.findMany({
+    where: { gabineteId: gabinete.id, slug: { in: segmentoSlugs }, status: 'ativo' },
     select: { id: true },
   })
-  if (!segmento) return { erro: 'Segmento não encontrado' }
+  if (segmentos.length === 0) return { erro: 'Segmento não encontrado' }
 
   const whatsapp = normalizeWhatsApp(whatsappRaw)
   if (!whatsapp) return { erro: 'Número de WhatsApp inválido' }
@@ -80,11 +82,13 @@ export async function submeterCadastro(input: SubmeterCadastroInput): Promise<{ 
     pessoaId = criada.id
   }
 
-  await prisma.pessoaSegmento.upsert({
-    where: { pessoaId_segmentoId: { pessoaId, segmentoId: segmento.id } },
-    create: { pessoaId, segmentoId: segmento.id },
-    update: {},
-  })
+  for (const segmento of segmentos) {
+    await prisma.pessoaSegmento.upsert({
+      where: { pessoaId_segmentoId: { pessoaId, segmentoId: segmento.id } },
+      create: { pessoaId, segmentoId: segmento.id },
+      update: {},
+    })
+  }
 
   // Cria vínculo de rede apenas se ainda não existir (NULL != NULL no SQL)
   const vinculoExistente = await prisma.vinculoRede.findFirst({
@@ -101,5 +105,5 @@ export async function submeterCadastro(input: SubmeterCadastroInput): Promise<{ 
     })
   }
 
-  redirect(`/${slug}/cadastro/${segmentoSlug}/sucesso`)
+  redirect(sucessoUrl)
 }
