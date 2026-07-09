@@ -4,6 +4,14 @@ import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import { getGabineteBySlug } from '@/lib/gabinete'
 import { normalizeWhatsApp } from '@/lib/whatsapp'
+import { getSupabaseAdmin } from '@/lib/supabase/admin'
+
+const TIPOS_FOTO_PERMITIDOS = {
+  'image/jpeg': 'jpg',
+  'image/png': 'png',
+  'image/webp': 'webp',
+  'image/gif': 'gif',
+} as const
 
 type SubmeterCadastroInput = {
   slug: string
@@ -16,6 +24,7 @@ type SubmeterCadastroInput = {
   genero?: string
   mobilizadorToken?: string
   sucessoUrl: string
+  foto?: File | null
 }
 
 export async function submeterCadastro(input: SubmeterCadastroInput): Promise<{ erro: string } | never> {
@@ -30,10 +39,18 @@ export async function submeterCadastro(input: SubmeterCadastroInput): Promise<{ 
     genero,
     mobilizadorToken,
     sucessoUrl,
+    foto,
   } = input
 
   const gabinete = await getGabineteBySlug(slug)
   if (!gabinete || !gabinete.ativo) return { erro: 'Gabinete não encontrado' }
+
+  let tipoFoto: string | undefined
+  if (foto && foto.size > 0) {
+    tipoFoto = TIPOS_FOTO_PERMITIDOS[foto.type.toLowerCase() as keyof typeof TIPOS_FOTO_PERMITIDOS]
+    if (!tipoFoto) return { erro: 'Tipo de imagem não permitido — use JPEG, PNG, WebP ou GIF' }
+    if (foto.size > 5 * 1024 * 1024) return { erro: 'Imagem muito grande — máximo 5MB' }
+  }
 
   // Segmento é opcional — o link fixo do mobilizador (sem segmento, só ?m=token)
   // não passa nenhum segmentoSlug. Só é erro se slugs foram informados e nenhum
@@ -85,6 +102,24 @@ export async function submeterCadastro(input: SubmeterCadastroInput): Promise<{ 
       },
     })
     pessoaId = criada.id
+  }
+
+  if (foto && foto.size > 0 && tipoFoto) {
+    const path = `${gabinete.id}/pessoas/${pessoaId}/foto.${tipoFoto}`
+    const buffer = Buffer.from(await foto.arrayBuffer())
+    const { error } = await getSupabaseAdmin().storage
+      .from('gabinete-assets')
+      .upload(path, buffer, { upsert: true, contentType: foto.type })
+
+    if (!error) {
+      const { data: { publicUrl } } = getSupabaseAdmin().storage.from('gabinete-assets').getPublicUrl(path)
+      await prisma.pessoa.update({
+        where: { id: pessoaId },
+        data: { fotoUrl: `${publicUrl}?v=${Date.now()}` },
+      })
+    } else {
+      console.error('[submeterCadastro] storage error:', error)
+    }
   }
 
   for (const segmento of segmentos) {
