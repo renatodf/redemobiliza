@@ -105,5 +105,13 @@ export async function submeterCadastro(input: SubmeterCadastroInput): Promise<{ 
     })
   }
 
-  redirect(sucessoUrl)
+  // sucessoUrl vem de uma Server Action chamada por Client Component — um
+  // atacante pode invocar submeterCadastro diretamente (bypassando a UI) com
+  // qualquer valor. Só redireciona se for um caminho relativo same-origin.
+  const sucessoUrlSegura =
+    sucessoUrl.startsWith('/') && !sucessoUrl.startsWith('//') && !sucessoUrl.includes('://')
+      ? sucessoUrl
+      : `/${slug}`
+
+  redirect(sucessoUrlSegura)
 }
