@@ -105,13 +105,24 @@ export async function submeterCadastro(input: SubmeterCadastroInput): Promise<{ 
     })
   }
 
-  // sucessoUrl vem de uma Server Action chamada por Client Component — um
-  // atacante pode invocar submeterCadastro diretamente (bypassando a UI) com
-  // qualquer valor. Só redireciona se for um caminho relativo same-origin.
-  const sucessoUrlSegura =
-    sucessoUrl.startsWith('/') && !sucessoUrl.startsWith('//') && !sucessoUrl.includes('://')
-      ? sucessoUrl
-      : `/${slug}`
+  redirect(caminhoRelativoSeguro(sucessoUrl, `/${slug}`))
+}
 
-  redirect(sucessoUrlSegura)
+// sucessoUrl vem de uma Server Action chamada por Client Component — um
+// atacante pode invocar submeterCadastro diretamente (bypassando a UI) com
+// qualquer valor. Checar a string crua (ex: startsWith('/')) não é suficiente:
+// navegadores normalizam barra invertida e caracteres de controle antes de
+// resolver a URL (ex: "/\evil.com" e "/\t/evil.com" viram "//evil.com" —
+// origem diferente), então usamos o próprio parser de URL (mesma
+// implementação WHATWG que o navegador usa) contra uma origem fixa e só
+// aceitamos se a origem resolvida não mudou.
+function caminhoRelativoSeguro(valor: string, fallback: string): string {
+  const origemFixa = 'http://localhost.invalid'
+  try {
+    const resolvida = new URL(valor, origemFixa)
+    if (resolvida.origin !== origemFixa) return fallback
+    return resolvida.pathname + resolvida.search + resolvida.hash
+  } catch {
+    return fallback
+  }
 }
