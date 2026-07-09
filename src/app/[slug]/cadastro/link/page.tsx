@@ -17,13 +17,18 @@ export default async function CadastroLinkPage({
     .split(',')
     .map((s) => s.trim())
     .filter(Boolean)
-  if (segmentoSlugs.length === 0) notFound()
 
-  const segmentosValidos = await prisma.segmento.findMany({
-    where: { gabineteId: gabinete.id, slug: { in: segmentoSlugs }, status: 'ativo' },
-    select: { slug: true },
-  })
-  if (segmentosValidos.length === 0) notFound()
+  // Link fixo do mobilizador não tem segmento nenhum — só ?m=token. Só é 404
+  // se não há segmento E não há token de mobilizador (link vazio, sem sentido).
+  if (segmentoSlugs.length === 0 && !searchParams.m) notFound()
+
+  const segmentosValidos = segmentoSlugs.length > 0
+    ? await prisma.segmento.findMany({
+        where: { gabineteId: gabinete.id, slug: { in: segmentoSlugs }, status: 'ativo' },
+        select: { slug: true },
+      })
+    : []
+  if (segmentoSlugs.length > 0 && segmentosValidos.length === 0 && !searchParams.m) notFound()
 
   const [regioes, profissoes] = await Promise.all([
     prisma.regiao.findMany({

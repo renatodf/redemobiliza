@@ -35,11 +35,16 @@ export async function submeterCadastro(input: SubmeterCadastroInput): Promise<{ 
   const gabinete = await getGabineteBySlug(slug)
   if (!gabinete || !gabinete.ativo) return { erro: 'Gabinete não encontrado' }
 
-  const segmentos = await prisma.segmento.findMany({
-    where: { gabineteId: gabinete.id, slug: { in: segmentoSlugs }, status: 'ativo' },
-    select: { id: true },
-  })
-  if (segmentos.length === 0) return { erro: 'Segmento não encontrado' }
+  // Segmento é opcional — o link fixo do mobilizador (sem segmento, só ?m=token)
+  // não passa nenhum segmentoSlug. Só é erro se slugs foram informados e nenhum
+  // bateu (dado inválido/obsoleto); lista vazia de propósito não é erro.
+  const segmentos = segmentoSlugs.length > 0
+    ? await prisma.segmento.findMany({
+        where: { gabineteId: gabinete.id, slug: { in: segmentoSlugs }, status: 'ativo' },
+        select: { id: true },
+      })
+    : []
+  if (segmentoSlugs.length > 0 && segmentos.length === 0) return { erro: 'Segmento não encontrado' }
 
   const whatsapp = normalizeWhatsApp(whatsappRaw)
   if (!whatsapp) return { erro: 'Número de WhatsApp inválido' }
