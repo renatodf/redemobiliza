@@ -499,12 +499,9 @@ export default async function FichaPessoaPage({
 
       <MobilizadorSection
         slug={params.slug}
-        pessoaId={pessoa.id}
-        temEmail={!!pessoa.email}
         isMobilizador={pessoa.isMobilizador}
         tokenMobilizador={pessoa.tokenMobilizador ?? null}
         appUrl={getAppUrl()}
-        corPrimaria={gabinete.corPrimaria}
       />
     </div>
   )
