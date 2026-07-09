@@ -43,8 +43,11 @@ migrado pra cá — a home deixa de mostrar isso). Cada card tem:
   — **mecanismo inalterado**, o mesmo usado hoje.
 - Botão "Copiar link" com feedback visual ("Copiado!" por alguns segundos).
 - QR code do link (gerado como já é feito hoje, com a lib `qrcode`).
-- Dois botões de download: "Baixar JPG" (fundo branco) e "Baixar PNG" (fundo
-  transparente).
+- Dois botões de download: "Baixar PNG" (fundo branco) e "Baixar PNG transparente".
+  (Correção em relação à ideia original de JPG: a lib `qrcode` já usada no projeto só
+  suporta PNG/SVG/texto no servidor — `type: 'image/jpeg'` cai silenciosamente em PNG.
+  Gerar JPG de verdade exigiria duas dependências novas; decidido manter só PNG, que é
+  o formato padrão pra QR code de qualquer forma, sem lossy compression nas bordas.)
 
 Sem mudança de acesso/dados — é puramente uma tela nova reaproveitando dados que a
 home já buscava.
@@ -107,13 +110,14 @@ especial `raiz`: quando presente, filtra `VinculoRede.indicadoPorId: null` em ve
 buscar vínculos de um `pessoaId` específico. Um link "Ver Rede Raiz" fica visível perto
 dos filtros existentes da página.
 
-## Download de QR code (JPG/PNG)
+## Download de QR code (PNG opaco + PNG transparente)
 
 A lib `qrcode` (já é dependência do projeto, já usada em `/mobilizador/page.tsx`)
-suporta nativamente:
-- PNG com fundo transparente: `QRCode.toDataURL(link, { color: { light: '#0000' } })`.
-- JPG: `QRCode.toDataURL(link, { type: 'image/jpeg' })` (fundo branco, já que JPG não
-  suporta transparência).
+suporta nativamente, sem dependência nova:
+- PNG opaco (fundo branco): `QRCode.toDataURL(link, { width: 300, margin: 2 })` — o
+  mesmo que já é gerado hoje.
+- PNG transparente: `QRCode.toDataURL(link, { width: 300, margin: 2, color: { light:
+  '#ffffff00' } })` — hex de 8 dígitos com canal alpha zerado.
 
 Cada card gera as duas data URLs no servidor (mesmo padrão do `qrDataUrl` de hoje) e os
 botões de download são simplesmente `<a href={dataUrl} download="...">` — sem
