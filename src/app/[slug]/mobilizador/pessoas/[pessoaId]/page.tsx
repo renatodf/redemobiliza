@@ -72,6 +72,10 @@ export default async function MobilizadorPessoaPage({
     },
   })
 
+  const totalRede = pessoa.isMobilizador
+    ? await prisma.vinculoRede.count({ where: { indicadoPorId: pessoa.id, deletedAt: null } })
+    : 0
+
   const statusLabel: Record<string, string> = {
     aberta: 'Em aberto',
     expirada: 'Expirada',
@@ -89,7 +93,7 @@ export default async function MobilizadorPessoaPage({
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-bold">{pessoa.nome}</h1>
-        <Link href={`/${params.slug}/mobilizador/rede`} className="text-sm text-gray-500 hover:underline">
+        <Link href={`/${params.slug}/mobilizador`} className="text-sm text-gray-500 hover:underline">
           ← Voltar
         </Link>
       </div>
@@ -148,6 +152,22 @@ export default async function MobilizadorPessoaPage({
           )}
         </div>
       </div>
+
+      {pessoa.isMobilizador && (
+        <div className="bg-gray-50 rounded-lg p-4 text-sm">
+          <p className="text-xs text-gray-500">Cadastrados na Rede</p>
+          {totalRede > 0 ? (
+            <Link
+              href={`/${params.slug}/mobilizador?rede=${pessoa.id}&path=${pessoa.id}`}
+              className="text-lg font-semibold hover:underline text-gray-900"
+            >
+              {totalRede}
+            </Link>
+          ) : (
+            <p className="text-lg font-semibold text-gray-400">0</p>
+          )}
+        </div>
+      )}
 
       {/* Observações */}
       <div className="bg-white rounded-lg p-6 shadow-sm space-y-3">

@@ -1,13 +1,23 @@
+import Link from 'next/link'
 import Avatar from './Avatar'
 import LiveClock from './LiveClock'
 
 export default function Topbar({
   usuarioNome,
   usuarioFotoUrl,
+  perfilHref,
 }: {
   usuarioNome: string
   usuarioFotoUrl: string | null
+  perfilHref?: string
 }) {
+  const perfilBloco = (
+    <div className="flex items-center gap-2">
+      <Avatar fotoUrl={usuarioFotoUrl} nome={usuarioNome} size={28} />
+      <span className="text-sm hidden sm:inline text-[#494949]">{usuarioNome}</span>
+    </div>
+  )
+
   return (
     <header className="bg-white border-b border-[#D9D9D9] px-4 md:px-6 py-3 flex items-center justify-between gap-3">
       <div className="flex items-center gap-3 min-w-0">
@@ -37,10 +47,13 @@ export default function Topbar({
             0
           </span>
         </span>
-        <div className="flex items-center gap-2">
-          <Avatar fotoUrl={usuarioFotoUrl} nome={usuarioNome} size={28} />
-          <span className="text-sm hidden sm:inline text-[#494949]">{usuarioNome}</span>
-        </div>
+        {perfilHref ? (
+          <Link href={perfilHref} className="hover:opacity-80">
+            {perfilBloco}
+          </Link>
+        ) : (
+          perfilBloco
+        )}
       </div>
     </header>
   )
