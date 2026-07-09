@@ -5,7 +5,8 @@ import { getGabineteBySlug } from '@/lib/gabinete'
 import { corTextoContraste } from '@/lib/cor-contraste'
 import { atualizarObservacaoDemanda as atualizarObservacaoDemandaAction } from '@/actions/admin/atualizar-observacao-demanda'
 import { alterarPrazoDemanda as alterarPrazoDemandaAction } from '@/actions/admin/alterar-prazo-demanda'
-import { marcarDesfechoDemanda as marcarDesfechoDemandaAction } from '@/actions/admin/marcar-desfecho-demanda'
+import { alterarStatusDemanda as alterarStatusDemandaAction } from '@/actions/admin/alterar-status-demanda'
+import { editarDemanda as editarDemandaAction } from '@/actions/admin/editar-demanda'
 import { reatribuirResponsavel as reatribuirResponsavelAction } from '@/actions/admin/reatribuir-responsavel'
 
 // Wrappers para actions que retornam valores, convertendo para void para compatibilidade com form action
@@ -19,9 +20,14 @@ async function alterarPrazoDemanda(formData: FormData) {
   await alterarPrazoDemandaAction(formData)
 }
 
-async function marcarDesfechoDemanda(formData: FormData) {
+async function alterarStatusDemanda(formData: FormData) {
   'use server'
-  await marcarDesfechoDemandaAction(formData)
+  await alterarStatusDemandaAction(formData)
+}
+
+async function editarDemanda(formData: FormData) {
+  'use server'
+  await editarDemandaAction(formData)
 }
 
 async function reatribuirResponsavel(formData: FormData) {
@@ -45,7 +51,7 @@ export default async function DetalheDemandaPage({
   if (!gabinete) notFound()
   const corTexto = corTextoContraste(gabinete.corPrimaria)
 
-  const [demanda, colaboradores] = await Promise.all([
+  const [demanda, colaboradores, areas] = await Promise.all([
     prisma.demanda.findFirst({
       where: { id: params.demandaId, gabineteId: gabinete.id, deletedAt: null },
       include: {
@@ -61,12 +67,16 @@ export default async function DetalheDemandaPage({
       orderBy: { nome: 'asc' },
       select: { id: true, nome: true },
     }),
+    prisma.areaDemanda.findMany({
+      where: { gabineteId: gabinete.id },
+      orderBy: { nome: 'asc' },
+      select: { id: true, nome: true },
+    }),
   ])
 
   if (!demanda) notFound()
 
   const cfg = STATUS_CONFIG[demanda.status as keyof typeof STATUS_CONFIG] ?? { label: demanda.status, cor: 'bg-gray-100 text-gray-800' }
-  const podeEncerrar = demanda.status === 'aberta' || demanda.status === 'expirada'
   const prazoISO = demanda.prazoDesfecho.toISOString().slice(0, 16)
 
   const endereco = [demanda.solicitante.logradouro, demanda.solicitante.numero, demanda.solicitante.complemento, demanda.solicitante.bairro, demanda.solicitante.cep]
@@ -80,13 +90,20 @@ export default async function DetalheDemandaPage({
         <span className="text-gray-900 font-medium">{demanda.titulo}</span>
       </div>
 
+      <input type="checkbox" id="modo-edicao" className="peer hidden" />
+
       {/* Cabeçalho */}
       <div className="bg-white rounded-lg shadow-sm p-6 space-y-3">
         <div className="flex items-start justify-between gap-4">
           <h1 className="text-xl font-bold text-gray-900">{demanda.titulo}</h1>
-          <span className={`shrink-0 inline-block text-xs px-2 py-1 rounded-full font-medium ${cfg.cor}`}>
-            {cfg.label}
-          </span>
+          <div className="flex items-center gap-3 shrink-0">
+            <span className={`inline-block text-xs px-2 py-1 rounded-full font-medium ${cfg.cor}`}>
+              {cfg.label}
+            </span>
+            <label htmlFor="modo-edicao" className="cursor-pointer text-lg leading-none" aria-label="Editar demanda" title="Editar demanda">
+              ✏️
+            </label>
+          </div>
         </div>
         <p className="text-sm text-gray-700 whitespace-pre-wrap">{demanda.descricao}</p>
         <div className="flex flex-wrap gap-4 text-xs text-gray-500 border-t border-gray-100 pt-3">
@@ -97,6 +114,55 @@ export default async function DetalheDemandaPage({
             {demanda.prazoAlterado && ' ⚑ alterado'}
           </span>
         </div>
+      </div>
+
+      {/* Editar dados (só em modo edição) */}
+      <div className="hidden peer-checked:block bg-white rounded-lg shadow-sm p-6 space-y-3">
+        <h2 className="text-base font-semibold">Editar dados</h2>
+        <form action={editarDemanda} className="space-y-3">
+          <input type="hidden" name="slug" value={params.slug} />
+          <input type="hidden" name="demandaId" value={demanda.id} />
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">Título</label>
+            <input
+              name="titulo"
+              type="text"
+              defaultValue={demanda.titulo}
+              required
+              className="block w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">Descrição</label>
+            <textarea
+              name="descricao"
+              rows={3}
+              defaultValue={demanda.descricao}
+              required
+              className="block w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">Área</label>
+            <select
+              name="areaId"
+              defaultValue={demanda.areaId}
+              required
+              className="block w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+            >
+              {areas.map((a) => (
+                <option key={a.id} value={a.id}>{a.nome}</option>
+              ))}
+            </select>
+          </div>
+          <button
+            type="submit"
+            style={{ backgroundColor: gabinete.corPrimaria, color: corTexto }}
+            className="px-4 py-2 rounded-md text-sm font-medium"
+          >
+            Salvar dados
+          </button>
+        </form>
       </div>
 
       {/* Solicitante */}
@@ -137,9 +203,16 @@ export default async function DetalheDemandaPage({
       {/* Observação */}
       <div className="bg-white rounded-lg shadow-sm p-6 space-y-3">
         <h2 className="text-base font-semibold">Observação</h2>
-        {demanda.observacao && (
+        {demanda.observacao ? (
           <p className="text-sm text-gray-700 whitespace-pre-wrap bg-gray-50 rounded p-3">{demanda.observacao}</p>
+        ) : (
+          <p className="text-sm text-gray-500">Nenhuma observação registrada.</p>
         )}
+      </div>
+
+      {/* Editar observação (só em modo edição) */}
+      <div className="hidden peer-checked:block bg-white rounded-lg shadow-sm p-6 space-y-3">
+        <h2 className="text-base font-semibold">Atualizar observação</h2>
         <form action={atualizarObservacaoDemanda} className="space-y-2">
           <input type="hidden" name="slug" value={params.slug} />
           <input type="hidden" name="demandaId" value={demanda.id} />
@@ -160,58 +233,58 @@ export default async function DetalheDemandaPage({
         </form>
       </div>
 
-      {/* Alterar prazo */}
-      {podeEncerrar && (
-        <div className="bg-white rounded-lg shadow-sm p-6 space-y-3">
-          <h2 className="text-base font-semibold">Alterar prazo</h2>
-          <form action={alterarPrazoDemanda} className="space-y-3">
-            <input type="hidden" name="slug" value={params.slug} />
-            <input type="hidden" name="demandaId" value={demanda.id} />
-            <input
-              name="novoPrazo"
-              type="datetime-local"
-              defaultValue={prazoISO}
-              required
-              className="border border-gray-300 rounded-md px-3 py-2 text-sm"
-            />
-            <textarea
-              name="justificativa"
-              required
-              rows={2}
-              placeholder="Justificativa obrigatória..."
-              className="block w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
-            />
-            <button type="submit" className="bg-orange-600 text-white px-4 py-2 rounded-md text-sm font-medium">
-              Alterar prazo
-            </button>
-          </form>
-        </div>
-      )}
+      {/* Status (só em modo edição) */}
+      <div className="hidden peer-checked:block bg-white rounded-lg shadow-sm p-6 space-y-3">
+        <h2 className="text-base font-semibold">Status</h2>
+        <form action={alterarStatusDemanda} className="flex gap-3">
+          <input type="hidden" name="slug" value={params.slug} />
+          <input type="hidden" name="demandaId" value={demanda.id} />
+          <select
+            name="novoStatus"
+            defaultValue={demanda.status}
+            required
+            className="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm"
+          >
+            <option value="aberta">Em aberto</option>
+            <option value="expirada">Expirada</option>
+            <option value="atendida">Atendida</option>
+            <option value="nao_atendida">Não atendida</option>
+          </select>
+          <button
+            type="submit"
+            style={{ backgroundColor: gabinete.corPrimaria, color: corTexto }}
+            className="px-4 py-2 rounded-md text-sm font-medium"
+          >
+            Salvar status
+          </button>
+        </form>
+      </div>
 
-      {/* Desfecho */}
-      {podeEncerrar && (
-        <div className="bg-white rounded-lg shadow-sm p-6 space-y-3">
-          <h2 className="text-base font-semibold">Desfecho</h2>
-          <div className="flex gap-3">
-            <form action={marcarDesfechoDemanda}>
-              <input type="hidden" name="slug" value={params.slug} />
-              <input type="hidden" name="demandaId" value={demanda.id} />
-              <input type="hidden" name="desfecho" value="atendida" />
-              <button type="submit" className="bg-green-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-green-700">
-                ✓ Marcar como Atendida
-              </button>
-            </form>
-            <form action={marcarDesfechoDemanda}>
-              <input type="hidden" name="slug" value={params.slug} />
-              <input type="hidden" name="demandaId" value={demanda.id} />
-              <input type="hidden" name="desfecho" value="nao_atendida" />
-              <button type="submit" className="bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-red-700">
-                ✗ Marcar como Não Atendida
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
+      {/* Prazo (só em modo edição) */}
+      <div className="hidden peer-checked:block bg-white rounded-lg shadow-sm p-6 space-y-3">
+        <h2 className="text-base font-semibold">Alterar prazo</h2>
+        <form action={alterarPrazoDemanda} className="space-y-3">
+          <input type="hidden" name="slug" value={params.slug} />
+          <input type="hidden" name="demandaId" value={demanda.id} />
+          <input
+            name="novoPrazo"
+            type="datetime-local"
+            defaultValue={prazoISO}
+            required
+            className="border border-gray-300 rounded-md px-3 py-2 text-sm"
+          />
+          <textarea
+            name="justificativa"
+            required
+            rows={2}
+            placeholder="Justificativa obrigatória..."
+            className="block w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
+          />
+          <button type="submit" className="bg-orange-600 text-white px-4 py-2 rounded-md text-sm font-medium">
+            Alterar prazo
+          </button>
+        </form>
+      </div>
 
       {/* Linha do tempo */}
       <div className="bg-white rounded-lg shadow-sm p-6 space-y-4">
