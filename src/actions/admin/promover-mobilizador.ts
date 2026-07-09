@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { prisma } from '@/lib/prisma'
 import { assertAdminAccess } from '@/lib/assert-admin-access'
 import { getSupabaseAdmin } from '@/lib/supabase/admin'
+import { criarOuReaproveitarUsuarioMobilizador } from '@/lib/supabase/criar-usuario-mobilizador'
 import { enviarEmail, escapeHtml } from '@/lib/email'
 
 export async function promoverMobilizador(
@@ -29,12 +30,9 @@ export async function promoverMobilizador(
     if (!pessoa.email) return { erro: 'Pessoa não tem e-mail cadastrado. Adicione um e-mail antes de promover.' }
     if (pessoa.isMobilizador) return { erro: 'Pessoa já é mobilizadora.' }
 
-    const { data, error } = await getSupabaseAdmin().auth.admin.createUser({
-      email: pessoa.email,
-      password: senha,
-      email_confirm: true,
-    })
-    if (error || !data.user) return { erro: 'Erro ao criar acesso: ' + (error?.message ?? 'desconhecido') }
+    const resultado = await criarOuReaproveitarUsuarioMobilizador(getSupabaseAdmin(), pessoa.email, senha)
+    if ('erro' in resultado) return { erro: resultado.erro }
+    const { userId, criadoAgora } = resultado
 
     const tokenMobilizador = crypto.randomUUID().replace(/-/g, '')
 
@@ -42,15 +40,15 @@ export async function promoverMobilizador(
       await prisma.$transaction([
         prisma.pessoa.update({
           where: { id: pessoaId },
-          data: { isMobilizador: true, userId: data.user.id, tokenMobilizador },
+          data: { isMobilizador: true, userId, tokenMobilizador },
         }),
         prisma.usuarioGabinete.create({
-          data: { userId: data.user.id, gabineteId: gabinete.id, papel: 'mobilizador' },
+          data: { userId, gabineteId: gabinete.id, papel: 'mobilizador' },
         }),
       ])
     } catch (txError) {
-      // Cleanup orphaned Supabase user
-      await getSupabaseAdmin().auth.admin.deleteUser(data.user.id)
+      // Só remove o usuário do Supabase se fomos nós que acabamos de criá-lo agora
+      if (criadoAgora) await getSupabaseAdmin().auth.admin.deleteUser(userId)
       throw txError
     }
 
