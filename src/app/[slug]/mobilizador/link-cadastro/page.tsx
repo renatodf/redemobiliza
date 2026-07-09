@@ -5,6 +5,7 @@ import QRCode from 'qrcode'
 import { prisma } from '@/lib/prisma'
 import { getGabineteBySlug } from '@/lib/gabinete'
 import { getAppUrl } from '@/lib/app-url'
+import CopiarLinkButton from './CopiarLinkButton'
 
 export default async function MobilizadorLinkCadastroPage({
   params,
@@ -52,15 +53,10 @@ export default async function MobilizadorLinkCadastroPage({
       <div className="bg-white rounded-lg p-6 shadow-sm space-y-4">
         <div>
           <p className="text-xs text-gray-500 mb-1">Seu link personalizado</p>
-          <p className="text-sm text-blue-600 break-all">{link}</p>
-          <a
-            href={link}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-block mt-1 text-xs text-blue-600 underline"
-          >
-            Abrir link
-          </a>
+          <div className="flex items-center gap-3">
+            <p className="text-sm text-blue-600 break-all flex-1">{link}</p>
+            <CopiarLinkButton link={link} corPrimaria={gabinete.corPrimaria} />
+          </div>
         </div>
         <div className="flex flex-col items-center gap-3">
           {/* eslint-disable-next-line @next/next/no-img-element */}
