@@ -24,7 +24,7 @@ function buildItensAdmin(slug: string): ItemMenu[] {
     { label: 'Demandas', href: `/${slug}/admin/demandas`, icone: 'demandas' },
     { label: 'Tarefas', emBreve: true, icone: 'tarefas' },
     { label: 'Banco de Talentos', emBreve: true, icone: 'banco-talentos' },
-    { label: 'Link de Cadastro', emBreve: true, icone: 'link-cadastro' },
+    { label: 'Link de Cadastro', href: `/${slug}/admin/link-cadastro`, icone: 'link-cadastro' },
     { label: 'Importar/Exportar', emBreve: true, icone: 'importar-exportar' },
     { label: 'Configurações', href: `/${slug}/admin/configuracoes`, icone: 'configuracoes' },
   ]
@@ -34,6 +34,7 @@ function buildItensMobilizador(slug: string): ItemMenu[] {
   return [
     { label: 'Início', href: `/${slug}/mobilizador`, icone: 'inicio' },
     { label: 'Demandas', href: `/${slug}/mobilizador/demandas`, icone: 'demandas' },
+    { label: 'Link de Cadastro', href: `/${slug}/mobilizador/link-cadastro`, icone: 'link-cadastro' },
   ]
 }
 
