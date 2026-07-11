@@ -1,6 +1,6 @@
 # HANDOFF — Rede Mobiliza
 
-> Documento de transição gerado em 2026-07-10, a partir do histórico completo do projeto (245 commits) e dos specs/plans em `docs/superpowers/`. HEAD no momento: `4746de7` (branch `main`).
+> Documento de transição gerado em 2026-07-10, a partir do histórico completo do projeto (245 commits) e dos specs/plans em `docs/superpowers/`. Atualizado em 2026-07-11 com o trabalho da sessão seguinte (Central de Filtros — aba Pessoas e exportação assíncrona, seção 11 abaixo). HEAD no momento da última atualização: `ced0330` (branch `main`).
 
 ## O que é o projeto
 
@@ -52,6 +52,22 @@ Home vira a listagem da rede (reaproveitando `UsuariosTable` em modo somente-lei
 
 > ⚠️ **O spec deste módulo está desatualizado**: `docs/superpowers/specs/2026-07-09-link-de-cadastro-design.md` ainda descreve o design original (card por segmento para o mobilizador), que foi abandonado em favor do link fixo após teste real revelar que um gabinete sem nenhum `Segmento` quebrava o design original. O spec não foi corrigido para refletir o que foi de fato construído.
 
+### 11. Central de Filtros e Exportação — apenas Fase 1: aba Pessoas (11/07)
+
+Spec completo em `docs/superpowers/specs/2026-07-11-central-de-filtros-design.md`: uma tela de filtros/exportação acessível pelo ícone de lupa do Topbar (antes decorativo), com três abas planejadas — **Pessoas**, **Demandas** e **Banco de Talentos** — cada uma com filtros combináveis e exportação própria. **Só a aba Pessoas foi construída até agora**; as abas Demandas e Banco de Talentos aparecem desabilitadas na UI (`FiltrosTabs.tsx`, rótulo "Em breve") e não têm rota nem componente implementados.
+
+O que existe hoje:
+- Rotas `/[slug]/admin/filtros` (casca de abas) e `/[slug]/mobilizador/filtros` (só Pessoas, sem casca de abas — mobilizador não tem acesso a Demandas/Banco de Talentos nesta tela).
+- `PessoasFiltro.tsx`: filtros combináveis por aniversário (dia/semana/mês, ignora ano), sexo, região, faixa de idade, profissão e segmento (multi-select); botão "Limpar filtro" ao lado de "Filtrar".
+- Escopo: admin vê o gabinete inteiro; mobilizador vê apenas a própria sub-rede — **toda a sub-árvore de indicações**, não só indicados diretos. Isso exigiu `coletarSubRedeIds(pessoaId, gabineteId)` em `src/lib/rede.ts`, uma **CTE recursiva em SQL bruto** (`prisma.$queryRaw`, já que Prisma não suporta consulta recursiva nativa) com proteção contra ciclo (`d5501c3`).
+- Exportação síncrona em `GET /api/[slug]/filtros/pessoas/exportar`: gera PDF (`pdf-lib`, não `pdfkit` como o spec original menciona — decisão tomada na implementação) ou Excel (`exceljs`) com nome/WhatsApp/e-mail/região/profissão/segmentos/nascimento, e devolve como download direto.
+- Funções puras de aniversário/idade em `src/lib/aniversario.ts`; where-builder + filtro pós-consulta (para os campos que não dá pra expressar em `where` do Prisma, ex. faixa etária calculada) em `src/lib/filtros-pessoas.ts`.
+
+**Exportação assíncrona por e-mail para 500+ pessoas — implementada nesta sessão**, seguindo o plano em `docs/superpowers/plans/2026-07-11-central-de-filtros-exportacao-assincrona.md`: `LIMITE_EXPORT_SINCRONO = 500` (`src/lib/filtros-pessoas.ts`), aviso na UI quando `totalFiltrado >= 500`, botão "Limpar filtro"; acima do limite a rota responde na hora com página de confirmação e gera o arquivo em segundo plano (fire-and-forget — seguro porque o processo Node do Docker é persistente), sobe pro bucket `gabinete-assets` com link assinado de 48h (`uploadExportacaoESaerAssinada`, `src/lib/upload-exportacao.ts`) e envia por e-mail (`templateExportacaoPronta`, `src/lib/email.ts`). Destinatário é sempre `session.user.email` de quem pediu (fix pós-revisão — ver pendência 3).
+
+**Ainda não implementado (spec já escrito, aguardando):**
+- Abas Demandas e Banco de Talentos (filtros, exportação PDF/Excel de Demandas; exportação em ZIP de currículos + fluxo de encaminhamento em massa para Demanda no Banco de Talentos).
+
 ---
 
 ## Decisões técnicas importantes e por quê
@@ -65,6 +81,8 @@ Home vira a listagem da rede (reaproveitando `UsuariosTable` em modo somente-lei
 - **QR code**: lib `qrcode`, `toDataURL()` server-side — só PNG/SVG/texto funcionam de verdade no servidor (`type:'image/jpeg'` cai silenciosamente para PNG); PNG transparente via hex de 8 dígitos com alpha (`#ffffff00`).
 - **Deploy manual obrigatório**: EasyPanel com `autoDeploy:false` — todo `git push` precisa ser seguido de um curl no webhook de deploy. Dois remotes: `origin` (`rede-mobiliza`, canônico) e `easypanel` (`redemobiliza`, espelho que o EasyPanel observa).
 - **Tema dinâmico por gabinete** (`corPrimaria`/`corTextoContraste()`) aplicado em quase toda a UI — **exceção conhecida**: a tela pública `/cadastro/*` ainda usa `bg-blue-600` fixo, nunca recebeu a cor do gabinete.
+- **Sub-rede completa via CTE recursiva**: como Prisma não suporta consulta recursiva nativa, `coletarSubRedeIds` (`src/lib/rede.ts`) usa `prisma.$queryRaw` para percorrer `VinculoRede.indicadoPorId` recursivamente, com proteção explícita contra ciclo — reaproveitável por qualquer tela futura que precise da árvore de indicação completa de um mobilizador, não só um nível.
+- **Exportação em lote usa link assinado, não público**: diferente do padrão de upload de foto/currículo individual (URL pública fixa), arquivos de exportação em massa (potencialmente centenas de registros com dado pessoal de uma vez) usam `createSignedUrl` com expiração — ver seção 11 e pendência 3.
 
 ---
 
@@ -88,20 +106,24 @@ Home vira a listagem da rede (reaproveitando `UsuariosTable` em modo somente-lei
 | `8e08818` | `promoverMobilizador` não gerava `tokenMobilizador` → 404 no login do mobilizador |
 | `d705184`/`131d5ee` | Promoção de mobilizador reaproveitava conta órfã do Supabase Auth (e inicialmente reaproveitava a senha — corrigido no mesmo dia) |
 | `c7c813b` | Paginação quebrava depois da página 7 (joins mortos de demanda) |
-| `5e304f3` (esta sessão) | Link do mobilizador redesenhado pra link fixo após gabinete real sem nenhum Segmento quebrar o design original |
-| `4746de7` (esta sessão) | Botão nativo de input de arquivo com aparência inconsistente — substituído por `<label>` totalmente estilizado |
+| `5e304f3` | Link do mobilizador redesenhado pra link fixo após gabinete real sem nenhum Segmento quebrar o design original |
+| `4746de7` | Botão nativo de input de arquivo com aparência inconsistente — substituído por `<label>` totalmente estilizado |
+| `31df5a4` | Confirmação de presença de pessoa já cadastrada exigia `nome` incorretamente antes de checar se a pessoa já existia (ver pendência 1 da versão anterior deste documento — corrigido) |
+| `f278147`/`ff2347a` | Incompatibilidade de tipo Buffer/exceljs no teste de exportação, e `as any` (bloqueado pelo ESLint `no-explicit-any`) trocado por `Uint8Array` — build Docker estava quebrando por isso |
 
 ---
 
 ## Pendências / próximos passos conhecidos
 
-1. **Bug pré-existente, sinalizado e não corrigido** (flagrado por um revisor durante o plano de Link de Cadastro, fora do escopo daquela feature): em `src/actions/public/submeter-cadastro.ts`, `handleConfirmar` (`CadastroForm.tsx`) envia `nome: ''`, mas `submeterCadastro` valida `!nome.trim()` **antes** de checar se a pessoa já existe — então o fluxo "já cadastrado, só confirmar presença" sempre retorna erro "Nome é obrigatório". Confirmado ainda presente no código atual.
-2. **Banco de Talentos incompleto**: falta dashboard, tela de listagem/filtros, seleção múltipla + exportação em ZIP de currículos, e o fluxo de encaminhamento para Demanda — tudo especificado em `docs/superpowers/specs/2026-06-28-banco-de-talentos-design.md` mas nunca implementado.
-3. **Spec de Link de Cadastro desatualizado** — precisa ser corrigido para refletir o design de link fixo (ver seção 10 acima).
-4. **Domínio de e-mail do Resend nunca configurado**: o spec do módulo de Demandas já listava isso como pendência em 27/06 ("configurar domínio de envio no Resend (DNS)", "definir endereço de remetente"). Variável de produção atual (`REMETENTE_EMAIL=onboarding@resend.dev`, conforme memória do projeto) sugere que ainda está no domínio sandbox do Resend, que restringe destinatários.
-5. **"Dados Gerais"**: usuário mencionou (conversa, não spec) querer um dashboard como nova tela inicial do sistema, com o botão "Usuários" ficando só com a listagem atual — não especificado nem planejado ainda.
-6. **README.md é o stub padrão do `create-next-app`** (36 linhas, texto genérico), não versionado no git, sem nenhuma documentação real do projeto.
-7. **Tema dinâmico do gabinete não chega na tela pública `/cadastro/*`** — ainda usa azul fixo (`bg-blue-600`), diferente do resto do sistema.
+1. ~~Bug de confirmação de presença exigindo nome~~ — **corrigido em `31df5a4`** (11/07).
+2. **Banco de Talentos incompleto — agora reenquadrado como parte da Central de Filtros**: a aba "Banco de Talentos" da Central de Filtros (seção 11 acima) assume o papel do dashboard/listagem que o spec original de 28/06 previa. Nem essa aba nem a aba Demandas foram construídas ainda — só filtro/exportação de Pessoas existe. Ver `docs/superpowers/specs/2026-07-11-central-de-filtros-design.md` para o desenho completo pendente (filtros de Demandas; filtros + ZIP de currículos + encaminhamento em massa de Banco de Talentos).
+3. ~~Exportação assíncrona por e-mail (Pessoas, 500+ registros)~~ — **implementada nesta sessão** (plano `docs/superpowers/plans/2026-07-11-central-de-filtros-exportacao-assincrona.md`, 4 tasks + 1 fix pós-revisão, ver `.superpowers/sdd/progress.md`). Decisão tomada durante a implementação: quem recebe o e-mail de exportação é sempre a **conta logada que pediu o download** (`session.user.email`), não uma ficha de `Pessoa` — diferente do padrão de alertas (Demanda hoje, Agenda no futuro), que notificam **todos os vinculados à entidade**. Ver pendência 9 abaixo.
+4. **Spec de Link de Cadastro desatualizado** — precisa ser corrigido para refletir o design de link fixo (ver seção 10 acima).
+5. **Domínio de e-mail do Resend nunca configurado**: o spec do módulo de Demandas já listava isso como pendência em 27/06 ("configurar domínio de envio no Resend (DNS)", "definir endereço de remetente"). Variável de produção atual (`REMETENTE_EMAIL=onboarding@resend.dev`, conforme memória do projeto) sugere que ainda está no domínio sandbox do Resend, que restringe destinatários — **agora também bloqueia o e-mail de exportação pronta** da pendência 3 acima, não só os alertas de Demandas. Ver pendência 9: a ideia de e-mail de sistema por gabinete pode ser a solução definitiva pra isso.
+6. **"Dados Gerais"**: usuário mencionou (conversa, não spec) querer um dashboard como nova tela inicial do sistema, com o botão "Usuários" ficando só com a listagem atual — não especificado nem planejado ainda.
+7. **README.md é o stub padrão do `create-next-app`** (36 linhas, texto genérico), não versionado no git, sem nenhuma documentação real do projeto.
+8. **Tema dinâmico do gabinete não chega na tela pública `/cadastro/*`** — ainda usa azul fixo (`bg-blue-600`), diferente do resto do sistema.
+9. **Ideia (conversa, não spec): e-mail de sistema por gabinete**. Cada gabinete teria seu próprio remetente de e-mail ("nome do gabinete"), reaproveitado por todo tipo de aviso do sistema — alertas de Demanda (já existe), alertas de Agenda (**módulo de Agenda ainda nem existe** — mencionado como algo futuro, onde um evento poderá ter várias pessoas vinculadas), e o e-mail de exportação pronta (pendência 3). Não especificado nem planejado ainda; pode ser a solução para a pendência 5 (domínio Resend em sandbox) se o remetente por gabinete vier com domínio verificado próprio.
 
 ---
 

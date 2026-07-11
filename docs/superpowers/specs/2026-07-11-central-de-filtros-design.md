@@ -62,7 +62,7 @@ Exportações com **500 pessoas ou mais** não bloqueiam a resposta HTTP esperan
 2. Ao clicar em exportar, a rota responde imediatamente com uma página de confirmação ("Sua exportação foi iniciada — você vai receber um e-mail com o link de download em alguns minutos"), e continua gerando o arquivo em segundo plano no mesmo processo (não há fila/job separado — o servidor roda em processo Node persistente no Docker, não serverless, então uma tarefa em background sobrevive normalmente após a resposta ser enviada).
 3. O arquivo gerado é enviado pro bucket `gabinete-assets` (mesmo já usado no projeto), em `{gabineteId}/exports/{exportId}.{ext}`.
 4. O link de download é um **link assinado do Supabase Storage** (`createSignedUrl`), válido por **48 horas** — não o link público usado hoje pra fotos/currículos. Dado exportado em lote (telefone, endereço, PcD, etc. de muitas pessoas de uma vez) tem risco maior que um único arquivo de perfil, então não fica com URL pública permanente.
-5. O e-mail é enviado (via `enviarEmail`, já integrado com Resend) pro e-mail de quem pediu a exportação (`Pessoa.email` da sessão de quem clicou).
+5. O e-mail é enviado (via `enviarEmail`, já integrado com Resend) pro e-mail da **conta logada** que pediu a exportação (`session.user.email`) — não uma ficha de `Pessoa`, já que nem todo admin necessariamente tem uma. Diferente do padrão de alertas (Demanda hoje, Agenda no futuro), que notificam todos os vinculados à entidade — esse padrão fica fora do escopo do e-mail de exportação.
 
 Abaixo de 500 pessoas, o comportamento continua exatamente como antes: download direto, sem passar por armazenamento nem e-mail.
 
