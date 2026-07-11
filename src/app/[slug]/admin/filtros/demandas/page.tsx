@@ -25,7 +25,8 @@ export default async function AdminFiltrosDemandasPage({
   }
 
   const where = buildWhereDemandas(gabinete.id, filtros)
-  const pagina = Math.max(1, Number(searchParams.page ?? 1))
+  const paginaBruta = Number(searchParams.page ?? 1)
+  const pagina = Number.isFinite(paginaBruta) ? Math.max(1, Math.floor(paginaBruta)) : 1
   const skip = (pagina - 1) * TAMANHO_PAGINA
   const take = TAMANHO_PAGINA
 
