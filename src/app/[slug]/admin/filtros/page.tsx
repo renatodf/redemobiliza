@@ -65,7 +65,7 @@ export default async function AdminFiltrosPage({
       <FiltrosTabs
         abas={[
           { chave: 'pessoas', label: 'Pessoas', href: `/${params.slug}/admin/filtros` },
-          { chave: 'demandas', label: 'Demandas' },
+          { chave: 'demandas', label: 'Demandas', href: `/${params.slug}/admin/filtros/demandas` },
           { chave: 'banco-talentos', label: 'Banco de Talentos' },
         ]}
         abaAtiva="pessoas"
