@@ -1,0 +1,123 @@
+// src/app/api/[slug]/filtros/banco-talentos/exportar/route.ts
+import JSZip from 'jszip'
+import { NextRequest, NextResponse } from 'next/server'
+import { prisma } from '@/lib/prisma'
+import { assertAdminAccess } from '@/lib/assert-admin-access'
+import { enviarEmail, templateDemandaAtribuida } from '@/lib/email'
+import { getAppUrl } from '@/lib/app-url'
+import { garantirAreaEmprego } from '@/lib/garantir-area-emprego'
+
+export async function POST(request: NextRequest, { params }: { params: { slug: string } }) {
+  let gabineteId: string
+  let userId: string
+
+  try {
+    const { session, gabinete } = await assertAdminAccess(params.slug)
+    gabineteId = gabinete.id
+    userId = session.user.id
+  } catch {
+    return new NextResponse('Não autorizado', { status: 403 })
+  }
+
+  const formData = await request.formData()
+  const pessoaIds = formData.getAll('pessoaId').map(String)
+  const abrirDemanda = formData.get('abrirDemanda') === 'sim'
+  const responsavelId = formData.get('responsavelId') as string | null
+
+  if (pessoaIds.length === 0) {
+    return new NextResponse('Nenhum candidato selecionado', { status: 400 })
+  }
+
+  // Revalida contra o gabinete — IDs de outro tenant (form adulterado) somem
+  // silenciosamente da lista, nunca causam erro nem vazam dado.
+  const pessoas = await prisma.pessoa.findMany({
+    where: { id: { in: pessoaIds }, gabineteId },
+    select: {
+      id: true,
+      nome: true,
+      bancoTalentos: { select: { curriculoUrl: true } },
+    },
+  })
+
+  if (abrirDemanda) {
+    if (!responsavelId) return new NextResponse('Responsável obrigatório', { status: 400 })
+
+    const responsavel = await prisma.pessoa.findFirst({
+      where: { id: responsavelId, gabineteId, isMobilizador: true, isColaborador: true },
+      select: { id: true, nome: true, email: true },
+    })
+    if (!responsavel) return new NextResponse('Responsável inválido', { status: 400 })
+
+    const autorPessoa = await prisma.pessoa.findFirst({
+      where: { userId, gabineteId },
+      select: { id: true },
+    })
+    if (!autorPessoa) return new NextResponse('Não foi possível identificar o autor', { status: 400 })
+
+    const areaEmpregoId = await garantirAreaEmprego(gabineteId)
+    const config = await prisma.configuracaoSistema.findUnique({ where: { gabineteId } })
+    const horasPrazo = config?.prazoDemandasHoras ?? 72
+    const prazoDesfecho = new Date(Date.now() + horasPrazo * 60 * 60 * 1000)
+    const appUrl = getAppUrl()
+
+    for (const p of pessoas) {
+      const titulo = `Acompanhamento de encaminhamento — ${p.nome}`
+      const demanda = await prisma.demanda.create({
+        data: {
+          gabineteId,
+          titulo,
+          descricao: 'Encaminhamento gerado a partir do Banco de Talentos.',
+          solicitanteId: p.id,
+          responsavelId,
+          areaId: areaEmpregoId,
+          prazoDesfecho,
+          criadoPorId: autorPessoa.id,
+          historico: {
+            create: { tipo: 'criacao', descricao: 'Demanda criada', autorId: autorPessoa.id },
+          },
+        },
+      })
+
+      if (responsavel.email) {
+        try {
+          await enviarEmail({
+            para: responsavel.email,
+            assunto: `Nova demanda atribuída: ${titulo}`,
+            html: templateDemandaAtribuida({
+              nomeResponsavel: responsavel.nome,
+              tituloDemanda: titulo,
+              nomeSolicitante: p.nome,
+              prazo: prazoDesfecho,
+              urlDemanda: `${appUrl}/${params.slug}/mobilizador/demandas/${demanda.id}`,
+            }),
+          })
+        } catch {
+          // falha no email não bloqueia a criação da demanda
+        }
+      }
+    }
+  }
+
+  const zip = new JSZip()
+  for (const p of pessoas) {
+    const url = p.bancoTalentos?.curriculoUrl
+    if (!url) continue
+    const resposta = await fetch(url)
+    if (!resposta.ok) continue
+    const buffer = Buffer.from(await resposta.arrayBuffer())
+    const extensao = url.split('.').pop()?.split('?')[0] ?? 'pdf'
+    const nomeArquivo = `${p.nome.replace(/\s+/g, '_')}.${extensao}`
+    zip.file(nomeArquivo, buffer)
+  }
+
+  const zipBuffer = await zip.generateAsync({ type: 'nodebuffer' })
+  const hoje = new Date()
+  const dataFormatada = `${String(hoje.getDate()).padStart(2, '0')}_${String(hoje.getMonth() + 1).padStart(2, '0')}_${hoje.getFullYear()}`
+
+  return new NextResponse(new Uint8Array(zipBuffer), {
+    headers: {
+      'Content-Type': 'application/zip',
+      'Content-Disposition': `attachment; filename="curriculos_${dataFormatada}.zip"`,
+    },
+  })
+}
