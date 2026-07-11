@@ -1,5 +1,6 @@
 // src/app/[slug]/admin/filtros/PessoasFiltro.tsx
 import Pagination from '@/components/admin/Pagination'
+import { LIMITE_EXPORT_SINCRONO } from '@/lib/filtros-pessoas'
 
 type PessoaLinha = {
   id: string
@@ -107,10 +108,23 @@ export default function PessoasFiltro({
         >
           Filtrar
         </button>
+        <a
+          href={baseHref}
+          className="text-sm text-gray-500 underline px-2 py-1.5 hover:text-gray-700"
+        >
+          Limpar filtro
+        </a>
       </form>
 
       <div className="flex items-center justify-between flex-wrap gap-2">
-        <p className="text-sm text-gray-600">{totalFiltrado.toLocaleString('pt-BR')} pessoa(s) encontrada(s)</p>
+        <div>
+          <p className="text-sm text-gray-600">{totalFiltrado.toLocaleString('pt-BR')} pessoa(s) encontrada(s)</p>
+          {totalFiltrado >= LIMITE_EXPORT_SINCRONO && (
+            <p className="text-xs text-amber-600 mt-0.5">
+              Esse filtro tem muitos resultados — o arquivo será enviado por e-mail.
+            </p>
+          )}
+        </div>
         <div className="flex gap-2">
           <a
             href={`${exportarHref}?${queryAtual}${separador}formato=pdf`}

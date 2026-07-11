@@ -1,5 +1,11 @@
 import { estaNoIntervaloAniversario, calcularIdade } from './aniversario'
 
+// Acima disso, a exportação não bloqueia a resposta HTTP esperando o
+// arquivo inteiro ser gerado — vira um fluxo assíncrono por e-mail (ver
+// rota de exportação). Constante única, reaproveitada pela UI (aviso) e
+// pela rota (decisão real), pra nunca ficar dessincronizado.
+export const LIMITE_EXPORT_SINCRONO = 500
+
 export type FiltrosPessoasParams = {
   genero?: string
   regiaoId?: string
