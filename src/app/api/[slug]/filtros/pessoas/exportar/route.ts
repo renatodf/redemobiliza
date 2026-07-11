@@ -53,18 +53,32 @@ async function gerarESalvarExportacao(
 export async function GET(request: NextRequest, { params }: { params: { slug: string } }) {
   let gabineteId: string
   let idsRede: string[] | undefined
-  let userId: string
+  // Quem recebe o e-mail de exportação é sempre a conta logada que pediu o
+  // download (não a ficha de Pessoa, que pode nem existir para um admin) —
+  // decisão do usuário, diferente do padrão de alertas (Demanda/Agenda),
+  // que notificam todos os vinculados à entidade.
+  let solicitante: { nome: string; email: string } | undefined
 
   try {
     const { session, gabinete } = await assertAdminAccess(params.slug)
     gabineteId = gabinete.id
-    userId = session.user.id
+    if (session.user.email) {
+      solicitante = {
+        nome: (session.user.user_metadata?.full_name as string | undefined) ?? session.user.email,
+        email: session.user.email,
+      }
+    }
   } catch {
     try {
       const { session, gabinete, pessoa } = await assertMobilizadorAccess(params.slug)
       gabineteId = gabinete.id
       idsRede = await coletarSubRedeIds(pessoa.id, gabinete.id)
-      userId = session.user.id
+      if (session.user.email) {
+        solicitante = {
+          nome: (session.user.user_metadata?.full_name as string | undefined) ?? session.user.email,
+          email: session.user.email,
+        }
+      }
     } catch {
       return new NextResponse('Não autorizado', { status: 403 })
     }
@@ -99,19 +113,12 @@ export async function GET(request: NextRequest, { params }: { params: { slug: st
   const pessoas = aplicarFiltrosPosConsulta(candidatas, filtros, new Date())
 
   if (pessoas.length >= LIMITE_EXPORT_SINCRONO) {
-    const solicitante = await prisma.pessoa.findFirst({
-      where: { userId, gabineteId },
-      select: { nome: true, email: true },
-    })
-    if (solicitante?.email) {
-      gerarESalvarExportacao(pessoas, formato, gabineteId, {
-        nome: solicitante.nome,
-        email: solicitante.email,
-      }).catch((err) => {
+    if (solicitante) {
+      gerarESalvarExportacao(pessoas, formato, gabineteId, solicitante).catch((err) => {
         console.error('[exportar-pessoas] falha na exportação assíncrona:', err)
       })
     } else {
-      console.error('[exportar-pessoas] solicitante sem e-mail cadastrado — exportação assíncrona não enviada')
+      console.error('[exportar-pessoas] sessão sem e-mail — exportação assíncrona não enviada')
     }
     return new NextResponse(paginaConfirmacao(), {
       headers: { 'Content-Type': 'text/html; charset=utf-8' },
