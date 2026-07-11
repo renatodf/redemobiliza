@@ -248,24 +248,33 @@ export default function CadastroForm({
                   )}
                 </div>
                 <div className="flex-1 space-y-1">
-                  <input
-                    ref={inputFotoRef}
-                    name="foto"
-                    type="file"
-                    accept="image/*"
-                    capture="environment"
-                    onChange={handleFotoChange}
-                    className="block w-full text-sm"
-                  />
-                  {webcamDisponivel && (
-                    <button
-                      type="button"
-                      onClick={handleAbrirWebcam}
-                      className="text-xs text-blue-600 underline"
+                  <div className="flex flex-wrap items-center gap-2">
+                    <label
+                      htmlFor="foto-input"
+                      className="bg-blue-600 text-white text-[11px] px-2.5 py-1 rounded-md hover:opacity-90 font-medium cursor-pointer"
                     >
-                      Ou tirar foto pela webcam
-                    </button>
-                  )}
+                      Escolher arquivo
+                    </label>
+                    <input
+                      ref={inputFotoRef}
+                      id="foto-input"
+                      name="foto"
+                      type="file"
+                      accept="image/*"
+                      capture="environment"
+                      onChange={handleFotoChange}
+                      className="sr-only"
+                    />
+                    {webcamDisponivel && (
+                      <button
+                        type="button"
+                        onClick={handleAbrirWebcam}
+                        className="bg-blue-600 text-white text-[11px] px-2.5 py-1 rounded-md hover:opacity-90 font-medium"
+                      >
+                        Tirar foto pela webcam
+                      </button>
+                    )}
+                  </div>
                   <p className="text-xs text-gray-500">
                     {comprimindo ? 'Reduzindo tamanho da imagem…' : 'Envie uma foto ou tire na hora.'}
                   </p>
