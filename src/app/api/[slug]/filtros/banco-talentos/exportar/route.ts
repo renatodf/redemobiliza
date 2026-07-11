@@ -98,12 +98,25 @@ export async function POST(request: NextRequest, { params }: { params: { slug: s
     }
   }
 
+  // curriculoUrl só é gravado por salvar-banco-talentos.ts, sempre via
+  // getSupabaseAdmin().storage.getPublicUrl() — nunca texto livre. Mesmo
+  // assim, restringimos o fetch ao domínio do próprio Storage (defesa em
+  // profundidade contra SSRF, caso um futuro caminho de escrita quebre essa
+  // garantia) e recusamos redirect, pra um 302 não poder escapar do check.
+  const origemStorage = new URL(process.env.NEXT_PUBLIC_SUPABASE_URL!).origin
   const zip = new JSZip()
   for (const p of pessoas) {
     const url = p.bancoTalentos?.curriculoUrl
     if (!url) continue
-    const resposta = await fetch(url)
-    if (!resposta.ok) continue
+    let origemUrl: string
+    try {
+      origemUrl = new URL(url).origin
+    } catch {
+      continue
+    }
+    if (origemUrl !== origemStorage) continue
+    const resposta = await fetch(url, { redirect: 'error' }).catch(() => null)
+    if (!resposta || !resposta.ok) continue
     const buffer = Buffer.from(await resposta.arrayBuffer())
     const extensao = url.split('.').pop()?.split('?')[0] ?? 'pdf'
     const nomeArquivo = `${p.nome.replace(/\s+/g, '_')}.${extensao}`
