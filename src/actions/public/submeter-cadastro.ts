@@ -66,7 +66,15 @@ export async function submeterCadastro(input: SubmeterCadastroInput): Promise<{ 
   const whatsapp = normalizeWhatsApp(whatsappRaw)
   if (!whatsapp) return { erro: 'Número de WhatsApp inválido' }
 
-  if (!nome.trim()) return { erro: 'Nome é obrigatório' }
+  const pessoaExistente = await prisma.pessoa.findUnique({
+    where: { gabineteId_whatsapp: { gabineteId: gabinete.id, whatsapp } },
+    select: { id: true },
+  })
+
+  // Nome só é obrigatório para cadastro novo — a etapa de confirmação (pessoa
+  // já cadastrada, só registrando presença) envia nome vazio de propósito,
+  // já que não pede esse dado de novo.
+  if (!pessoaExistente && !nome.trim()) return { erro: 'Nome é obrigatório' }
 
   let mobilizadorId: string | null = null
   if (mobilizadorToken) {
@@ -76,11 +84,6 @@ export async function submeterCadastro(input: SubmeterCadastroInput): Promise<{ 
     })
     mobilizadorId = mob?.id ?? null
   }
-
-  const pessoaExistente = await prisma.pessoa.findUnique({
-    where: { gabineteId_whatsapp: { gabineteId: gabinete.id, whatsapp } },
-    select: { id: true },
-  })
 
   let pessoaId: string
 
