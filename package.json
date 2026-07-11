@@ -16,6 +16,7 @@
     "@supabase/ssr": "^0.12.0",
     "@supabase/supabase-js": "^2.108.2",
     "exceljs": "^4.4.0",
+    "jszip": "^3.10.1",
     "next": "14.2.35",
     "pdf-lib": "^1.17.1",
     "pg": "^8.22.0",
