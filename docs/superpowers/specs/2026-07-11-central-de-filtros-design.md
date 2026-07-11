@@ -50,7 +50,23 @@ Como Prisma não suporta consulta recursiva nativamente, isso exige uma **CTE re
 
 Pessoas sem `nascimento` preenchido são excluídas automaticamente de qualquer filtro de aniversário/idade (não aparecem como falso positivo).
 
+**Botão "Limpar filtro":** ao lado de "Filtrar" — link simples que volta pra URL sem nenhum parâmetro de filtro. Com filtro limpo, "Exportar" exporta 100% do que está dentro do escopo de quem pediu (admin = gabinete inteiro; mobilizador = a própria sub-rede — o escopo de segurança nunca é ignorado, só os critérios de filtro).
+
 **Exportação:** botão "Exportar" pergunta o formato — **PDF** ou **Excel (.xlsx)**. Gera um arquivo com as pessoas que batem no filtro (nome, WhatsApp, e-mail, região, profissão, segmentos, data de nascimento).
+
+### Exportação grande — download por e-mail (adicionado 11/07/2026, após o merge do Plano 1)
+
+Exportações com **500 pessoas ou mais** não bloqueiam a resposta HTTP esperando o arquivo inteiro ser gerado. Em vez disso:
+
+1. A tela mostra um aviso junto da contagem ("X pessoa(s) encontrada(s)") quando `total >= 500`: algo como "Esse filtro tem muitos resultados — o arquivo será enviado por e-mail."
+2. Ao clicar em exportar, a rota responde imediatamente com uma página de confirmação ("Sua exportação foi iniciada — você vai receber um e-mail com o link de download em alguns minutos"), e continua gerando o arquivo em segundo plano no mesmo processo (não há fila/job separado — o servidor roda em processo Node persistente no Docker, não serverless, então uma tarefa em background sobrevive normalmente após a resposta ser enviada).
+3. O arquivo gerado é enviado pro bucket `gabinete-assets` (mesmo já usado no projeto), em `{gabineteId}/exports/{exportId}.{ext}`.
+4. O link de download é um **link assinado do Supabase Storage** (`createSignedUrl`), válido por **48 horas** — não o link público usado hoje pra fotos/currículos. Dado exportado em lote (telefone, endereço, PcD, etc. de muitas pessoas de uma vez) tem risco maior que um único arquivo de perfil, então não fica com URL pública permanente.
+5. O e-mail é enviado (via `enviarEmail`, já integrado com Resend) pro e-mail de quem pediu a exportação (`Pessoa.email` da sessão de quem clicou).
+
+Abaixo de 500 pessoas, o comportamento continua exatamente como antes: download direto, sem passar por armazenamento nem e-mail.
+
+**Ressalva conhecida:** o domínio de envio do Resend ainda está em modo sandbox (`onboarding@resend.dev`), que restringe os destinatários que conseguem receber de verdade — pendência já registrada desde o módulo de Demandas (27/06/2026), não resolvida por este plano.
 
 ---
 
