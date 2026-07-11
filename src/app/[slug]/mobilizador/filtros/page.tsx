@@ -69,7 +69,7 @@ export default async function MobilizadorFiltrosPage({
       <FiltrosTabs
         abas={[
           { chave: 'pessoas', label: 'Pessoas', href: `/${params.slug}/mobilizador/filtros` },
-          { chave: 'demandas', label: 'Demandas' },
+          { chave: 'demandas', label: 'Demandas', href: `/${params.slug}/mobilizador/filtros/demandas` },
         ]}
         abaAtiva="pessoas"
         corPrimaria={gabinete.corPrimaria}
