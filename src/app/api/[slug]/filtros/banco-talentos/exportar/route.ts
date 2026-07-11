@@ -28,10 +28,18 @@ export async function POST(request: NextRequest, { params }: { params: { slug: s
     return new NextResponse('Nenhum candidato selecionado', { status: 400 })
   }
 
-  // Revalida contra o gabinete — IDs de outro tenant (form adulterado) somem
+  // Revalida contra o gabinete e reaplica os mesmos invariantes fixos da
+  // listagem (colocado: false, curriculoUrl não nulo) — sem isso, um
+  // pessoaId selecionado antes de alguém ser marcado "colocado", ou sem
+  // nenhum registro em BancoTalentos, ainda entraria no ZIP e geraria
+  // Demanda de encaminhamento indevida. IDs que não passam somem
   // silenciosamente da lista, nunca causam erro nem vazam dado.
   const pessoas = await prisma.pessoa.findMany({
-    where: { id: { in: pessoaIds }, gabineteId },
+    where: {
+      id: { in: pessoaIds },
+      gabineteId,
+      bancoTalentos: { colocado: false, curriculoUrl: { not: null } },
+    },
     select: {
       id: true,
       nome: true,
@@ -119,7 +127,11 @@ export async function POST(request: NextRequest, { params }: { params: { slug: s
     if (!resposta || !resposta.ok) continue
     const buffer = Buffer.from(await resposta.arrayBuffer())
     const extensao = url.split('.').pop()?.split('?')[0] ?? 'pdf'
-    const nomeArquivo = `${p.nome.replace(/\s+/g, '_')}.${extensao}`
+    // Sanitiza (evita path traversal via "/" no nome) e sufixa com parte do
+    // id (evita colisão silenciosa no zip entre duas pessoas de mesmo nome —
+    // extratores costumam sobrescrever entradas duplicadas sem avisar).
+    const nomeSanitizado = p.nome.replace(/[^\w.-]+/g, '_')
+    const nomeArquivo = `${nomeSanitizado}_${p.id.slice(-6)}.${extensao}`
     zip.file(nomeArquivo, buffer)
   }
 
