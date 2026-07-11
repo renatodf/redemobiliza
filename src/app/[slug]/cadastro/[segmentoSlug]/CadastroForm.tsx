@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useTransition } from 'react'
 import { verificarWhatsApp } from '@/actions/public/verificar-whatsapp'
 import { submeterCadastro } from '@/actions/public/submeter-cadastro'
 import { comprimirImagem } from '@/lib/comprimir-imagem'
+import { corTextoContraste } from '@/lib/cor-contraste'
 
 type Regiao = { id: string; nome: string }
 type Profissao = { id: string; nome: string }
@@ -15,6 +16,7 @@ type Props = {
   sucessoUrl: string
   regioes: Regiao[]
   profissoes: Profissao[]
+  corPrimaria: string
 }
 
 type Passo = 'whatsapp' | 'dados' | 'confirmacao'
@@ -26,7 +28,10 @@ export default function CadastroForm({
   sucessoUrl,
   regioes,
   profissoes,
+  corPrimaria,
 }: Props) {
+  const corTexto = corTextoContraste(corPrimaria)
+  const estiloBotaoPrimario = { backgroundColor: corPrimaria, color: corTexto }
   const [passo, setPasso] = useState<Passo>('whatsapp')
   const [whatsapp, setWhatsapp] = useState('')
   const [erro, setErro] = useState<string | null>(null)
@@ -202,7 +207,8 @@ export default function CadastroForm({
           <button
             type="submit"
             disabled={isPending}
-            className="w-full bg-blue-600 text-white py-2 px-4 rounded-md text-sm font-medium hover:bg-blue-700 disabled:opacity-50"
+            style={estiloBotaoPrimario}
+            className="w-full py-2 px-4 rounded-md text-sm font-medium hover:opacity-90 disabled:opacity-50"
           >
             {isPending ? 'Verificando...' : 'Continuar'}
           </button>
@@ -224,7 +230,8 @@ export default function CadastroForm({
                   <button
                     type="button"
                     onClick={handleCapturarFoto}
-                    className="flex-1 bg-blue-600 text-white py-1.5 px-3 rounded-md text-xs font-medium hover:bg-blue-700"
+                    style={estiloBotaoPrimario}
+                    className="flex-1 py-1.5 px-3 rounded-md text-xs font-medium hover:opacity-90"
                   >
                     Capturar
                   </button>
@@ -251,7 +258,8 @@ export default function CadastroForm({
                   <div className="flex flex-wrap items-center gap-2">
                     <label
                       htmlFor="foto-input"
-                      className="bg-blue-600 text-white text-[11px] px-2.5 py-1 rounded-md hover:opacity-90 font-medium cursor-pointer"
+                      style={estiloBotaoPrimario}
+                      className="text-[11px] px-2.5 py-1 rounded-md hover:opacity-90 font-medium cursor-pointer"
                     >
                       Escolher arquivo
                     </label>
@@ -269,7 +277,8 @@ export default function CadastroForm({
                       <button
                         type="button"
                         onClick={handleAbrirWebcam}
-                        className="bg-blue-600 text-white text-[11px] px-2.5 py-1 rounded-md hover:opacity-90 font-medium"
+                        style={estiloBotaoPrimario}
+                        className="text-[11px] px-2.5 py-1 rounded-md hover:opacity-90 font-medium"
                       >
                         Tirar foto pela webcam
                       </button>
@@ -350,7 +359,8 @@ export default function CadastroForm({
             <button
               type="submit"
               disabled={isPending}
-              className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-md text-sm font-medium hover:bg-blue-700 disabled:opacity-50"
+              style={estiloBotaoPrimario}
+              className="flex-1 py-2 px-4 rounded-md text-sm font-medium hover:opacity-90 disabled:opacity-50"
             >
               {isPending ? 'Enviando...' : 'Confirmar cadastro'}
             </button>
@@ -374,7 +384,8 @@ export default function CadastroForm({
             <button
               type="submit"
               disabled={isPending}
-              className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-md text-sm font-medium hover:bg-blue-700 disabled:opacity-50"
+              style={estiloBotaoPrimario}
+              className="flex-1 py-2 px-4 rounded-md text-sm font-medium hover:opacity-90 disabled:opacity-50"
             >
               {isPending ? 'Confirmando...' : 'Confirmar'}
             </button>

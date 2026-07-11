@@ -57,6 +57,7 @@ export default async function CadastroPage({
           sucessoUrl={`/${params.slug}/cadastro/${params.segmentoSlug}/sucesso`}
           regioes={regioes}
           profissoes={profissoes}
+          corPrimaria={gabinete.corPrimaria}
         />
       </div>
     </div>

@@ -36,39 +36,52 @@ campo novo no schema.
 
 ## Tela do mobilizador — `/{slug}/mobilizador/link-cadastro`
 
-Um card por segmento ativo do gabinete (mesmo conteúdo que hoje aparece na home,
-migrado pra cá — a home deixa de mostrar isso). Cada card tem:
+> ⚠️ **Revisado em 11/07/2026, após implementação real**: o design original abaixo
+> (um card por segmento, cada um com seu próprio link `?m=token`) foi **abandonado**
+> assim que um gabinete real sem nenhum `Segmento` cadastrado quebrou a tela (nenhum
+> card pra mostrar). A versão implementada substitui os cards por segmento por **um
+> único link fixo pessoal**, independente de segmento — ver descrição abaixo.
 
-- Link pessoal: `https://{appUrl}/{slug}/cadastro/{segmento.slug}?m={tokenMobilizador}`
-  — **mecanismo inalterado**, o mesmo usado hoje.
-- Botão "Copiar link" com feedback visual ("Copiado!" por alguns segundos).
-- QR code do link (gerado como já é feito hoje, com a lib `qrcode`).
+Um único bloco (não mais um card por segmento) com:
+
+- **Link fixo pessoal**: `https://{appUrl}/{slug}/cadastro/link?m={tokenMobilizador}`
+  — reaproveita a mesma rota estática `/cadastro/link` usada pelo link composto do
+  admin (ver seção seguinte), só que sem `?segmentos=`. Quem se cadastra por ele entra
+  direto na rede do mobilizador e não fica marcado em nenhum segmento (o cadastro por
+  segmento continua existindo, só não é mais o caminho do link pessoal do mobilizador).
+- Botão "Copiar link" com feedback visual ("Copiado!" por alguns segundos)
+  (`CopiarLinkButton.tsx`).
+- QR code do link (lib `qrcode`, mesmo padrão de antes).
 - Dois botões de download: "Baixar PNG" (fundo branco) e "Baixar PNG transparente".
   (Correção em relação à ideia original de JPG: a lib `qrcode` já usada no projeto só
   suporta PNG/SVG/texto no servidor — `type: 'image/jpeg'` cai silenciosamente em PNG.
   Gerar JPG de verdade exigiria duas dependências novas; decidido manter só PNG, que é
   o formato padrão pra QR code de qualquer forma, sem lossy compression nas bordas.)
 
-Sem mudança de acesso/dados — é puramente uma tela nova reaproveitando dados que a
-home já buscava.
+Implementado em `src/app/[slug]/mobilizador/link-cadastro/page.tsx`. Sem mudança de
+acesso/dados — é puramente uma tela nova reaproveitando dados que a home já buscava
+(`Pessoa.tokenMobilizador`).
 
 ## Tela do admin — `/{slug}/admin/link-cadastro`
 
 Formulário com:
 
-1. **Segmentos** — lista de checkboxes com todos os segmentos ativos do gabinete (pode
-   marcar mais de um). Mesmo padrão de multi-seleção já usado em
-   `BancoTalentosDialog.tsx` (estado local `Set<string>` + inputs hidden).
-2. **Rede** — um `<select>` com "Rede Raiz (sem mobilizador)" como primeira opção
-   (valor vazio) seguido de todos os mobilizadores do gabinete pelo nome. Escolher um
-   mobilizador aqui significa: quem se cadastrar por esse link entra **diretamente** na
-   rede dele (mesmo significado de `indicadoPorId` hoje — vínculo direto, não desce
-   mais um nível).
-3. Botão **"Gerar Link"** — server action que recebe os segmentos e (opcionalmente) o
-   `pessoaId` do mobilizador escolhido, monta a URL e gera os dois QR codes (JPG/PNG),
-   devolvendo tudo via `useFormState` (mesmo padrão já usado em outros diálogos do
-   projeto). Não há atualização "ao vivo" enquanto marca os checkboxes — só ao clicar
-   Gerar Link, evitando introduzir geração de QR code no client.
+1. **Segmentos** — lista de botões-pílula (multi-seleção via estado local
+   `Set<string>` de `segmento.id`, enviados como inputs hidden `segmentoIds`) com
+   todos os segmentos ativos do gabinete (pode marcar mais de um). Implementado em
+   `GerarLinkForm.tsx`.
+2. **Rede** — um `<select name="mobilizadorPessoaId">` com "Rede Raiz (sem
+   mobilizador)" como primeira opção (valor vazio) seguido de todos os mobilizadores
+   do gabinete pelo nome. Escolher um mobilizador aqui significa: quem se cadastrar
+   por esse link entra **diretamente** na rede dele (mesmo significado de
+   `indicadoPorId` hoje — vínculo direto, não desce mais um nível).
+3. Botão **"Gerar Link"** — server action (`gerarLinkCadastro`,
+   `src/actions/admin/gerar-link-cadastro.ts`) que recebe os `segmentoIds` e
+   (opcionalmente) o `mobilizadorPessoaId` escolhido, monta a URL e gera os dois QR
+   codes **PNG** (opaco + transparente — não JPG, ver correção abaixo), devolvendo
+   tudo via `useFormState` (mesmo padrão já usado em outros diálogos do projeto). Não
+   há atualização "ao vivo" enquanto marca os segmentos — só ao clicar Gerar Link,
+   evitando introduzir geração de QR code no client.
 4. Depois de gerado: mesmo bloco de link + copiar + QR + downloads da tela do
    mobilizador.
 
@@ -129,4 +142,3 @@ JavaScript de cliente.
   se crescer muito, é um follow-up).
 - Qualquer redesenho da tela "Dados Gerais" (dashboard futuro) mencionada pelo usuário
   — não faz parte deste spec.
-- Mudar o mecanismo de link pessoal do mobilizador (continua um segmento por link).
