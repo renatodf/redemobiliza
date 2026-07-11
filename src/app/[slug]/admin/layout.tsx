@@ -101,7 +101,11 @@ export default async function AdminLayout({
               </form>
             </div>
           )}
-          <Topbar usuarioNome={usuarioNome} usuarioFotoUrl={usuarioFotoUrl} />
+          <Topbar
+            usuarioNome={usuarioNome}
+            usuarioFotoUrl={usuarioFotoUrl}
+            filtrosHref={`/${params.slug}/admin/filtros`}
+          />
           <main className="flex-1 overflow-y-auto p-4 md:p-6">
             <div className="bg-white rounded-xl shadow-sm p-4 md:p-6 max-w-6xl mx-auto">
               {children}
