@@ -91,3 +91,20 @@ export function templateDemandaExpirada({
     <p><a href="${escapeHtml(urlDemanda)}">Acessar demanda →</a></p>
   `
 }
+
+export function templateExportacaoPronta({
+  nomeDestinatario,
+  urlDownload,
+  expiraEm,
+}: {
+  nomeDestinatario: string
+  urlDownload: string
+  expiraEm: Date
+}): string {
+  return `
+    <p>Olá, ${escapeHtml(nomeDestinatario)}!</p>
+    <p>Sua exportação de dados está pronta. Clique no link abaixo para baixar o arquivo:</p>
+    <p><a href="${escapeHtml(urlDownload)}">Baixar arquivo →</a></p>
+    <p>Esse link expira em ${expiraEm.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}.</p>
+  `
+}
