@@ -1,7 +1,9 @@
 # Design — Banco de Talentos
 
 **Data:** 2026-06-28
-**Status:** aprovado
+**Status:** substituído em 11/07/2026 — ver `docs/superpowers/specs/2026-07-11-central-de-filtros-aba-banco-de-talentos-design.md`
+
+> ⚠️ **Este spec está obsoleto.** Só a Fase 1 (modelos `AreaColocacao`/`BancoTalentos`/`BancoTalentosArea`, gestão de áreas em Configurações, e o dialog de cadastro na ficha da pessoa) foi construída a partir daqui — confirmado no HANDOFF do projeto. O restante (dashboard dedicado, model `Encaminhamento` separado, "gestor padrão" fixo, notificação automática por e-mail, 9 filtros, indicadores de aniversário) foi **substituído** por um desenho mais simples, decidido em 11/07/2026 após revisão comparativa explícita com o usuário: a listagem/exportação vira uma aba da Central de Filtros (sem dashboard, sem model de auditoria separado, responsável escolhido a cada exportação em vez de configurado uma vez). Mantido aqui só como histórico — não é mais a fonte de verdade pra esse módulo.
 
 ---
 
