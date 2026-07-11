@@ -1,14 +1,14 @@
-// src/app/[slug]/admin/filtros/demandas/page.tsx
+// src/app/[slug]/admin/filtros/banco-talentos/page.tsx
 import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import { getGabineteBySlug } from '@/lib/gabinete'
-import { buildWhereDemandas, type FiltrosDemandasParams } from '@/lib/filtros-demandas'
+import { buildWhereBancoTalentos, type FiltrosBancoTalentosParams } from '@/lib/filtros-banco-talentos'
 import FiltrosTabs from '../FiltrosTabs'
-import DemandasFiltro from '../DemandasFiltro'
+import BancoTalentosFiltro from '../BancoTalentosFiltro'
 
 const TAMANHO_PAGINA = 20
 
-export default async function AdminFiltrosDemandasPage({
+export default async function AdminFiltrosBancoTalentosPage({
   params,
   searchParams,
 }: {
@@ -18,37 +18,42 @@ export default async function AdminFiltrosDemandasPage({
   const gabinete = await getGabineteBySlug(params.slug)
   if (!gabinete) notFound()
 
-  const filtros: FiltrosDemandasParams = {
-    areaId: searchParams.areaId,
-    status: searchParams.status as 'atendida' | 'nao_atendida' | 'pendente' | undefined,
+  const filtros: FiltrosBancoTalentosParams = {
+    areaIds: searchParams.areaIds ? searchParams.areaIds.split(',').filter(Boolean) : undefined,
+    prioridade: searchParams.prioridade,
+    isPcd: searchParams.isPcd === 'sim' || searchParams.isPcd === 'nao' ? searchParams.isPcd : undefined,
     regiaoId: searchParams.regiaoId,
   }
 
-  const where = buildWhereDemandas(gabinete.id, filtros)
+  const where = buildWhereBancoTalentos(gabinete.id, filtros)
   const paginaBruta = Number(searchParams.page ?? 1)
   const pagina = Number.isFinite(paginaBruta) ? Math.max(1, Math.floor(paginaBruta)) : 1
   const skip = (pagina - 1) * TAMANHO_PAGINA
   const take = TAMANHO_PAGINA
 
-  const [demandasPagina, totalFiltrado, areas, regioes] = await Promise.all([
-    prisma.demanda.findMany({
+  const [talentosPagina, totalFiltrado, areas, regioes, mobilizadores] = await Promise.all([
+    prisma.bancoTalentos.findMany({
       where,
-      orderBy: { criadoEm: 'desc' },
+      orderBy: { pessoa: { nome: 'asc' } },
       skip,
       take,
       select: {
-        id: true,
-        titulo: true,
-        status: true,
-        prazoDesfecho: true,
-        area: { select: { nome: true } },
-        solicitante: { select: { nome: true } },
-        responsavel: { select: { nome: true } },
+        pessoaId: true,
+        prioridade: true,
+        isPcd: true,
+        curriculoUrl: true,
+        pessoa: { select: { nome: true, regiao: { select: { nome: true } } } },
+        areas: { select: { area: { select: { nome: true } } } },
       },
     }),
-    prisma.demanda.count({ where }),
-    prisma.areaDemanda.findMany({ where: { gabineteId: gabinete.id }, orderBy: { nome: 'asc' } }),
+    prisma.bancoTalentos.count({ where }),
+    prisma.areaColocacao.findMany({ where: { gabineteId: gabinete.id, status: 'ativa' }, orderBy: { nome: 'asc' } }),
     prisma.regiao.findMany({ where: { gabineteId: gabinete.id, ativa: true }, orderBy: { nome: 'asc' } }),
+    prisma.pessoa.findMany({
+      where: { gabineteId: gabinete.id, isMobilizador: true, isColaborador: true, deletedAt: null },
+      orderBy: { nome: 'asc' },
+      select: { id: true, nome: true },
+    }),
   ])
 
   return (
@@ -63,19 +68,20 @@ export default async function AdminFiltrosDemandasPage({
           { chave: 'demandas', label: 'Demandas', href: `/${params.slug}/admin/filtros/demandas` },
           { chave: 'banco-talentos', label: 'Banco de Talentos', href: `/${params.slug}/admin/filtros/banco-talentos` },
         ]}
-        abaAtiva="demandas"
+        abaAtiva="banco-talentos"
         corPrimaria={gabinete.corPrimaria}
       />
-      <DemandasFiltro
-        baseHref={`/${params.slug}/admin/filtros/demandas`}
-        exportarHref={`/api/${params.slug}/filtros/demandas/exportar`}
+      <BancoTalentosFiltro
+        baseHref={`/${params.slug}/admin/filtros/banco-talentos`}
+        exportarHref={`/api/${params.slug}/filtros/banco-talentos/exportar`}
         searchParams={searchParams}
-        demandas={demandasPagina}
+        talentos={talentosPagina}
         totalFiltrado={totalFiltrado}
         paginaAtual={pagina}
         tamanhoPagina={TAMANHO_PAGINA}
         areas={areas}
         regioes={regioes}
+        mobilizadores={mobilizadores}
         corPrimaria={gabinete.corPrimaria}
       />
     </div>

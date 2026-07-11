@@ -66,7 +66,7 @@ export default async function AdminFiltrosPage({
         abas={[
           { chave: 'pessoas', label: 'Pessoas', href: `/${params.slug}/admin/filtros` },
           { chave: 'demandas', label: 'Demandas', href: `/${params.slug}/admin/filtros/demandas` },
-          { chave: 'banco-talentos', label: 'Banco de Talentos' },
+          { chave: 'banco-talentos', label: 'Banco de Talentos', href: `/${params.slug}/admin/filtros/banco-talentos` },
         ]}
         abaAtiva="pessoas"
         corPrimaria={gabinete.corPrimaria}
