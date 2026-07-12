@@ -32,6 +32,26 @@ describe('buildWherePessoas', () => {
     const where = buildWherePessoas('gab-1', { genero: 'feminino' })
     expect(where.nascimento).toBeUndefined()
   })
+
+  it('filtra por escolaridade', () => {
+    const where = buildWherePessoas('gab-1', { escolaridade: 'Superior completo' })
+    expect(where.escolaridade).toBe('Superior completo')
+  })
+
+  it('sem filtro de escolaridade, não aplica', () => {
+    const where = buildWherePessoas('gab-1', {})
+    expect(where.escolaridade).toBeUndefined()
+  })
+
+  it('filtra por religião', () => {
+    const where = buildWherePessoas('gab-1', { religiao: 'Católica' })
+    expect(where.religiao).toBe('Católica')
+  })
+
+  it('sem filtro de religião, não aplica', () => {
+    const where = buildWherePessoas('gab-1', {})
+    expect(where.religiao).toBeUndefined()
+  })
 })
 
 describe('aplicarFiltrosPosConsulta', () => {

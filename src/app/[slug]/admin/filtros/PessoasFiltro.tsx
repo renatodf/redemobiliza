@@ -24,6 +24,8 @@ export default function PessoasFiltro({
   regioes,
   profissoes,
   segmentos,
+  escolaridades,
+  religioes,
   corPrimaria,
 }: {
   baseHref: string
@@ -36,6 +38,8 @@ export default function PessoasFiltro({
   regioes: { id: string; nome: string }[]
   profissoes: { id: string; nome: string }[]
   segmentos: { id: string; nome: string }[]
+  escolaridades: string[]
+  religioes: string[]
   corPrimaria: string
 }) {
   const qs = new URLSearchParams()
@@ -100,6 +104,24 @@ export default function PessoasFiltro({
         <div>
           <label className="block text-xs font-medium text-gray-600">Idade máx.</label>
           <input type="number" name="idadeMax" min={0} defaultValue={searchParams.idadeMax ?? ''} className="mt-1 w-20 border border-gray-300 rounded-md px-2 py-1.5 text-sm" />
+        </div>
+        <div>
+          <label className="block text-xs font-medium text-gray-600">Escolaridade</label>
+          <select name="escolaridade" defaultValue={searchParams.escolaridade ?? ''} className="mt-1 border border-gray-300 rounded-md px-2 py-1.5 text-sm">
+            <option value="">Todas</option>
+            {escolaridades.map((e) => (
+              <option key={e} value={e}>{e}</option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className="block text-xs font-medium text-gray-600">Religião</label>
+          <select name="religiao" defaultValue={searchParams.religiao ?? ''} className="mt-1 border border-gray-300 rounded-md px-2 py-1.5 text-sm">
+            <option value="">Todas</option>
+            {religioes.map((r) => (
+              <option key={r} value={r}>{r}</option>
+            ))}
+          </select>
         </div>
         <button
           type="submit"

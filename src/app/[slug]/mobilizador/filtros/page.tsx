@@ -31,6 +31,8 @@ export default async function MobilizadorFiltrosPage({
     aniversario: searchParams.aniversario as 'dia' | 'semana' | 'mes' | undefined,
     idadeMin: searchParams.idadeMin,
     idadeMax: searchParams.idadeMax,
+    escolaridade: searchParams.escolaridade,
+    religiao: searchParams.religiao,
   }
 
   const where = buildWherePessoas(gabinete.id, filtros, idsRede)
@@ -54,11 +56,25 @@ export default async function MobilizadorFiltrosPage({
   const { skip, take } = paginar(filtradas.length, pagina, TAMANHO_PAGINA)
   const pessoasPagina = filtradas.slice(skip, skip + take)
 
-  const [regioes, profissoes, segmentos] = await Promise.all([
+  const [regioes, profissoes, segmentos, escolaridadesRaw, religioesRaw] = await Promise.all([
     prisma.regiao.findMany({ where: { gabineteId: gabinete.id, ativa: true }, orderBy: { nome: 'asc' } }),
     prisma.profissao.findMany({ where: { gabineteId: gabinete.id, ativa: true }, orderBy: { nome: 'asc' } }),
     prisma.segmento.findMany({ where: { gabineteId: gabinete.id, status: 'ativo' }, orderBy: { nome: 'asc' } }),
+    prisma.pessoa.findMany({
+      where: { gabineteId: gabinete.id, deletedAt: null, escolaridade: { not: null } },
+      select: { escolaridade: true },
+      distinct: ['escolaridade'],
+      orderBy: { escolaridade: 'asc' },
+    }),
+    prisma.pessoa.findMany({
+      where: { gabineteId: gabinete.id, deletedAt: null, religiao: { not: null } },
+      select: { religiao: true },
+      distinct: ['religiao'],
+      orderBy: { religiao: 'asc' },
+    }),
   ])
+  const escolaridades = escolaridadesRaw.map((e) => e.escolaridade as string)
+  const religioes = religioesRaw.map((r) => r.religiao as string)
 
   return (
     <div className="space-y-6">
@@ -85,6 +101,8 @@ export default async function MobilizadorFiltrosPage({
         regioes={regioes}
         profissoes={profissoes}
         segmentos={segmentos}
+        escolaridades={escolaridades}
+        religioes={religioes}
         corPrimaria={gabinete.corPrimaria}
       />
     </div>

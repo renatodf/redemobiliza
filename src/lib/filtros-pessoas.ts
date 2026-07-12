@@ -14,6 +14,8 @@ export type FiltrosPessoasParams = {
   aniversario?: 'dia' | 'semana' | 'mes'
   idadeMin?: string
   idadeMax?: string
+  escolaridade?: string
+  religiao?: string
 }
 
 export type WherePessoas = {
@@ -25,6 +27,8 @@ export type WherePessoas = {
   profissaoId?: string
   segmentos?: { some: { segmentoId: string } }
   nascimento?: { not: null }
+  escolaridade?: string
+  religiao?: string
 }
 
 export function buildWherePessoas(
@@ -44,6 +48,8 @@ export function buildWherePessoas(
   if (params.aniversario || params.idadeMin || params.idadeMax) {
     where.nascimento = { not: null }
   }
+  if (params.escolaridade) where.escolaridade = params.escolaridade
+  if (params.religiao) where.religiao = params.religiao
   return where
 }
 
