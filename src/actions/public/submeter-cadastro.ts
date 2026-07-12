@@ -5,6 +5,7 @@ import { prisma } from '@/lib/prisma'
 import { getGabineteBySlug } from '@/lib/gabinete'
 import { normalizeWhatsApp } from '@/lib/whatsapp'
 import { getSupabaseAdmin } from '@/lib/supabase/admin'
+import { parseDataBrasileira } from '@/lib/data-brasileira'
 
 const TIPOS_FOTO_PERMITIDOS = {
   'image/jpeg': 'jpg',
@@ -22,6 +23,7 @@ type SubmeterCadastroInput = {
   regiaoId?: string
   profissaoId?: string
   genero?: string
+  nascimento?: string
   mobilizadorToken?: string
   sucessoUrl: string
   foto?: File | null
@@ -37,6 +39,7 @@ export async function submeterCadastro(input: SubmeterCadastroInput): Promise<{ 
     regiaoId,
     profissaoId,
     genero,
+    nascimento: nascimentoRaw,
     mobilizadorToken,
     sucessoUrl,
     foto,
@@ -65,6 +68,12 @@ export async function submeterCadastro(input: SubmeterCadastroInput): Promise<{ 
 
   const whatsapp = normalizeWhatsApp(whatsappRaw)
   if (!whatsapp) return { erro: 'Número de WhatsApp inválido' }
+
+  let nascimento: Date | null = null
+  if (nascimentoRaw?.trim()) {
+    nascimento = parseDataBrasileira(nascimentoRaw.trim())
+    if (!nascimento) return { erro: 'Data de nascimento inválida — use o formato DD/MM/AAAA' }
+  }
 
   const pessoaExistente = await prisma.pessoa.findUnique({
     where: { gabineteId_whatsapp: { gabineteId: gabinete.id, whatsapp } },
@@ -97,6 +106,7 @@ export async function submeterCadastro(input: SubmeterCadastroInput): Promise<{ 
         nome: nome.trim(),
         whatsapp,
         email: email?.trim() || null,
+        nascimento,
         genero: genero || null,
         regiaoId: regiaoId || null,
         profissaoId: profissaoId || null,
