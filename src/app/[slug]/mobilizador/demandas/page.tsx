@@ -16,7 +16,7 @@ export default async function MobilizadorDemandasPage({
   searchParams,
 }: {
   params: { slug: string }
-  searchParams: { status?: string }
+  searchParams: { status?: string; dataInicio?: string; dataFim?: string }
 }) {
   const resultado = await assertMobilizadorAccess(params.slug).catch(() => null)
   if (!resultado) notFound()
@@ -29,6 +29,17 @@ export default async function MobilizadorDemandasPage({
       deletedAt: null,
       responsavelId: pessoa.id,
       ...(searchParams.status ? { status: searchParams.status } : {}),
+      // dataInicio/dataFim chegam via clique no gráfico de pizza de Demandas
+      // do dashboard (Dados Gerais), que escopa ao mês atual — mesmo padrão
+      // já usado em /admin/demandas.
+      ...(searchParams.dataInicio || searchParams.dataFim
+        ? {
+            criadoEm: {
+              ...(searchParams.dataInicio ? { gte: new Date(`${searchParams.dataInicio}T00:00:00`) } : {}),
+              ...(searchParams.dataFim ? { lte: new Date(`${searchParams.dataFim}T23:59:59.999`) } : {}),
+            },
+          }
+        : {}),
     },
     orderBy: { prazoDesfecho: 'asc' },
     select: {
