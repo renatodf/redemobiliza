@@ -83,6 +83,7 @@ export default async function AdminFiltrosPage({
           { chave: 'pessoas', label: 'Pessoas', href: `/${params.slug}/admin/filtros` },
           { chave: 'demandas', label: 'Demandas', href: `/${params.slug}/admin/filtros/demandas` },
           { chave: 'banco-talentos', label: 'Banco de Talentos', href: `/${params.slug}/admin/filtros/banco-talentos` },
+          { chave: 'cadastros', label: 'Cadastros', href: `/${params.slug}/admin/filtros/cadastros` },
         ]}
         abaAtiva="pessoas"
         corPrimaria={gabinete.corPrimaria}
