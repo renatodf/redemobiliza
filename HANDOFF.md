@@ -1,6 +1,6 @@
 # HANDOFF — Rede Mobiliza
 
-> Documento de transição gerado em 2026-07-10, a partir do histórico completo do projeto (245 commits) e dos specs/plans em `docs/superpowers/`. Atualizado em 2026-07-11 com o trabalho da sessão seguinte (Central de Filtros — aba Pessoas e exportação assíncrona, seção 11 abaixo). HEAD no momento da última atualização: `ced0330` (branch `main`).
+> Documento de transição gerado em 2026-07-10, a partir do histórico completo do projeto (245 commits) e dos specs/plans em `docs/superpowers/`. Atualizado em 2026-07-11 com o trabalho da sessão seguinte (Central de Filtros — aba Pessoas e exportação assíncrona, seção 11 abaixo). Atualizado novamente em 2026-07-12 com as abas Demandas e Banco de Talentos da Central de Filtros e o Dashboard "Dados Gerais" (seções 12-14 abaixo). HEAD no momento da última atualização: `83d0341` (branch `main`, deployado em produção).
 
 ## O que é o projeto
 
@@ -65,8 +65,33 @@ O que existe hoje:
 
 **Exportação assíncrona por e-mail para 500+ pessoas — implementada nesta sessão**, seguindo o plano em `docs/superpowers/plans/2026-07-11-central-de-filtros-exportacao-assincrona.md`: `LIMITE_EXPORT_SINCRONO = 500` (`src/lib/filtros-pessoas.ts`), aviso na UI quando `totalFiltrado >= 500`, botão "Limpar filtro"; acima do limite a rota responde na hora com página de confirmação e gera o arquivo em segundo plano (fire-and-forget — seguro porque o processo Node do Docker é persistente), sobe pro bucket `gabinete-assets` com link assinado de 48h (`uploadExportacaoESaerAssinada`, `src/lib/upload-exportacao.ts`) e envia por e-mail (`templateExportacaoPronta`, `src/lib/email.ts`). Destinatário é sempre `session.user.email` de quem pediu (fix pós-revisão — ver pendência 3).
 
-**Ainda não implementado (spec já escrito, aguardando):**
-- Abas Demandas e Banco de Talentos (filtros, exportação PDF/Excel de Demandas; exportação em ZIP de currículos + fluxo de encaminhamento em massa para Demanda no Banco de Talentos).
+### 12. Central de Filtros — aba Demandas (12/07)
+
+Segunda aba da Central de Filtros (seção 11), seguindo o mesmo spec. Rotas `/[slug]/admin/filtros/demandas` e `/[slug]/mobilizador/filtros/demandas`, compartilhando `DemandasFiltro.tsx`. Filtros combináveis por status/área/prazo/datas; exportação **síncrona** (sem fila/e-mail, diferente da aba Pessoas) via PDF (`gerarPdfDemandas`) ou Excel (`gerarExcelDemandas`) em `src/lib/filtros-demandas.ts` (`buildWhereDemandas`). Escopo de segurança: admin vê o gabinete inteiro, mobilizador vê só as demandas em que é `responsavelId` — confirmado ponta a ponta (tela + exportação) contra dados reais de produção. Bug fix aplicado durante a revisão: `Number(searchParams.page)` virando `NaN` com input inválido (mesmo padrão pré-existente em `admin/filtros/page.tsx`, corrigido nos dois lugares).
+
+### 13. Central de Filtros — aba Banco de Talentos (12/07)
+
+Terceira e última aba planejada da Central de Filtros — **fecha a Fase 2 do Banco de Talentos** que a seção 6 deixava pendente (dashboard/listagem/filtros/exportação/encaminhamento). Só existe no admin (`/[slug]/admin/filtros/banco-talentos`), não no mobilizador.
+- `BancoTalentosFiltro.tsx`: filtro por área de colocação + PCD/prioridade, seleção múltipla via checkbox.
+- `POST /api/[slug]/filtros/banco-talentos/exportar`: opcionalmente cria uma `Demanda` por pessoa selecionada (encaminhamento em massa, sequencial, com histórico + e-mail), depois monta um **ZIP de currículos** (`jszip`) e devolve como download. Não existe modelo `Encaminhamento` — o "encaminhamento" é simplesmente a criação direta de `Demanda`s vinculadas ao `AreaColocacao`.
+- **Achado Important na revisão final, corrigido no mesmo dia (`f125439`)**: TOCTOU — a rota revalidava o tenant mas não reaplicava `colocado:false`/`curriculoUrl not null` da listagem original, então uma pessoa marcada como colocada (ou já sem registro no Banco de Talentos) depois de selecionada na tela ainda entrava no ZIP e gerava Demanda indevida. Corrigido incluindo esse `where` na revalidação.
+- Mesmo commit também sanitiza nome de arquivo no ZIP (path traversal) e sufixa com parte do id (evita colisão de nomes).
+- Fix de segurança pós-implementação (`8ae97ec`): SSRF potencial em `fetch(curriculoUrl)` — não explorável hoje (único caminho de escrita é `getPublicUrl` do próprio Storage), mas mitigado com allowlist de origem + `redirect:'error'` como defesa em profundidade.
+- Follow-up não bloqueante registrado: sem `$transaction` no loop de criação de Demandas — falha parcial deixa Demandas já criadas sem rollback.
+
+**Com isso, a Central de Filtros (spec de 11/07, seção 11) está completa: as três abas — Pessoas, Demandas, Banco de Talentos — existem e funcionam.**
+
+### 14. Dashboard "Dados Gerais" (12/07)
+
+Atende a pendência 6 da versão anterior deste documento (ideia de conversa, sem spec). Vira a **nova tela inicial** de admin e mobilizador.
+- `calcularFaixaEtaria` + `agruparTopEOutros` (`src/lib/dashboard.ts` ou equivalente) — funções puras de agregação, TDD.
+- `GraficoPizza.tsx` (`src/components/GraficoPizza.tsx`) reutilizável, com `PALETA_CATEGORICA`/`COR_NEUTRA`/`CORES_STATUS_DEMANDA` — cores de status de demanda cross-verificadas byte-a-byte contra `status-demanda.ts` para nunca divergir visualmente da Central de Filtros.
+- **Escolaridade e Religião** viraram filtros novos na aba Pessoas da Central de Filtros como pré-requisito (2 selects em `PessoasFiltro.tsx` + `buildWherePessoas`), gabinete-wide (não escopado por `idsRede` no mobilizador, mesmo padrão de região/profissão/segmento).
+- `DashboardConteudo.tsx` (`src/app/[slug]/admin/dashboard/DashboardConteudo.tsx`) é compartilhado entre admin e mobilizador (sem hardcoding de papel) — região + 5 pizzas (sexo, faixa etária, escolaridade, religião, status de demandas do mês).
+- **Bug de `deletedAt` corrigido** (herdado — pessoas soft-deletadas entravam nas contagens/agregados do dashboard): confirmado contra dado real (gabinete de teste com 1 pessoa soft-deletada: 40 total vs 39 ativa).
+- Mobilizador: `/[slug]/mobilizador/page.tsx` virou redirect; a antiga home (listagem da rede) migrou para `/[slug]/mobilizador/rede/page.tsx`; nova `/[slug]/mobilizador/dashboard/page.tsx` reusa `DashboardConteudo` escopado por `idsRede` (Pessoas) e `responsavelId`+`solicitante` combinados (Demandas). Menu: "Início" agora aponta pra `/rede`, "Dados Gerais" é item novo.
+- **Fix pós-revisão (commit `83d0341`, HEAD atual)**: `/mobilizador/demandas` não lia `dataInicio`/`dataFim` — clicar na fatia "Demandas do mês" do dashboard mostrava a contagem certa mas abria a listagem sem limite de data (admin já funcionava). Corrigido com o mesmo padrão de `criadoEm` já usado em `/admin/demandas`. Também trocado `revalidatePath` de `marcar-desfecho-demanda.ts` de `/mobilizador/rede` (sem dado de demanda) pra `/mobilizador/demandas` (recomendação da mesma revisão).
+- Follow-up não bloqueante: `assertMobilizadorAccess` não checa `tokenMobilizador` (diferente da página antiga) — pré-existente, fora de escopo.
 
 ---
 
@@ -116,11 +141,11 @@ O que existe hoje:
 ## Pendências / próximos passos conhecidos
 
 1. ~~Bug de confirmação de presença exigindo nome~~ — **corrigido em `31df5a4`** (11/07).
-2. **Banco de Talentos incompleto — agora reenquadrado como parte da Central de Filtros**: a aba "Banco de Talentos" da Central de Filtros (seção 11 acima) assume o papel do dashboard/listagem que o spec original de 28/06 previa. Nem essa aba nem a aba Demandas foram construídas ainda — só filtro/exportação de Pessoas existe. Ver `docs/superpowers/specs/2026-07-11-central-de-filtros-design.md` para o desenho completo pendente (filtros de Demandas; filtros + ZIP de currículos + encaminhamento em massa de Banco de Talentos).
+2. ~~Banco de Talentos incompleto~~ — **concluído em 12/07**: as abas Demandas (seção 12) e Banco de Talentos (seção 13) da Central de Filtros foram construídas. As três abas do spec (`docs/superpowers/specs/2026-07-11-central-de-filtros-design.md`) existem e funcionam.
 3. ~~Exportação assíncrona por e-mail (Pessoas, 500+ registros)~~ — **implementada nesta sessão** (plano `docs/superpowers/plans/2026-07-11-central-de-filtros-exportacao-assincrona.md`, 4 tasks + 1 fix pós-revisão, ver `.superpowers/sdd/progress.md`). Decisão tomada durante a implementação: quem recebe o e-mail de exportação é sempre a **conta logada que pediu o download** (`session.user.email`), não uma ficha de `Pessoa` — diferente do padrão de alertas (Demanda hoje, Agenda no futuro), que notificam **todos os vinculados à entidade**. Ver pendência 9 abaixo.
 4. ~~Spec de Link de Cadastro desatualizado~~ — **corrigido nesta sessão**: `docs/superpowers/specs/2026-07-09-link-de-cadastro-design.md` agora descreve o link fixo pessoal do mobilizador (não mais cards por segmento), com nota explícita marcando a mudança e o motivo (gabinete sem `Segmento` quebrando o design original).
 5. **Domínio de e-mail do Resend nunca configurado**: o spec do módulo de Demandas já listava isso como pendência em 27/06 ("configurar domínio de envio no Resend (DNS)", "definir endereço de remetente"). Variável de produção atual (`REMETENTE_EMAIL=onboarding@resend.dev`, conforme memória do projeto) sugere que ainda está no domínio sandbox do Resend, que restringe destinatários — **agora também bloqueia o e-mail de exportação pronta** da pendência 3 acima, não só os alertas de Demandas. Ver pendência 9: a ideia de e-mail de sistema por gabinete pode ser a solução definitiva pra isso. **Fora do alcance de uma sessão de código** — precisa de ação do usuário no painel do Resend/DNS.
-6. **"Dados Gerais"**: usuário mencionou (conversa, não spec) querer um dashboard como nova tela inicial do sistema, com o botão "Usuários" ficando só com a listagem atual — não especificado nem planejado ainda.
+6. ~~"Dados Gerais"~~ — **construído em 12/07** (seção 14): dashboard virou a nova tela inicial de admin e mobilizador, com região + 5 pizzas; "Usuários"/rede ficou só com a listagem, em item de menu próprio.
 7. ~~README.md é o stub padrão do `create-next-app`~~ — **corrigido nesta sessão**: README real com visão geral, stack, setup local e tabela de scripts, apontando pro `HANDOFF.md` para o histórico completo.
 8. ~~Tema dinâmico do gabinete não chega na tela pública `/cadastro/*`~~ — **corrigido nesta sessão**: `CadastroForm.tsx` (compartilhado por `/cadastro/[segmentoSlug]` e `/cadastro/link`) ganhou prop `corPrimaria`, e os 6 botões que usavam `bg-blue-600` fixo agora usam `style={{ backgroundColor: corPrimaria, color: corTextoContraste(corPrimaria) }}`, mesmo padrão já usado no resto do sistema. Verificado manualmente com um gabinete real (`amigos-do-izalci`, `corPrimaria: #263e0f`) — botão renderiza com a cor certa e contraste de texto correto.
 9. **Ideia (conversa, não spec): e-mail de sistema por gabinete**. Cada gabinete teria seu próprio remetente de e-mail ("nome do gabinete"), reaproveitado por todo tipo de aviso do sistema — alertas de Demanda (já existe), alertas de Agenda (**módulo de Agenda ainda nem existe** — mencionado como algo futuro, onde um evento poderá ter várias pessoas vinculadas), e o e-mail de exportação pronta (pendência 3). Não especificado nem planejado ainda; pode ser a solução para a pendência 5 (domínio Resend em sandbox) se o remetente por gabinete vier com domínio verificado próprio. **Requer spec + plano antes de código** (decisão do usuário, 11/07/2026 — feature grande demais pra encaixar numa sessão de "pendências rápidas").
@@ -140,3 +165,4 @@ O que existe hoje:
 - Produção: `https://rede-mobiliza-app.azl4mh.easypanel.host/`
 - Fluxo: `git push origin main` (canônico) + `git push easypanel main` (o que o EasyPanel observa) → `curl http://187.77.34.212:3000/api/deploy/<token>` para disparar o build manualmente (autoDeploy está desligado) → confirmar `commit.sha` via API tRPC do EasyPanel.
 - Credenciais e detalhes completos: memória do projeto (`project_deploy.md`), não reproduzidos aqui por serem segredos.
+- **Estado em 12/07/2026**: push + deploy manual executados após o Dashboard "Dados Gerais" (seção 14). Produção confirmada rodando `commit.sha` `83d0341` via `projects.listProjectsAndServices`.
