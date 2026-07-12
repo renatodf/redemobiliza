@@ -321,14 +321,21 @@ export default async function FichaPessoaPage({
                 nome: pessoa.nome,
                 whatsapp: pessoa.whatsapp,
                 email: pessoa.email,
+                nascimento: pessoa.nascimento,
+                genero: pessoa.genero,
+                origem: pessoa.origem,
                 regiaoId: pessoa.regiaoId,
                 profissaoId: pessoa.profissaoId,
-                genero: pessoa.genero,
                 cpf: pessoa.cpf,
                 telefoneFixo: pessoa.telefoneFixo,
                 orientacaoSexual: pessoa.orientacaoSexual,
                 religiao: pessoa.religiao,
                 escolaridade: pessoa.escolaridade,
+                bairro: pessoa.bairro,
+                logradouro: pessoa.logradouro,
+                numero: pessoa.numero,
+                complemento: pessoa.complemento,
+                cep: pessoa.cep,
               }}
               regioes={regioes}
               profissoes={profissoes}

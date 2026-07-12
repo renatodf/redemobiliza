@@ -5,6 +5,7 @@ import { prisma } from '@/lib/prisma'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { getGabineteBySlug } from '@/lib/gabinete'
 import { normalizeWhatsApp } from '@/lib/whatsapp'
+import { parseDataBrasileira } from '@/lib/data-brasileira'
 
 export async function editarPessoa(
   _prev: { ok: boolean; erro?: string } | null,
@@ -15,17 +16,30 @@ export async function editarPessoa(
   const nome = (formData.get('nome') as string).trim()
   const whatsappRaw = (formData.get('whatsapp') as string | null) ?? ''
   const email = (formData.get('email') as string | null)?.trim() || null
+  const nascimentoRaw = (formData.get('nascimento') as string | null)?.trim() || ''
   const regiaoId = (formData.get('regiaoId') as string | null) || null
   const profissaoId = (formData.get('profissaoId') as string | null) || null
   const genero = (formData.get('genero') as string | null) || null
+  const origem = (formData.get('origem') as string | null)?.trim() || null
   const cpf = (formData.get('cpf') as string | null)?.trim() || null
   const telefoneFixo = (formData.get('telefoneFixo') as string | null)?.trim() || null
   const orientacaoSexual = (formData.get('orientacaoSexual') as string | null)?.trim() || null
   const religiao = (formData.get('religiao') as string | null)?.trim() || null
   const escolaridade = (formData.get('escolaridade') as string | null)?.trim() || null
+  const bairro = (formData.get('bairro') as string | null)?.trim() || null
+  const logradouro = (formData.get('logradouro') as string | null)?.trim() || null
+  const numero = (formData.get('numero') as string | null)?.trim() || null
+  const complemento = (formData.get('complemento') as string | null)?.trim() || null
+  const cep = (formData.get('cep') as string | null)?.trim() || null
 
   if (!nome) return { ok: false, erro: 'Nome é obrigatório' }
   if (!whatsappRaw) return { ok: false, erro: 'WhatsApp é obrigatório' }
+
+  let nascimento: Date | null = null
+  if (nascimentoRaw) {
+    nascimento = parseDataBrasileira(nascimentoRaw)
+    if (!nascimento) return { ok: false, erro: 'Data de nascimento inválida — use o formato DD/MM/AAAA' }
+  }
 
   const supabase = createSupabaseServerClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -72,7 +86,9 @@ export async function editarPessoa(
       nome,
       whatsapp,
       email,
+      nascimento,
       genero,
+      origem,
       regiaoId,
       profissaoId,
       cpf,
@@ -80,6 +96,11 @@ export async function editarPessoa(
       orientacaoSexual,
       religiao,
       escolaridade,
+      bairro,
+      logradouro,
+      numero,
+      complemento,
+      cep,
     },
   })
 
