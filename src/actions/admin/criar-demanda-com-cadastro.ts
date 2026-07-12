@@ -72,7 +72,7 @@ export async function criarDemandaComCadastro(formData: FormData): Promise<void>
   if (!autorPessoa) throw new Error('Não foi possível identificar o autor')
 
   const solicitanteCheck = await prisma.pessoa.findFirst({
-    where: { id: solicitanteId, gabineteId: gabinete.id },
+    where: { id: solicitanteId, gabineteId: gabinete.id, deletedAt: null },
     select: { id: true },
   })
   if (!solicitanteCheck) throw new Error('Solicitante não encontrado')
@@ -91,7 +91,7 @@ export async function criarDemandaComCadastro(formData: FormData): Promise<void>
 
   const [, demanda] = await prisma.$transaction([
     prisma.pessoa.updateMany({
-      where: { id: solicitanteId, gabineteId: gabinete.id },
+      where: { id: solicitanteId, gabineteId: gabinete.id, deletedAt: null },
       data: {
         nome,
         whatsapp,

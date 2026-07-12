@@ -6,6 +6,7 @@ import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { getGabineteBySlug } from '@/lib/gabinete'
 import { normalizeWhatsApp } from '@/lib/whatsapp'
 import { parseDataBrasileira } from '@/lib/data-brasileira'
+import { coletarSubRedeIds } from '@/lib/rede'
 
 export async function editarPessoa(
   _prev: { ok: boolean; erro?: string } | null,
@@ -60,7 +61,8 @@ export async function editarPessoa(
   if (!isAdmin && !isMobilizador) throw new Error('Sem permissão')
 
   if (isMobilizador && !isAdmin) {
-    // Verificar que a pessoa está na rede direta do mobilizador ou é o próprio mobilizador
+    // Verificar que a pessoa está na sub-rede do mobilizador (toda a árvore de
+    // indicações, não só indicados diretos) ou é o próprio mobilizador
     const mobilizadorPessoa = await prisma.pessoa.findFirst({
       where: { userId: user.id, gabineteId: gabinete.id, isMobilizador: true },
       select: { id: true },
@@ -70,10 +72,8 @@ export async function editarPessoa(
     const isPropriaPessoa = mobilizadorPessoa.id === pessoaId
 
     if (!isPropriaPessoa) {
-      const vinculo = await prisma.vinculoRede.findFirst({
-        where: { gabineteId: gabinete.id, pessoaId, indicadoPorId: mobilizadorPessoa.id, deletedAt: null },
-      })
-      if (!vinculo) throw new Error('Pessoa fora da sua rede')
+      const idsRede = await coletarSubRedeIds(mobilizadorPessoa.id, gabinete.id)
+      if (!idsRede.includes(pessoaId)) throw new Error('Pessoa fora da sua rede')
     }
   }
 
