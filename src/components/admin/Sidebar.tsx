@@ -32,7 +32,8 @@ function buildItensAdmin(slug: string): ItemMenu[] {
 
 function buildItensMobilizador(slug: string): ItemMenu[] {
   return [
-    { label: 'Início', href: `/${slug}/mobilizador`, icone: 'inicio' },
+    { label: 'Dados Gerais', href: `/${slug}/mobilizador/dashboard`, icone: 'dados-gerais' },
+    { label: 'Início', href: `/${slug}/mobilizador/rede`, icone: 'inicio' },
     { label: 'Demandas', href: `/${slug}/mobilizador/demandas`, icone: 'demandas' },
     { label: 'Link de Cadastro', href: `/${slug}/mobilizador/link-cadastro`, icone: 'link-cadastro' },
   ]
