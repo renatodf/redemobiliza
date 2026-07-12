@@ -86,6 +86,7 @@ export default async function MobilizadorFiltrosPage({
         abas={[
           { chave: 'pessoas', label: 'Pessoas', href: `/${params.slug}/mobilizador/filtros` },
           { chave: 'demandas', label: 'Demandas', href: `/${params.slug}/mobilizador/filtros/demandas` },
+          { chave: 'cadastros', label: 'Cadastros', href: `/${params.slug}/mobilizador/filtros/cadastros` },
         ]}
         abaAtiva="pessoas"
         corPrimaria={gabinete.corPrimaria}
