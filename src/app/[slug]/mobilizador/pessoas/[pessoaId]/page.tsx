@@ -93,7 +93,7 @@ export default async function MobilizadorPessoaPage({
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-bold">{pessoa.nome}</h1>
-        <Link href={`/${params.slug}/mobilizador`} className="text-sm text-gray-500 hover:underline">
+        <Link href={`/${params.slug}/mobilizador/rede`} className="text-sm text-gray-500 hover:underline">
           ← Voltar
         </Link>
       </div>

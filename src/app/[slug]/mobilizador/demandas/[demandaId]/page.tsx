@@ -71,7 +71,7 @@ export default async function DetalheDemandaMobilizadorPage({
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-2 text-sm text-gray-500">
-        <Link href={`/${params.slug}/mobilizador`} className="hover:underline">← Voltar</Link>
+        <Link href={`/${params.slug}/mobilizador/rede`} className="hover:underline">← Voltar</Link>
       </div>
 
       <div className="bg-white rounded-lg p-6 shadow-sm space-y-3">

@@ -84,6 +84,6 @@ export async function editarPessoa(
   })
 
   revalidatePath(`/${slug}/admin/pessoas/${pessoaId}`)
-  revalidatePath(`/${slug}/mobilizador`)
+  revalidatePath(`/${slug}/mobilizador/rede`)
   return { ok: true }
 }

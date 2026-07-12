@@ -67,7 +67,7 @@ export async function promoverMobilizadorPorMobilizador(
       html: `<p>Olá, ${escapeHtml(pessoa.nome)}!</p><p>Seu acesso foi criado. Entre em <strong>/login</strong> com seu e-mail e a senha definida.</p>`,
     })
 
-    revalidatePath(`/${slug}/mobilizador`)
+    revalidatePath(`/${slug}/mobilizador/rede`)
     return {}
   } catch (e) {
     return { erro: e instanceof Error ? e.message : 'Erro desconhecido.' }

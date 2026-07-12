@@ -32,6 +32,6 @@ export async function marcarDesfechoDemandaMobilizador(formData: FormData): Prom
   })
 
   revalidatePath(`/${slug}/mobilizador/demandas/${demandaId}`)
-  revalidatePath(`/${slug}/mobilizador`)
+  revalidatePath(`/${slug}/mobilizador/rede`)
   return {}
 }
