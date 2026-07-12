@@ -39,3 +39,6 @@ next-env.d.ts
 
 # Playwright MCP snapshots (podem conter secrets)
 .playwright-mcp/
+
+# worktrees isolados de desenvolvimento
+/.worktrees/
