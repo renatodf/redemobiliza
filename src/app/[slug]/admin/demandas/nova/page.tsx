@@ -2,8 +2,9 @@ import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import { getGabineteBySlug } from '@/lib/gabinete'
 import { corTextoContraste } from '@/lib/cor-contraste'
-import { criarDemanda } from '@/actions/admin/criar-demanda'
+import { criarDemandaComCadastro } from '@/actions/admin/criar-demanda-com-cadastro'
 import { cadastrarSolicitante } from '@/actions/admin/cadastrar-solicitante'
+import CamposPessoa from '../../pessoas/[pessoaId]/CamposPessoa'
 
 export default async function NovaDemandaPage({
   params,
@@ -16,7 +17,7 @@ export default async function NovaDemandaPage({
   if (!gabinete) notFound()
   const corTexto = corTextoContraste(gabinete.corPrimaria)
 
-  const [areas, colaboradores, config] = await Promise.all([
+  const [areas, colaboradores, config, regioes, profissoes] = await Promise.all([
     prisma.areaDemanda.findMany({
       where: { gabineteId: gabinete.id },
       orderBy: { nome: 'asc' },
@@ -28,6 +29,16 @@ export default async function NovaDemandaPage({
       select: { id: true, nome: true },
     }),
     prisma.configuracaoSistema.findUnique({ where: { gabineteId: gabinete.id } }),
+    prisma.regiao.findMany({
+      where: { gabineteId: gabinete.id, ativa: true },
+      orderBy: { nome: 'asc' },
+      select: { id: true, nome: true },
+    }),
+    prisma.profissao.findMany({
+      where: { gabineteId: gabinete.id, ativa: true },
+      orderBy: { nome: 'asc' },
+      select: { id: true, nome: true },
+    }),
   ])
 
   const horasPrazo = config?.prazoDemandasHoras ?? 72
@@ -56,7 +67,27 @@ export default async function NovaDemandaPage({
   const solicitante = solicitanteId
     ? await prisma.pessoa.findFirst({
         where: { id: solicitanteId, gabineteId: gabinete.id, deletedAt: null },
-        select: { id: true, nome: true, whatsapp: true, bairro: true, logradouro: true, numero: true, complemento: true, cep: true, regiao: { select: { nome: true } } },
+        select: {
+          id: true,
+          nome: true,
+          whatsapp: true,
+          email: true,
+          nascimento: true,
+          genero: true,
+          origem: true,
+          regiaoId: true,
+          profissaoId: true,
+          cpf: true,
+          telefoneFixo: true,
+          orientacaoSexual: true,
+          religiao: true,
+          escolaridade: true,
+          bairro: true,
+          logradouro: true,
+          numero: true,
+          complemento: true,
+          cep: true,
+        },
       })
     : null
 
@@ -69,16 +100,13 @@ export default async function NovaDemandaPage({
         <h2 className="text-base font-semibold">Solicitante</h2>
 
         {solicitante ? (
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-900">{solicitante.nome}</p>
-                <p className="text-xs text-gray-500">{solicitante.whatsapp} · {solicitante.regiao?.nome ?? 'Sem região'}</p>
-              </div>
-              <a href={`/${params.slug}/admin/demandas/nova`} className="text-xs text-blue-600 hover:underline">
-                Trocar
-              </a>
-            </div>
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-gray-500">
+              Completando o cadastro de <span className="font-medium text-gray-900">{solicitante.nome}</span> abaixo.
+            </p>
+            <a href={`/${params.slug}/admin/demandas/nova`} className="text-xs text-blue-600 hover:underline">
+              Trocar
+            </a>
           </div>
         ) : (
           <div className="space-y-3">
@@ -184,11 +212,16 @@ export default async function NovaDemandaPage({
         )}
       </div>
 
-      {/* Formulário principal — só aparece quando solicitante selecionado */}
+      {/* Formulário único — ficha completa do solicitante + dados da demanda */}
       {solicitante && (
-        <form action={criarDemanda} className="space-y-6">
+        <form action={criarDemandaComCadastro} className="space-y-6">
           <input type="hidden" name="slug" value={params.slug} />
           <input type="hidden" name="solicitanteId" value={solicitante.id} />
+
+          <div className="bg-white rounded-lg shadow-sm p-6 space-y-4">
+            <h2 className="text-base font-semibold">Cadastro do Solicitante</h2>
+            <CamposPessoa pessoa={solicitante} regioes={regioes} profissoes={profissoes} />
+          </div>
 
           <div className="bg-white rounded-lg shadow-sm p-6 space-y-4">
             <h2 className="text-base font-semibold">Dados da Demanda</h2>
@@ -260,7 +293,7 @@ export default async function NovaDemandaPage({
             style={{ backgroundColor: gabinete.corPrimaria, color: corTexto }}
             className="w-full py-2.5 rounded-md text-sm font-medium hover:opacity-90"
           >
-            Abrir Demanda
+            Salvar
           </button>
         </form>
       )}
