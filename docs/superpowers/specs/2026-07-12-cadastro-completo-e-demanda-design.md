@@ -14,10 +14,11 @@ região/profissão/CPF/telefone fixo/orientação sexual/religião/escolaridade)
 só existem para receber dados de sistemas antigos (endereço completo, data de nascimento,
 origem do cadastro) — hoje só leitura na ficha, sem nenhum formulário que os edite.
 
-Esse spec fecha essa lacuna em três frentes: (1) o formulário de editar pessoa passa a
+Esse spec fecha essa lacuna em quatro frentes: (1) o formulário de editar pessoa passa a
 cobrir o modelo `Pessoa` inteiro, (2) o cadastro público ganha o campo de nascimento que
-nunca foi implementado, e (3) a tela de criar demanda passa a permitir completar o
-cadastro do solicitante no mesmo formulário, com um único salvamento atômico.
+nunca foi implementado, (3) a tela de criar demanda passa a permitir completar o cadastro
+do solicitante no mesmo formulário, com um único salvamento atômico, e (4) a Central de
+Filtros ganha uma aba dedicada a buscar uma pessoa e completar o cadastro dela na hora.
 
 ## 1. Componente compartilhado de campos da Pessoa
 
@@ -144,6 +145,34 @@ Tela `/[slug]/admin/demandas/nova` (`src/app/[slug]/admin/demandas/nova/page.tsx
   (`/admin/demandas/[id]`) não ganha esse comportamento — continua com seu modo de edição
   atual, só dos dados da própria demanda.
 
+## 6. Central de Filtros — nova aba "Cadastros"
+
+Nova aba na Central de Filtros, ao lado de Pessoas/Demandas/Banco de Talentos, para
+**buscar uma pessoa e completar o cadastro dela na hora**, sem precisar navegar até a
+ficha inteira (`/admin/pessoas/[pessoaId]`). Diferente das outras três abas, não é uma
+tela de filtro combinável + exportação — é busca simples + edição.
+
+- **Rotas novas**: `/[slug]/admin/filtros/cadastros/page.tsx` e
+  `/[slug]/mobilizador/filtros/cadastros/page.tsx`.
+- **Escopo de acesso** (mesmo critério já usado nas outras abas): admin busca no
+  gabinete inteiro; mobilizador busca só na própria sub-rede (`coletarSubRedeIds`,
+  `src/lib/rede.ts` — mesma CTE recursiva já usada nas abas Pessoas/Demandas).
+  `editarPessoa` já reforça essa mesma restrição no servidor (defesa em profundidade).
+- **UI**: busca por nome/WhatsApp via `?q=` (GET), lista de resultados (nome, WhatsApp,
+  região) — mesmo padrão visual da busca de solicitante em Nova Demanda. Clicar num
+  resultado (`?pessoaId=X`) mostra `<CamposPessoa>` completo e pré-preenchido, dentro do
+  **mesmo `EditarPessoaForm`** já usado na ficha da pessoa e no perfil do mobilizador —
+  **sem action nova**: reaproveita `editarPessoa` (que já cobre os campos novos da seção
+  1-3 acima) e o feedback "✓ Salvo!" que o form já tem.
+- **Sem cadastro de pessoa nova nesta aba** e **sem exportação** — só busca + edição de
+  quem já existe (decisão do usuário nesta sessão).
+- **Tabs existentes**: `FiltrosTabs` ganha a entrada `{ chave: 'cadastros', label:
+  'Cadastros', href: '.../filtros/cadastros' }` nos arrays de abas já presentes em
+  `admin/filtros/page.tsx`, `admin/filtros/demandas/page.tsx`,
+  `admin/filtros/banco-talentos/page.tsx`, `mobilizador/filtros/page.tsx` e
+  `mobilizador/filtros/demandas/page.tsx` (mobilizador não tem aba Banco de Talentos,
+  então só essas duas).
+
 ## Testes
 
 TDD nos módulos novos/alterados:
@@ -158,9 +187,15 @@ TDD nos módulos novos/alterados:
   tratamento adicional, fora de escopo).
 - `submeterCadastro`: nascimento opcional aceito quando ausente; erro amigável quando
   formato inválido; persistido corretamente quando válido.
+- Aba Cadastros: busca do admin cobre o gabinete inteiro; busca do mobilizador restrita à
+  sub-rede (mesmo teste de escopo já usado nas abas Pessoas/Demandas, incluindo o caso de
+  sub-árvore de múltiplos níveis); verificação manual de que salvar na aba usa a mesma
+  `editarPessoa` (sem regressão nas outras telas que a usam).
 
 ## Fora de escopo (explicitamente, por decisão do usuário nesta sessão)
 
+- Cadastrar pessoa nova a partir da aba "Cadastros" — só edição de quem já existe.
+- Exportação/filtros combináveis na aba "Cadastros" — é busca + edição, não filtro em massa.
 - Editar a ficha completa a partir da tela de uma demanda **já existente** — só na
   criação.
 - Qualquer tratamento novo de erro de WhatsApp duplicado além do que `editarPessoa` já
