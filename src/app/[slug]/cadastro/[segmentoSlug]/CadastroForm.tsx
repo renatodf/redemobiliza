@@ -143,6 +143,17 @@ export default function CadastroForm({
     e.preventDefault()
     setErro(null)
     const fd = new FormData(e.currentTarget)
+    // BUG CONHECIDO (pré-existente, não introduzido aqui — ver pendências do
+    // HANDOFF.md): qualquer File embutido num objeto comum passado pra uma
+    // Server Action chamada manualmente (fora do padrão nativo
+    // <form action={fn}>) quebra a serialização do Next ("Only plain
+    // objects... Classes or null prototypes are not supported") — mesmo com
+    // um arquivo de verdade selecionado, não só o File vazio que um
+    // <input type="file"> sem seleção produz. Esse guard só resolve o caso
+    // mais comum (cadastro sem foto). Upload de foto real no cadastro público
+    // continua quebrado até submeterCadastro ser migrado pra receber um
+    // FormData nativo, como uploadFotoPessoa já faz.
+    const fotoEscolhida = fd.get('foto') as File | null
     startTransition(async () => {
       const resultado = await submeterCadastro({
         slug,
@@ -156,7 +167,7 @@ export default function CadastroForm({
         nascimento: fd.get('nascimento') as string,
         mobilizadorToken,
         sucessoUrl,
-        foto: fd.get('foto') as File | null,
+        ...(fotoEscolhida && fotoEscolhida.size > 0 ? { foto: fotoEscolhida } : {}),
       })
       if (resultado && 'erro' in resultado) {
         setErro(resultado.erro)
