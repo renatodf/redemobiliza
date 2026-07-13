@@ -1,0 +1,30 @@
+name: Deploy Staging
+
+on:
+  push:
+    branches: [develop]
+
+jobs:
+  test-and-deploy:
+    runs-on: ubuntu-latest
+    env:
+      RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Typecheck
+        run: npx tsc --noEmit
+
+      - name: Testes
+        run: npx vitest run --exclude '**/.worktrees/**' --exclude '**/.claude/worktrees/**'
+
+      - name: Disparar deploy no EasyPanel (staging)
+        run: curl -f "http://187.77.34.212:3000/api/deploy/${{ secrets.EASYPANEL_STAGING_DEPLOY_HOOK }}"
