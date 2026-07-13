@@ -27,9 +27,9 @@ if [ -z "${DEPLOY_TOKEN:-}" ]; then
   fi
 fi
 
-echo "==> Verificando working tree limpo"
-if [ -n "$(git status --porcelain)" ]; then
-  echo "ERRO: há mudanças não commitadas. Commit ou stash antes de promover."
+echo "==> Verificando working tree limpo (arquivos rastreados)"
+if ! git diff --quiet || ! git diff --cached --quiet; then
+  echo "ERRO: há mudanças não commitadas em arquivos rastreados. Commit ou stash antes de promover."
   exit 1
 fi
 
