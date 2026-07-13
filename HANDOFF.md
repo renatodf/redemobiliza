@@ -77,7 +77,7 @@ Terceira e última aba planejada da Central de Filtros — **fecha a Fase 2 do B
 - **Achado Important na revisão final, corrigido no mesmo dia (`f125439`)**: TOCTOU — a rota revalidava o tenant mas não reaplicava `colocado:false`/`curriculoUrl not null` da listagem original, então uma pessoa marcada como colocada (ou já sem registro no Banco de Talentos) depois de selecionada na tela ainda entrava no ZIP e gerava Demanda indevida. Corrigido incluindo esse `where` na revalidação.
 - Mesmo commit também sanitiza nome de arquivo no ZIP (path traversal) e sufixa com parte do id (evita colisão de nomes).
 - Fix de segurança pós-implementação (`8ae97ec`): SSRF potencial em `fetch(curriculoUrl)` — não explorável hoje (único caminho de escrita é `getPublicUrl` do próprio Storage), mas mitigado com allowlist de origem + `redirect:'error'` como defesa em profundidade.
-- Follow-up não bloqueante registrado: sem `$transaction` no loop de criação de Demandas — falha parcial deixa Demandas já criadas sem rollback.
+- ~~Follow-up não bloqueante registrado: sem `$transaction` no loop de criação de Demandas~~ — **corrigido em `eee7ebd` (13/07)**: loop agora roda em `prisma.$transaction` em lote; e-mails continuam sendo enviados depois do commit, fora da transação.
 
 **Com isso, a Central de Filtros (spec de 11/07, seção 11) está completa: as três abas — Pessoas, Demandas, Banco de Talentos — existem e funcionam.**
 
@@ -91,7 +91,7 @@ Atende a pendência 6 da versão anterior deste documento (ideia de conversa, se
 - **Bug de `deletedAt` corrigido** (herdado — pessoas soft-deletadas entravam nas contagens/agregados do dashboard): confirmado contra dado real (gabinete de teste com 1 pessoa soft-deletada: 40 total vs 39 ativa).
 - Mobilizador: `/[slug]/mobilizador/page.tsx` virou redirect; a antiga home (listagem da rede) migrou para `/[slug]/mobilizador/rede/page.tsx`; nova `/[slug]/mobilizador/dashboard/page.tsx` reusa `DashboardConteudo` escopado por `idsRede` (Pessoas) e `responsavelId`+`solicitante` combinados (Demandas). Menu: "Início" agora aponta pra `/rede`, "Dados Gerais" é item novo.
 - **Fix pós-revisão (commit `83d0341`, HEAD atual)**: `/mobilizador/demandas` não lia `dataInicio`/`dataFim` — clicar na fatia "Demandas do mês" do dashboard mostrava a contagem certa mas abria a listagem sem limite de data (admin já funcionava). Corrigido com o mesmo padrão de `criadoEm` já usado em `/admin/demandas`. Também trocado `revalidatePath` de `marcar-desfecho-demanda.ts` de `/mobilizador/rede` (sem dado de demanda) pra `/mobilizador/demandas` (recomendação da mesma revisão).
-- Follow-up não bloqueante: `assertMobilizadorAccess` não checa `tokenMobilizador` (diferente da página antiga) — pré-existente, fora de escopo.
+- ~~Follow-up não bloqueante: `assertMobilizadorAccess` não checa `tokenMobilizador`~~ — **corrigido em `eee7ebd` (13/07)**: agora exige `tokenMobilizador` não-nulo, igual à página antiga. Efeito colateral pego na mesma correção: `scripts/vincular-mobilizador.ts` promovia mobilizador sem gerar token — corrigido para gerar `tokenMobilizador`, igual a `promover-mobilizador.ts`.
 
 ### 15. Cadastro Completo da Pessoa + Criação de Demanda + aba Cadastros (12/07)
 
