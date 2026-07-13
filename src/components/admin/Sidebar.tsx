@@ -23,7 +23,7 @@ function buildItensAdmin(slug: string): ItemMenu[] {
     { label: 'Usuários', href: `/${slug}/admin/pessoas`, icone: 'usuarios' },
     { label: 'Demandas', href: `/${slug}/admin/demandas`, icone: 'demandas' },
     { label: 'Tarefas', emBreve: true, icone: 'tarefas' },
-    { label: 'Banco de Talentos', emBreve: true, icone: 'banco-talentos' },
+    { label: 'Banco de Talentos', href: `/${slug}/admin/filtros/banco-talentos`, icone: 'banco-talentos' },
     { label: 'Link de Cadastro', href: `/${slug}/admin/link-cadastro`, icone: 'link-cadastro' },
     { label: 'Importar/Exportar', emBreve: true, icone: 'importar-exportar' },
     { label: 'Configurações', href: `/${slug}/admin/configuracoes`, icone: 'configuracoes' },
