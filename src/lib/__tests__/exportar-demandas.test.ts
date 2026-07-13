@@ -15,7 +15,11 @@ describe('gerarExcelDemandas', () => {
   it('gera um .xlsx válido com uma linha por demanda', async () => {
     const buffer = await gerarExcelDemandas([demandaExemplo])
     const workbook = new ExcelJS.Workbook()
-    await workbook.xlsx.load(new Uint8Array(buffer))
+    // exceljs declara sua própria interface global `Buffer extends ArrayBuffer`
+    // (index.d.ts do pacote), que colide com a do @types/node e quebra a
+    // compatibilidade estrutural — bug de tipos de terceiros, não do nosso código.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await workbook.xlsx.load(buffer as any)
     const sheet = workbook.getWorksheet('Demandas')
     expect(sheet?.rowCount).toBe(2)
     expect(sheet?.getRow(2).getCell(1).value).toBe('Buraco na rua principal')
@@ -24,7 +28,11 @@ describe('gerarExcelDemandas', () => {
   it('usa o label amigável do status, não o valor cru', async () => {
     const buffer = await gerarExcelDemandas([demandaExemplo])
     const workbook = new ExcelJS.Workbook()
-    await workbook.xlsx.load(new Uint8Array(buffer))
+    // exceljs declara sua própria interface global `Buffer extends ArrayBuffer`
+    // (index.d.ts do pacote), que colide com a do @types/node e quebra a
+    // compatibilidade estrutural — bug de tipos de terceiros, não do nosso código.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await workbook.xlsx.load(buffer as any)
     const sheet = workbook.getWorksheet('Demandas')
     expect(sheet?.getRow(2).getCell(3).value).toBe('CONCLUÍDO')
   })
@@ -32,7 +40,11 @@ describe('gerarExcelDemandas', () => {
   it('gera planilha vazia (só cabeçalho) quando não há demandas', async () => {
     const buffer = await gerarExcelDemandas([])
     const workbook = new ExcelJS.Workbook()
-    await workbook.xlsx.load(new Uint8Array(buffer))
+    // exceljs declara sua própria interface global `Buffer extends ArrayBuffer`
+    // (index.d.ts do pacote), que colide com a do @types/node e quebra a
+    // compatibilidade estrutural — bug de tipos de terceiros, não do nosso código.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await workbook.xlsx.load(buffer as any)
     const sheet = workbook.getWorksheet('Demandas')
     expect(sheet?.rowCount).toBe(1)
   })

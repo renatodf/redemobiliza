@@ -16,7 +16,11 @@ describe('gerarExcelPessoas', () => {
   it('gera um .xlsx válido com uma linha por pessoa', async () => {
     const buffer = await gerarExcelPessoas([pessoaExemplo])
     const workbook = new ExcelJS.Workbook()
-    await workbook.xlsx.load(new Uint8Array(buffer))
+    // exceljs declara sua própria interface global `Buffer extends ArrayBuffer`
+    // (index.d.ts do pacote), que colide com a do @types/node e quebra a
+    // compatibilidade estrutural — bug de tipos de terceiros, não do nosso código.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await workbook.xlsx.load(buffer as any)
     const sheet = workbook.getWorksheet('Pessoas')
     expect(sheet?.rowCount).toBe(2)
     expect(sheet?.getRow(2).getCell(1).value).toBe('Maria Silva')
@@ -25,7 +29,11 @@ describe('gerarExcelPessoas', () => {
   it('gera planilha vazia (só cabeçalho) quando não há pessoas', async () => {
     const buffer = await gerarExcelPessoas([])
     const workbook = new ExcelJS.Workbook()
-    await workbook.xlsx.load(new Uint8Array(buffer))
+    // exceljs declara sua própria interface global `Buffer extends ArrayBuffer`
+    // (index.d.ts do pacote), que colide com a do @types/node e quebra a
+    // compatibilidade estrutural — bug de tipos de terceiros, não do nosso código.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await workbook.xlsx.load(buffer as any)
     const sheet = workbook.getWorksheet('Pessoas')
     expect(sheet?.rowCount).toBe(1)
   })
