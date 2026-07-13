@@ -21,9 +21,12 @@ export async function assertMobilizadorAccess(slug: string) {
 
   const pessoa = await prisma.pessoa.findFirst({
     where: { userId: session.user.id, gabineteId: gabinete.id, isMobilizador: true },
-    select: { id: true, nome: true },
+    select: { id: true, nome: true, tokenMobilizador: true },
   })
-  if (!pessoa) throw new Error('Mobilizador não encontrado')
+  // tokenMobilizador é zerado junto com isMobilizador em revogar-mobilizador(-em-massa) —
+  // checar os dois é defesa em profundidade contra o flag ficando true sem token
+  // (mesmo padrão já usado em mobilizador/rede/page.tsx).
+  if (!pessoa || !pessoa.tokenMobilizador) throw new Error('Mobilizador não encontrado')
 
   return { session, gabinete, pessoa }
 }

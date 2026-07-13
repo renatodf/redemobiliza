@@ -50,10 +50,13 @@ async function main() {
   }
   console.log(`✓ Pessoa encontrada: ${pessoa.nome} (gabinete: ${pessoa.gabinete.nome})`)
 
-  // 3. Atualizar Pessoa.userId
+  // 3. Atualizar Pessoa.userId — tokenMobilizador é obrigatório junto com
+  // isMobilizador (mesmo padrão de promover-mobilizador.ts); sem ele,
+  // assertMobilizadorAccess rejeita o login mesmo com isMobilizador=true.
+  const tokenMobilizador = crypto.randomUUID().replace(/-/g, '')
   await (prisma as any).pessoa.update({
     where: { id: pessoa.id },
-    data: { userId: supabaseUser.id, isMobilizador: true },
+    data: { userId: supabaseUser.id, isMobilizador: true, tokenMobilizador },
   })
   console.log(`✓ Pessoa.userId atualizado`)
 

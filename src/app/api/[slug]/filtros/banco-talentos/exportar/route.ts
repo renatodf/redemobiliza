@@ -68,12 +68,14 @@ export async function POST(request: NextRequest, { params }: { params: { slug: s
     const prazoDesfecho = new Date(Date.now() + horasPrazo * 60 * 60 * 1000)
     const appUrl = getAppUrl()
 
-    for (const p of pessoas) {
-      const titulo = `Acompanhamento de encaminhamento — ${p.nome}`
-      const demanda = await prisma.demanda.create({
+    // $transaction em lote: ou todas as Demandas são criadas, ou nenhuma —
+    // sem isso, uma falha no meio do loop (ex. pessoa deletada entre a busca
+    // e o create) deixava Demandas parciais já criadas sem rollback.
+    const demandasCriadas = await prisma.$transaction(
+      pessoas.map((p) => prisma.demanda.create({
         data: {
           gabineteId,
-          titulo,
+          titulo: `Acompanhamento de encaminhamento — ${p.nome}`,
           descricao: 'Encaminhamento gerado a partir do Banco de Talentos.',
           solicitanteId: p.id,
           responsavelId,
@@ -84,16 +86,23 @@ export async function POST(request: NextRequest, { params }: { params: { slug: s
             create: { tipo: 'criacao', descricao: 'Demanda criada', autorId: autorPessoa.id },
           },
         },
-      })
+        select: { id: true, titulo: true },
+      }))
+    )
 
-      if (responsavel.email) {
+    // E-mails são enviados depois do commit, fora da transação (I/O externo
+    // não deve prender o lock do banco) — falha aqui não desfaz as Demandas.
+    if (responsavel.email) {
+      for (let i = 0; i < demandasCriadas.length; i++) {
+        const demanda = demandasCriadas[i]
+        const p = pessoas[i]
         try {
           await enviarEmail({
             para: responsavel.email,
-            assunto: `Nova demanda atribuída: ${titulo}`,
+            assunto: `Nova demanda atribuída: ${demanda.titulo}`,
             html: templateDemandaAtribuida({
               nomeResponsavel: responsavel.nome,
-              tituloDemanda: titulo,
+              tituloDemanda: demanda.titulo,
               nomeSolicitante: p.nome,
               prazo: prazoDesfecho,
               urlDemanda: `${appUrl}/${params.slug}/mobilizador/demandas/${demanda.id}`,
