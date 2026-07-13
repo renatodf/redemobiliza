@@ -142,33 +142,21 @@ export default function CadastroForm({
   function handleSubmeterDados(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setErro(null)
+    // fd já vem do form nativo com nome/email/regiaoId/profissaoId/genero/
+    // nascimento/foto (mesmos `name` de sempre) — só falta acrescentar o que
+    // não é input nenhum (slug, whatsapp vem do state da etapa anterior,
+    // segmentoSlugs, mobilizadorToken, sucessoUrl) e mandar o FormData
+    // inteiro direto. FormData é um built-in que o Next reconhece nativamente
+    // na serialização de Server Actions — diferente de um File solto dentro
+    // de um objeto comum, que quebrava antes (ver HANDOFF.md, pendência 10).
     const fd = new FormData(e.currentTarget)
-    // BUG CONHECIDO (pré-existente, não introduzido aqui — ver pendências do
-    // HANDOFF.md): qualquer File embutido num objeto comum passado pra uma
-    // Server Action chamada manualmente (fora do padrão nativo
-    // <form action={fn}>) quebra a serialização do Next ("Only plain
-    // objects... Classes or null prototypes are not supported") — mesmo com
-    // um arquivo de verdade selecionado, não só o File vazio que um
-    // <input type="file"> sem seleção produz. Esse guard só resolve o caso
-    // mais comum (cadastro sem foto). Upload de foto real no cadastro público
-    // continua quebrado até submeterCadastro ser migrado pra receber um
-    // FormData nativo, como uploadFotoPessoa já faz.
-    const fotoEscolhida = fd.get('foto') as File | null
+    fd.set('slug', slug)
+    fd.set('whatsapp', whatsapp)
+    for (const seg of segmentoSlugs) fd.append('segmentoSlugs', seg)
+    if (mobilizadorToken) fd.set('mobilizadorToken', mobilizadorToken)
+    fd.set('sucessoUrl', sucessoUrl)
     startTransition(async () => {
-      const resultado = await submeterCadastro({
-        slug,
-        segmentoSlugs,
-        whatsapp,
-        nome: fd.get('nome') as string,
-        email: fd.get('email') as string,
-        regiaoId: fd.get('regiaoId') as string,
-        profissaoId: fd.get('profissaoId') as string,
-        genero: fd.get('genero') as string,
-        nascimento: fd.get('nascimento') as string,
-        mobilizadorToken,
-        sucessoUrl,
-        ...(fotoEscolhida && fotoEscolhida.size > 0 ? { foto: fotoEscolhida } : {}),
-      })
+      const resultado = await submeterCadastro(fd)
       if (resultado && 'erro' in resultado) {
         setErro(resultado.erro)
       }
@@ -178,15 +166,15 @@ export default function CadastroForm({
   function handleConfirmar(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setErro(null)
+    const fd = new FormData()
+    fd.set('slug', slug)
+    fd.set('whatsapp', whatsapp)
+    fd.set('nome', '')
+    for (const seg of segmentoSlugs) fd.append('segmentoSlugs', seg)
+    if (mobilizadorToken) fd.set('mobilizadorToken', mobilizadorToken)
+    fd.set('sucessoUrl', sucessoUrl)
     startTransition(async () => {
-      const resultado = await submeterCadastro({
-        slug,
-        segmentoSlugs,
-        whatsapp,
-        nome: '',
-        mobilizadorToken,
-        sucessoUrl,
-      })
+      const resultado = await submeterCadastro(fd)
       if (resultado && 'erro' in resultado) {
         setErro(resultado.erro)
       }

@@ -14,36 +14,19 @@ const TIPOS_FOTO_PERMITIDOS = {
   'image/gif': 'gif',
 } as const
 
-type SubmeterCadastroInput = {
-  slug: string
-  segmentoSlugs: string[]
-  whatsapp: string
-  nome: string
-  email?: string
-  regiaoId?: string
-  profissaoId?: string
-  genero?: string
-  nascimento?: string
-  mobilizadorToken?: string
-  sucessoUrl: string
-  foto?: File | null
-}
-
-export async function submeterCadastro(input: SubmeterCadastroInput): Promise<{ erro: string } | never> {
-  const {
-    slug,
-    segmentoSlugs,
-    whatsapp: whatsappRaw,
-    nome,
-    email,
-    regiaoId,
-    profissaoId,
-    genero,
-    nascimento: nascimentoRaw,
-    mobilizadorToken,
-    sucessoUrl,
-    foto,
-  } = input
+export async function submeterCadastro(formData: FormData): Promise<{ erro: string } | never> {
+  const slug = formData.get('slug') as string
+  const segmentoSlugs = formData.getAll('segmentoSlugs') as string[]
+  const whatsappRaw = formData.get('whatsapp') as string
+  const nome = (formData.get('nome') as string | null) ?? ''
+  const email = formData.get('email') as string | null
+  const regiaoId = formData.get('regiaoId') as string | null
+  const profissaoId = formData.get('profissaoId') as string | null
+  const genero = formData.get('genero') as string | null
+  const nascimentoRaw = formData.get('nascimento') as string | null
+  const mobilizadorToken = (formData.get('mobilizadorToken') as string | null) || undefined
+  const sucessoUrl = formData.get('sucessoUrl') as string
+  const foto = formData.get('foto') as File | null
 
   const gabinete = await getGabineteBySlug(slug)
   if (!gabinete || !gabinete.ativo) return { erro: 'Gabinete não encontrado' }
