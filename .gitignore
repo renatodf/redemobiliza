@@ -42,3 +42,7 @@ next-env.d.ts
 
 # worktrees isolados de desenvolvimento
 /.worktrees/
+
+# Copias locais de referencia por ambiente (nao usadas pelo EasyPanel em runtime)
+.env.staging
+.env.production
