@@ -139,22 +139,27 @@ export default function CadastroForm({
     })
   }
 
-  function handleSubmeterDados(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    setErro(null)
-    // fd já vem do form nativo com nome/email/regiaoId/profissaoId/genero/
-    // nascimento/foto (mesmos `name` de sempre) — só falta acrescentar o que
-    // não é input nenhum (slug, whatsapp vem do state da etapa anterior,
-    // segmentoSlugs, mobilizadorToken, sucessoUrl) e mandar o FormData
-    // inteiro direto. FormData é um built-in que o Next reconhece nativamente
-    // na serialização de Server Actions — diferente de um File solto dentro
-    // de um objeto comum, que quebrava antes (ver HANDOFF.md, pendência 10).
-    const fd = new FormData(e.currentTarget)
+  // Campos que toda chamada a submeterCadastro precisa levar, além dos que já
+  // vêm do form nativo (nome/email/regiaoId/profissaoId/genero/nascimento/foto)
+  // — usado tanto no cadastro novo quanto na confirmação de presença.
+  function preencherCamposComuns(fd: FormData) {
     fd.set('slug', slug)
     fd.set('whatsapp', whatsapp)
     for (const seg of segmentoSlugs) fd.append('segmentoSlugs', seg)
     if (mobilizadorToken) fd.set('mobilizadorToken', mobilizadorToken)
     fd.set('sucessoUrl', sucessoUrl)
+  }
+
+  function handleSubmeterDados(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    setErro(null)
+    // fd já vem do form nativo com nome/email/regiaoId/profissaoId/genero/
+    // nascimento/foto (mesmos `name` de sempre). FormData é um built-in que o
+    // Next reconhece nativamente na serialização de Server Actions —
+    // diferente de um File solto dentro de um objeto comum, que quebrava
+    // antes (ver HANDOFF.md, pendência 10).
+    const fd = new FormData(e.currentTarget)
+    preencherCamposComuns(fd)
     startTransition(async () => {
       const resultado = await submeterCadastro(fd)
       if (resultado && 'erro' in resultado) {
@@ -167,12 +172,8 @@ export default function CadastroForm({
     e.preventDefault()
     setErro(null)
     const fd = new FormData()
-    fd.set('slug', slug)
-    fd.set('whatsapp', whatsapp)
     fd.set('nome', '')
-    for (const seg of segmentoSlugs) fd.append('segmentoSlugs', seg)
-    if (mobilizadorToken) fd.set('mobilizadorToken', mobilizadorToken)
-    fd.set('sucessoUrl', sucessoUrl)
+    preencherCamposComuns(fd)
     startTransition(async () => {
       const resultado = await submeterCadastro(fd)
       if (resultado && 'erro' in resultado) {
