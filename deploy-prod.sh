@@ -40,6 +40,9 @@ git checkout develop
 git pull origin develop
 
 echo "==> Rodando testes locais antes da promoção"
+if [ -f .env.production ] && [ -z "${RESEND_API_KEY:-}" ]; then
+  export RESEND_API_KEY="$(grep '^RESEND_API_KEY=' .env.production | cut -d= -f2-)"
+fi
 npx tsc --noEmit
 npx vitest run --exclude '**/.worktrees/**' --exclude '**/.claude/worktrees/**'
 
