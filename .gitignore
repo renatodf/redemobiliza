@@ -46,4 +46,3 @@ next-env.d.ts
 # Copias locais de referencia por ambiente (nao usadas pelo EasyPanel em runtime)
 .env.staging
 .env.production
-.easypanel-password
