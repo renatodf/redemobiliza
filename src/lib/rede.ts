@@ -40,3 +40,22 @@ export async function coletarSubRedeIds(pessoaId: string, gabineteId: string): P
   `
   return resultado.map((r) => r.id)
 }
+
+// Resolve o parâmetro `redeDeId` (vindo da URL) para a lista de ids de pessoa
+// que ele representa: `undefined` quando nenhum filtro de rede está ativo,
+// a Rede Raiz (pessoas sem indicador) quando `redeDeId === 'raiz'`, ou a
+// sub-rede completa e recursiva de um mobilizador específico nos demais casos.
+export async function resolverIdsRedeDe(
+  redeDeId: string | undefined,
+  gabineteId: string
+): Promise<string[] | undefined> {
+  if (!redeDeId) return undefined
+  if (redeDeId === 'raiz') {
+    const vinculos = await prisma.vinculoRede.findMany({
+      where: { indicadoPorId: null, gabineteId, deletedAt: null },
+      select: { pessoaId: true },
+    })
+    return vinculos.map((v) => v.pessoaId)
+  }
+  return coletarSubRedeIds(redeDeId, gabineteId)
+}
