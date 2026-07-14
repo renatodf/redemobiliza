@@ -6,16 +6,26 @@ export type FatiaPizza = {
   href?: string
 }
 
+const RAIO = 48
+const CENTRO = 50
+
+function pontoNoCirculo(anguloGraus: number) {
+  const rad = (anguloGraus * Math.PI) / 180
+  return {
+    x: CENTRO + RAIO * Math.sin(rad),
+    y: CENTRO - RAIO * Math.cos(rad),
+  }
+}
+
 export function GraficoPizza({ titulo, fatias }: { titulo: string; fatias: FatiaPizza[] }) {
   const total = fatias.reduce((acc, f) => acc + f.valor, 0)
   let acumulado = 0
-  const stops = fatias.map((f) => {
+  const arcos = fatias.map((f) => {
     const inicio = total > 0 ? (acumulado / total) * 360 : 0
     acumulado += f.valor
     const fim = total > 0 ? (acumulado / total) * 360 : 0
-    return `${f.cor} ${inicio}deg ${fim}deg`
+    return { ...f, inicio, fim }
   })
-  const gradiente = total > 0 ? `conic-gradient(${stops.join(', ')})` : '#e1e0d9'
 
   return (
     <section className="bg-white rounded-xl shadow-sm p-5">
@@ -24,7 +34,31 @@ export function GraficoPizza({ titulo, fatias }: { titulo: string; fatias: Fatia
         <p className="text-sm text-gray-500">Nenhum dado disponível.</p>
       ) : (
         <div className="flex items-center gap-5">
-          <div className="w-28 h-28 rounded-full shrink-0" style={{ background: gradiente }} aria-hidden />
+          <svg viewBox="0 0 100 100" className="w-28 h-28 shrink-0">
+            {arcos.map((a) => {
+              // Fatia única cobrindo 100% — um arco com início/fim idênticos é
+              // degenerado (SVG não desenha), então usamos um círculo completo.
+              const circuloCompleto = a.fim - a.inicio >= 359.99
+              const forma = circuloCompleto ? (
+                <circle cx={CENTRO} cy={CENTRO} r={RAIO} fill={a.cor} />
+              ) : (
+                (() => {
+                  const p1 = pontoNoCirculo(a.inicio)
+                  const p2 = pontoNoCirculo(a.fim)
+                  const largeArc = a.fim - a.inicio > 180 ? 1 : 0
+                  const path = `M${CENTRO},${CENTRO} L${p1.x},${p1.y} A${RAIO},${RAIO} 0 ${largeArc} 1 ${p2.x},${p2.y} Z`
+                  return <path d={path} fill={a.cor} />
+                })()
+              )
+              return a.href ? (
+                <a key={a.chave} href={a.href} className="cursor-pointer">
+                  {forma}
+                </a>
+              ) : (
+                <g key={a.chave}>{forma}</g>
+              )
+            })}
+          </svg>
           <ul className="flex-1 space-y-1.5 text-sm">
             {fatias.map((f) => {
               const conteudo = (
