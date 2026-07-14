@@ -6,6 +6,7 @@ import { calcularIdade } from '@/lib/aniversario'
 import { calcularFaixaEtaria } from '@/lib/faixa-etaria'
 import { agruparTopEOutros } from '@/lib/agrupar-top-outros'
 import { PALETA_CATEGORICA, COR_NEUTRA, CORES_STATUS_DEMANDA } from '@/lib/cores-graficos'
+import { CAMPOS_FILTRO_PESSOAS } from '@/lib/filtros-ativos'
 
 type ContagemChave = { chave: string | null; contagem: number }
 
@@ -70,6 +71,9 @@ export function DashboardConteudo({
   totalSemNascimento,
   escolaridade,
   religiao,
+  segmentoAtivo,
+  profissaoAtiva,
+  redeAtiva,
 }: {
   slug: string
   dashboardHref: string
@@ -95,6 +99,9 @@ export function DashboardConteudo({
   totalSemNascimento: number
   escolaridade: ContagemChave[]
   religiao: ContagemChave[]
+  segmentoAtivo?: { nome: string } | null
+  profissaoAtiva?: { nome: string } | null
+  redeAtiva?: { nome: string } | null
 }) {
   // Demandas — cores de status reservadas, sempre as 4 fatias (mesmo 0)
   const mapaDemandas = Object.fromEntries(contagemDemandas.map((c) => [c.chave, c.contagem]))
@@ -180,6 +187,33 @@ export function DashboardConteudo({
     href: construirHref(filtrosHref, searchParams, { regiaoId: r.id }, ['periodo', 'inicio', 'fim']),
   }))
 
+  // Filtros ativos (badges removíveis + "Limpar tudo")
+  const GENERO_LABEL: Record<string, string> = { masculino: 'Masculino', feminino: 'Feminino', outro: 'Outro' }
+  type FiltroExibivel = { chave: string; label: string }
+  const filtrosAtivosExibiveis: FiltroExibivel[] = []
+  if (searchParams.regiaoId) {
+    const regiaoFiltrada = regioes.find((r) => r.id === searchParams.regiaoId)
+    filtrosAtivosExibiveis.push({ chave: 'regiaoId', label: `Região: ${regiaoFiltrada?.nome ?? searchParams.regiaoId}` })
+  }
+  if (searchParams.genero) {
+    filtrosAtivosExibiveis.push({ chave: 'genero', label: `Sexo: ${GENERO_LABEL[searchParams.genero] ?? searchParams.genero}` })
+  }
+  if (searchParams.segmentoId) {
+    filtrosAtivosExibiveis.push({ chave: 'segmentoId', label: `Segmento: ${segmentoAtivo?.nome ?? searchParams.segmentoId}` })
+  }
+  if (searchParams.profissaoId) {
+    filtrosAtivosExibiveis.push({ chave: 'profissaoId', label: `Profissão: ${profissaoAtiva?.nome ?? searchParams.profissaoId}` })
+  }
+  if (searchParams.escolaridade) {
+    filtrosAtivosExibiveis.push({ chave: 'escolaridade', label: `Escolaridade: ${searchParams.escolaridade}` })
+  }
+  if (searchParams.religiao) {
+    filtrosAtivosExibiveis.push({ chave: 'religiao', label: `Religião: ${searchParams.religiao}` })
+  }
+  if (searchParams.redeDeId) {
+    filtrosAtivosExibiveis.push({ chave: 'redeDeId', label: `Rede: ${redeAtiva?.nome ?? searchParams.redeDeId}` })
+  }
+
   return (
     <div className="max-w-5xl mx-auto py-6 px-4 space-y-8">
       <div className="flex flex-wrap items-center justify-between gap-4">
@@ -202,6 +236,32 @@ export function DashboardConteudo({
       <p className="text-sm text-gray-500 -mt-4">
         Período selecionado: <strong>{labelPeriodo[periodo] ?? periodo}</strong>
       </p>
+
+      {filtrosAtivosExibiveis.length > 0 && (
+        <div className="flex flex-wrap items-center gap-2 -mt-4">
+          {filtrosAtivosExibiveis.map((f) => (
+            <span
+              key={f.chave}
+              className="inline-flex items-center gap-1.5 bg-gray-100 text-gray-700 text-xs pl-2.5 pr-1.5 py-1 rounded-full"
+            >
+              {f.label}
+              <a
+                href={construirHref(dashboardHref, searchParams, {}, [f.chave])}
+                className="text-gray-400 hover:text-gray-700 leading-none"
+                aria-label={`Remover filtro ${f.label}`}
+              >
+                ×
+              </a>
+            </span>
+          ))}
+          <a
+            href={construirHref(dashboardHref, searchParams, {}, [...CAMPOS_FILTRO_PESSOAS])}
+            className="text-xs text-blue-600 hover:underline"
+          >
+            Limpar tudo
+          </a>
+        </div>
+      )}
 
       <section>
         <h2 className="text-base font-semibold text-gray-800 mb-3">Pessoas por região</h2>
