@@ -18,6 +18,11 @@ describe('encontrarPosicaoRegiao', () => {
   it('retorna null para nome vazio', () => {
     expect(encontrarPosicaoRegiao('')).toBeNull()
   })
+
+  it('encontra regiões com nome combinado usadas por gabinetes reais', () => {
+    expect(encontrarPosicaoRegiao('Sudoeste/Octogonal')).toEqual({ x: 44, y: 38 })
+    expect(encontrarPosicaoRegiao('SCIA/Estrutural')).toEqual({ x: 40, y: 38 })
+  })
 })
 
 describe('calcularTamanhoBalao', () => {

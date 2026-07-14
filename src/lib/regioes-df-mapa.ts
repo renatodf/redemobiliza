@@ -3,13 +3,17 @@ type PosicaoRegiao = { nome: string; x: number; y: number }
 // Coordenadas aproximadas (percentual, viewBox 0 0 100 85) — ilustrativas, não uma
 // projeção cartográfica real. Inclui as Regiões Administrativas oficiais do DF e
 // alguns apelidos informais comuns (Asa Norte/Sul, Sudoeste/Octogonal, etc) já que
-// gabinetes cadastram o nome da Região livremente.
+// gabinetes cadastram o nome da Região livremente. Confirmado contra gabinete real
+// (amigos-do-izalci, 35 regiões cadastradas): duas usam o nome combinado com barra
+// ("Sudoeste/Octogonal", "SCIA/Estrutural") em vez dos nomes separados — adicionados
+// como entradas próprias já que a normalização não junta strings com "/".
 const REGIOES_DF: PosicaoRegiao[] = [
   { nome: 'Plano Piloto', x: 50, y: 30 },
   { nome: 'Asa Norte', x: 52, y: 25 },
   { nome: 'Asa Sul', x: 50, y: 35 },
   { nome: 'Sudoeste', x: 44, y: 38 },
   { nome: 'Octogonal', x: 43, y: 39 },
+  { nome: 'Sudoeste/Octogonal', x: 44, y: 38 },
   { nome: 'Noroeste', x: 46, y: 22 },
   { nome: 'Cruzeiro', x: 42, y: 33 },
   { nome: 'Lago Norte', x: 58, y: 22 },
@@ -40,6 +44,7 @@ const REGIOES_DF: PosicaoRegiao[] = [
   { nome: 'Varjão', x: 54, y: 20 },
   { nome: 'SCIA', x: 40, y: 38 },
   { nome: 'Estrutural', x: 40, y: 38 },
+  { nome: 'SCIA/Estrutural', x: 40, y: 38 },
   { nome: 'SIA', x: 41, y: 40 },
   { nome: 'Arniqueira', x: 32, y: 50 },
   { nome: 'Sol Nascente', x: 20, y: 45 },
