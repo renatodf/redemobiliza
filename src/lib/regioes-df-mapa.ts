@@ -70,5 +70,6 @@ export function calcularTamanhoBalao(
 ): number {
   if (max <= min) return (tamanhoMin + tamanhoMax) / 2
   const proporcao = (contagem - min) / (max - min)
-  return tamanhoMin + proporcao * (tamanhoMax - tamanhoMin)
+  const tamanho = tamanhoMin + proporcao * (tamanhoMax - tamanhoMin)
+  return Math.max(tamanhoMin, Math.min(tamanhoMax, tamanho))
 }

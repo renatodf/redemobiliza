@@ -36,4 +36,12 @@ describe('calcularTamanhoBalao', () => {
   it('retorna o ponto médio quando min e max são iguais (evita divisão por zero)', () => {
     expect(calcularTamanhoBalao(42, 42, 42)).toBe(25.5)
   })
+
+  it('retorna tamanho mínimo quando contagem está abaixo do intervalo min/max', () => {
+    expect(calcularTamanhoBalao(1, 10, 100)).toBe(17)
+  })
+
+  it('retorna tamanho máximo quando contagem está acima do intervalo min/max', () => {
+    expect(calcularTamanhoBalao(150, 10, 100)).toBe(34)
+  })
 })
