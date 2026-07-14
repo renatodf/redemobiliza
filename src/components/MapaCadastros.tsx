@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { MapContainer, TileLayer, Marker, Tooltip, useMap } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
@@ -42,15 +42,26 @@ function AjustarViewport({ pontos }: { pontos: [number, number][] }) {
 }
 
 export default function MapaCadastros({ regioes }: { regioes: RegiaoMapa[] }) {
-  const pinos = regioes.filter(
-    (r): r is RegiaoMapa & { latitude: number; longitude: number } =>
-      r.latitude != null && r.longitude != null && r.contagem > 0
+  const regioesKey = regioes.map((r) => `${r.id}:${r.latitude}:${r.longitude}:${r.contagem}`).join('|')
+
+  const pinos = useMemo(
+    () =>
+      regioes.filter(
+        (r): r is RegiaoMapa & { latitude: number; longitude: number } =>
+          r.latitude != null && r.longitude != null && r.contagem > 0
+      ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [regioesKey]
   )
 
   const contagens = pinos.map((p) => p.contagem)
   const min = contagens.length > 0 ? Math.min(...contagens) : 0
   const max = contagens.length > 0 ? Math.max(...contagens) : 0
-  const pontos: [number, number][] = pinos.map((p) => [p.latitude, p.longitude])
+
+  const pontos: [number, number][] = useMemo(
+    () => pinos.map((p) => [p.latitude, p.longitude] as [number, number]),
+    [pinos]
+  )
 
   return (
     <div>
