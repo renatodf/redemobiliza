@@ -1,5 +1,6 @@
 // src/app/[slug]/admin/filtros/PessoasFiltro.tsx
 import Pagination from '@/components/admin/Pagination'
+import VisualizarDadosGeraisButton from '@/components/admin/VisualizarDadosGeraisButton'
 import { LIMITE_EXPORT_SINCRONO } from '@/lib/filtros-pessoas'
 
 type PessoaLinha = {
@@ -15,6 +16,7 @@ type PessoaLinha = {
 
 export default function PessoasFiltro({
   baseHref,
+  dashboardHref,
   exportarHref,
   searchParams,
   pessoas,
@@ -29,6 +31,7 @@ export default function PessoasFiltro({
   corPrimaria,
 }: {
   baseHref: string
+  dashboardHref: string
   exportarHref: string
   searchParams: Record<string, string | undefined>
   pessoas: PessoaLinha[]
@@ -148,6 +151,7 @@ export default function PessoasFiltro({
           )}
         </div>
         <div className="flex gap-2">
+          <VisualizarDadosGeraisButton dashboardHref={dashboardHref} searchParams={searchParams} corPrimaria={corPrimaria} />
           <a
             href={`${exportarHref}?${queryAtual}${separador}formato=pdf`}
             style={{ backgroundColor: corPrimaria }}

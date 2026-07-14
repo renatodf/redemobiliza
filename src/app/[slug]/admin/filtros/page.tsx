@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import { getGabineteBySlug } from '@/lib/gabinete'
 import { buildWherePessoas, aplicarFiltrosPosConsulta, type FiltrosPessoasParams } from '@/lib/filtros-pessoas'
+import { resolverIdsRedeDe } from '@/lib/rede'
 import { paginar } from '@/lib/paginacao'
 import FiltrosTabs from './FiltrosTabs'
 import PessoasFiltro from './PessoasFiltro'
@@ -31,7 +32,8 @@ export default async function AdminFiltrosPage({
     religiao: searchParams.religiao,
   }
 
-  const where = buildWherePessoas(gabinete.id, filtros)
+  const idsRede = await resolverIdsRedeDe(searchParams.redeDeId, gabinete.id)
+  const where = buildWherePessoas(gabinete.id, filtros, idsRede)
   const candidatas = await prisma.pessoa.findMany({
     where,
     orderBy: { nome: 'asc' },
@@ -90,6 +92,7 @@ export default async function AdminFiltrosPage({
       />
       <PessoasFiltro
         baseHref={`/${params.slug}/admin/filtros`}
+        dashboardHref={`/${params.slug}/admin/dashboard`}
         exportarHref={`/api/${params.slug}/filtros/pessoas/exportar`}
         searchParams={searchParams}
         pessoas={pessoasPagina}
