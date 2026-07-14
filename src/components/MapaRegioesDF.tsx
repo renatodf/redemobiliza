@@ -1,9 +1,18 @@
 'use client'
 
 import { useRef, useState } from 'react'
-import { encontrarPosicaoRegiao, calcularTamanhoBalao } from '@/lib/regioes-df-mapa'
+import {
+  encontrarPosicaoRegiao,
+  calcularTamanhoBalao,
+  VIEWBOX_LARGURA,
+  VIEWBOX_ALTURA,
+} from '@/lib/regioes-df-mapa'
 
-const CONTORNO_DF = 'M20,9 L70,7 L86,24 L80,54 L58,79 L28,77 L11,53 L14,24 Z'
+// Contorno real do Distrito Federal, simplificado a partir do perímetro oficial do
+// IBGE (municípios do Brasil, código 5300108 — Brasília/DF) e projetado no viewBox
+// VIEWBOX_LARGURA x VIEWBOX_ALTURA preservando a proporção real (~1.72:1).
+const CONTORNO_DF =
+  'M89.15,5.07 L90.13,4.88 L93.25,8.19 L98.62,9.09 L99.22,9.95 L97.45,13.69 L97.62,19.15 L99.58,20.61 L98.81,23.23 L99.46,25.86 L95.33,33.98 L94.1,34.61 L93.63,39.27 L92.73,40.26 L94.73,44.81 L93.43,46.04 L93.09,51.33 L93.82,52.94 L95.96,53.37 L98.88,56.61 L99.92,56.55 L99.94,58.07 L0.81,58.18 L3.67,47.09 L2.81,45.31 L1.06,45.41 L1.52,40.25 L0.07,35.51 L1.96,32.36 L4.61,31.5 L8.19,25.96 L8.13,23.02 L7.05,21.93 L4.73,21.82 L4.54,19.94 L5.53,14.66 L6.96,12.92 L8.86,12.84 L8.84,0.0 L88.85,0.02 L89.15,5.07 Z'
 
 export type RegiaoMapa = { id: string; nome: string; contagem: number; href?: string }
 
@@ -76,8 +85,13 @@ export default function MapaRegioesDF({ regioes }: { regioes: RegiaoMapa[] }) {
           className="absolute inset-0"
           style={{ transformOrigin: '0 0', transform: `translate(${tx}px, ${ty}px) scale(${scale})` }}
         >
-          <svg viewBox="0 0 100 85" className="absolute inset-0 w-full h-full" aria-hidden>
-            <path d={CONTORNO_DF} fill="#dbe6f0" stroke="#9fb3c8" strokeWidth={1} />
+          <svg
+            viewBox={`0 0 ${VIEWBOX_LARGURA} ${VIEWBOX_ALTURA}`}
+            preserveAspectRatio="none"
+            className="absolute inset-0 w-full h-full"
+            aria-hidden
+          >
+            <path d={CONTORNO_DF} fill="#dbe6f0" stroke="#9fb3c8" strokeWidth={0.3} />
           </svg>
           {pinos.map((p) => {
             const conteudo = (
@@ -99,7 +113,14 @@ export default function MapaRegioesDF({ regioes }: { regioes: RegiaoMapa[] }) {
               </div>
             )
             return (
-              <div key={p.id} className="absolute" style={{ left: `${p.x}%`, top: `${p.y}%` }}>
+              <div
+                key={p.id}
+                className="absolute"
+                style={{
+                  left: `${(p.x / VIEWBOX_LARGURA) * 100}%`,
+                  top: `${(p.y / VIEWBOX_ALTURA) * 100}%`,
+                }}
+              >
                 {p.href ? <a href={p.href}>{conteudo}</a> : conteudo}
               </div>
             )
