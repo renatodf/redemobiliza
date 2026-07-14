@@ -954,7 +954,7 @@ git commit -m "feat: tela de Cidades ganha UF, indicador de localizacao e edicao
 
 - [ ] **Step 1: Instalar as dependências**
 
-Run: `npm install leaflet react-leaflet`
+Run: `npm install leaflet react-leaflet@^4`
 Run: `npm install -D @types/leaflet`
 Expected: `package.json` ganha `leaflet` e `react-leaflet` em `dependencies`, `@types/leaflet` em `devDependencies`.
 
