@@ -95,21 +95,23 @@ export default function MapaRegioesDF({ regioes }: { regioes: RegiaoMapa[] }) {
           </svg>
           {pinos.map((p) => {
             const conteudo = (
-              <div className="flex items-center gap-1.5">
-                <div
-                  className="shrink-0 shadow-sm"
-                  style={{
-                    width: p.tamanho,
-                    height: p.tamanho,
-                    borderRadius: '50% 50% 50% 0',
-                    backgroundColor: '#2563eb',
-                    transform: 'rotate(-45deg)',
-                  }}
-                />
-                <div className="bg-white rounded-md px-2 py-0.5 shadow-sm whitespace-nowrap">
-                  <span className="text-xs font-semibold text-blue-700">{p.nome}</span>
-                  <span className="text-xs text-blue-700 ml-1">{p.contagem}</span>
-                </div>
+              <div
+                title={p.nome}
+                className="shrink-0 shadow-sm flex items-center justify-center"
+                style={{
+                  width: p.tamanho,
+                  height: p.tamanho,
+                  borderRadius: '50% 50% 50% 0',
+                  backgroundColor: '#2563eb',
+                  transform: 'rotate(-45deg)',
+                }}
+              >
+                <span
+                  className="font-semibold text-white leading-none"
+                  style={{ transform: 'rotate(45deg)', fontSize: Math.max(7, p.tamanho * 0.38) }}
+                >
+                  {p.contagem}
+                </span>
               </div>
             )
             return (
