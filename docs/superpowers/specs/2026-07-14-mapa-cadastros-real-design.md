@@ -214,6 +214,56 @@ Recebe a mesma lista que já alimenta a lista "Pessoas por região" hoje, estend
 - **Nominatim fora do ar / bloqueando a requisição**: mesmo tratamento de falha de geocodificação
   — Região salva sem coordenada, admin pode tentar editar de novo mais tarde.
 
+## Fase 2 (planejada, não implementada nesta rodada): drill-down por CEP dentro da cidade
+
+Ideia do usuário pra depois desta primeira entrega: clicar no pin de uma cidade abre os pins de
+cada cadastro daquela cidade que tiver CEP preenchido, com um pin por CEP (não por pessoa) —
+CEP com mais de um cadastro mostra o número de cadastros naquele pin, mesmo padrão visual dos
+pins de Região da Fase 1.
+
+Já dá pra registrar como isso se encaixa na arquitetura da Fase 1, sem precisar mudar nada do que
+já foi desenhado acima:
+
+- **Geocodificação de CEP** é um problema diferente do de Região: CEP brasileiro não geocodifica
+  bem sozinho no Nominatim (cobertura granular de CEP no OpenStreetMap é inconsistente no
+  Brasil). O caminho é em duas etapas — **ViaCEP** (gratuito, sem chave, fonte oficial de
+  CEP→endereço no Brasil) resolve o CEP pra um endereço (logradouro/bairro/cidade/UF), e esse
+  endereço então passa pelo mesmo geocodificador Nominatim já construído na Fase 1 (a função
+  `geocodificarRegiao` não é reaproveitada diretamente — ela monta a query a partir de
+  nome+UF de Região — mas o mecanismo de chamada ao Nominatim por trás dela é o mesmo,
+  reaproveitável).
+- **Cache por CEP, não por pessoa**: assim como a coordenada de Região é geocodificada uma vez e
+  reaproveitada por todas as pessoas daquela Região, a coordenada de CEP precisa de uma tabela
+  própria de cache (`CepGeocodificado`, ou nome equivalente: `{ cep, latitude, longitude }`),
+  já que várias pessoas frequentemente compartilham o mesmo CEP (mesmo condomínio/rua). Isso não
+  exige nenhuma mudança na Fase 1 — é uma tabela nova e independente.
+- **Gatilho da geocodificação**: sob demanda, no momento em que o admin clica pra expandir uma
+  cidade no mapa — nesse momento o sistema busca coordenada de qualquer CEP daquela cidade ainda
+  não cacheado. Decisão consciente de trade-off: toca só um lugar no código (não precisa
+  instrumentar todo action que salva `Pessoa.cep` — cadastro público, edição, nova demanda,
+  cadastro inline na Central de Filtros), mas o primeiro clique numa cidade com muitos CEPs novos
+  pode demorar (Nominatim limita a 1 req/s). Fica pra quando esta fase for implementada de fato
+  decidir o estado de carregamento (spinner progressivo, limite de CEPs geocodificados por
+  clique, etc.) — não resolvido aqui.
+- **UX do drill-down**: clicar no pin de uma Região não navega mais pra Central de Filtros (esse
+  caminho passa a existir só pela lista lateral, que já linka pra lá hoje) — em vez disso, o
+  próprio mapa dá zoom/pan pra dentro da cidade e troca os pins de Região pelos pins de CEP
+  daquela cidade, com um botão "← voltar" pra retornar à visão geral. Sem navegação de página,
+  sem modal — tudo dentro do mesmo mapa.
+- **Clique no pin de CEP**: sempre abre um popup no próprio mapa (nunca navega sozinho) com o(s)
+  nome(s) das pessoas daquele CEP — 1 nome se só houver um cadastro, lista se houver mais.
+  Cada nome dentro do popup é um link pra ficha da pessoa, como uma ação separada e deliberada
+  (clicar no pin em si não navega).
+- **Pessoas sem CEP preenchido não aparecem no drill-down** — continuam contando pro total da
+  Região (pin de cidade não muda), mas ficam "invisíveis" no nível de CEP. Não há indicador de
+  quantas ficaram de fora nesta primeira ideia — pode ser revisitado quando a fase for desenhada.
+
+O resto (schema exato de tabelas/actions novas, testes, tratamento de erro completo) fica pra uma
+sessão de brainstorming própria quando esta fase for priorizada — o registro acima é só pra
+garantir que a Fase 1 não tome nenhuma decisão que atrapalhe isso depois (e confirmadamente não
+toma: cache de coordenada em tabela separada, não embutida em `Pessoa`, é o mesmo padrão que a
+Fase 1 já usa pra Região).
+
 ## Testes
 
 - `src/lib/__tests__/geocodificar-regiao.test.ts` (novo, TDD, mock de `fetch`): resultado
