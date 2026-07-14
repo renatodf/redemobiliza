@@ -1,6 +1,7 @@
 // src/app/[slug]/admin/dashboard/DashboardConteudo.tsx
 import { GraficoDemandas } from '@/components/GraficoDemandas'
 import { GraficoPizza, type FatiaPizza } from '@/components/GraficoPizza'
+import MapaRegioesDF from '@/components/MapaRegioesDF'
 import { calcularIdade } from '@/lib/aniversario'
 import { calcularFaixaEtaria } from '@/lib/faixa-etaria'
 import { agruparTopEOutros } from '@/lib/agrupar-top-outros'
@@ -204,17 +205,22 @@ export function DashboardConteudo({
 
       <section>
         <h2 className="text-base font-semibold text-gray-800 mb-3">Pessoas por região</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          {regioesComHref.map((r) => (
-            <a key={r.id} href={r.href} className="bg-white rounded-xl shadow-sm p-4 hover:shadow-md transition-shadow">
-              <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">
-                {r.nome}
-                {!r.ativa && <span className="ml-1 normal-case text-gray-400">(desativada)</span>}
-              </p>
-              <p className="text-2xl font-bold text-gray-900 mt-1">{r.contagem}</p>
-            </a>
-          ))}
-          {regioesComHref.length === 0 && <p className="text-sm text-gray-500">Nenhuma região cadastrada.</p>}
+        <div className="flex flex-col lg:flex-row gap-4 items-start">
+          <div className="grid grid-cols-2 gap-3 lg:w-64 lg:shrink-0 w-full">
+            {regioesComHref.map((r) => (
+              <a key={r.id} href={r.href} className="bg-white rounded-xl shadow-sm p-4 hover:shadow-md transition-shadow">
+                <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">
+                  {r.nome}
+                  {!r.ativa && <span className="ml-1 normal-case text-gray-400">(desativada)</span>}
+                </p>
+                <p className="text-2xl font-bold text-gray-900 mt-1">{r.contagem}</p>
+              </a>
+            ))}
+            {regioesComHref.length === 0 && <p className="text-sm text-gray-500">Nenhuma região cadastrada.</p>}
+          </div>
+          <div className="flex-1 min-w-0 w-full">
+            <MapaRegioesDF regioes={regioesComHref} />
+          </div>
         </div>
       </section>
 
