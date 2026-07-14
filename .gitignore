@@ -46,3 +46,6 @@ next-env.d.ts
 # Copias locais de referencia por ambiente (nao usadas pelo EasyPanel em runtime)
 .env.staging
 .env.production
+
+# Scratch de skills (progress ledger, mockups do companion visual)
+.superpowers/
