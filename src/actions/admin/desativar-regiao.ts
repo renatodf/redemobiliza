@@ -15,5 +15,6 @@ export async function desativarRegiao(formData: FormData) {
     data: { ativa: false },
   })
 
-  revalidatePath(`/${slug}/admin/regioes`)
+  revalidatePath(`/${slug}/admin/configuracoes/cidades`)
+  revalidatePath(`/${slug}/admin/dashboard`)
 }
