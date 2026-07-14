@@ -1,7 +1,7 @@
 // src/app/[slug]/admin/dashboard/DashboardConteudo.tsx
 import { GraficoDemandas } from '@/components/GraficoDemandas'
 import { GraficoPizza, type FatiaPizza } from '@/components/GraficoPizza'
-import MapaRegioesDF from '@/components/MapaRegioesDF'
+import MapaCadastros from '@/components/MapaCadastrosLoader'
 import { calcularIdade } from '@/lib/aniversario'
 import { calcularFaixaEtaria } from '@/lib/faixa-etaria'
 import { agruparTopEOutros } from '@/lib/agrupar-top-outros'
@@ -85,7 +85,7 @@ export function DashboardConteudo({
   segmentosComContagem: { nome: string; tipo: string; contagem: number }[]
   rankingMobilizadores: { nome: string; contagem: number }[]
   pessoasPorOrigem: ContagemChave[]
-  regioes: { id: string; nome: string; ativa: boolean; contagem: number }[]
+  regioes: { id: string; nome: string; ativa: boolean; contagem: number; uf: string | null; latitude: number | null; longitude: number | null }[]
   contagemGenero: ContagemChave[]
   contagemDemandas: ContagemChave[]
   mesLabel: string
@@ -223,7 +223,7 @@ export function DashboardConteudo({
             {regioesComHref.length === 0 && <p className="text-sm text-gray-500">Nenhuma região cadastrada.</p>}
           </div>
           <div className="flex-1 min-w-0 w-full">
-            <MapaRegioesDF regioes={regioesComHref} />
+            <MapaCadastros regioes={regioesComHref} />
           </div>
         </div>
       </section>

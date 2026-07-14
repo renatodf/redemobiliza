@@ -123,6 +123,9 @@ export default async function MobilizadorDashboardPage({
         id: true,
         nome: true,
         ativa: true,
+        uf: true,
+        latitude: true,
+        longitude: true,
         _count: { select: { pessoas: { where: wherePessoas } } },
       },
       orderBy: { pessoas: { _count: 'desc' } },
@@ -192,7 +195,15 @@ export default async function MobilizadorDashboardPage({
       segmentosComContagem={segmentosRaw.map((s) => ({ nome: s.nome, tipo: s.tipo, contagem: s._count.pessoas }))}
       rankingMobilizadores={rankingMobilizadores}
       pessoasPorOrigem={pessoasPorOrigemRaw.map((o) => ({ chave: o.origem, contagem: o._count.id }))}
-      regioes={regioesRaw.map((r) => ({ id: r.id, nome: r.nome, ativa: r.ativa, contagem: r._count.pessoas }))}
+      regioes={regioesRaw.map((r) => ({
+        id: r.id,
+        nome: r.nome,
+        ativa: r.ativa,
+        uf: r.uf,
+        latitude: r.latitude,
+        longitude: r.longitude,
+        contagem: r._count.pessoas,
+      }))}
       contagemGenero={pessoasPorGeneroRaw.map((g) => ({ chave: g.genero, contagem: g._count.id }))}
       contagemDemandas={demandasMesRaw.map((d) => ({ chave: d.status, contagem: d._count.id }))}
       mesLabel={mesLabel}
