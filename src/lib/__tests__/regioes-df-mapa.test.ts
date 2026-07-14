@@ -3,12 +3,12 @@ import { encontrarPosicaoRegiao, calcularTamanhoBalao } from '../regioes-df-mapa
 
 describe('encontrarPosicaoRegiao', () => {
   it('encontra região por nome exato', () => {
-    expect(encontrarPosicaoRegiao('Taguatinga')).toEqual({ x: 28, y: 50 })
+    expect(encontrarPosicaoRegiao('Taguatinga')).toEqual({ x: 23.15, y: 34.85 })
   })
 
   it('encontra região ignorando acentuação e caixa', () => {
-    expect(encontrarPosicaoRegiao('AGUAS CLARAS')).toEqual({ x: 33, y: 52 })
-    expect(encontrarPosicaoRegiao('águas claras')).toEqual({ x: 33, y: 52 })
+    expect(encontrarPosicaoRegiao('AGUAS CLARAS')).toEqual({ x: 26.22, y: 35.9 })
+    expect(encontrarPosicaoRegiao('águas claras')).toEqual({ x: 26.22, y: 35.9 })
   })
 
   it('retorna null para nome sem correspondência', () => {
@@ -20,8 +20,8 @@ describe('encontrarPosicaoRegiao', () => {
   })
 
   it('encontra regiões com nome combinado usadas por gabinetes reais', () => {
-    expect(encontrarPosicaoRegiao('Sudoeste/Octogonal')).toEqual({ x: 44, y: 38 })
-    expect(encontrarPosicaoRegiao('SCIA/Estrutural')).toEqual({ x: 40, y: 38 })
+    expect(encontrarPosicaoRegiao('Sudoeste/Octogonal')).toEqual({ x: 36.43, y: 31.68 })
+    expect(encontrarPosicaoRegiao('SCIA/Estrutural')).toEqual({ x: 29.28, y: 29.57 })
   })
 })
 

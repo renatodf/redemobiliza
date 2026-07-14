@@ -206,14 +206,18 @@ export function DashboardConteudo({
       <section>
         <h2 className="text-base font-semibold text-gray-800 mb-3">Pessoas por região</h2>
         <div className="flex flex-col lg:flex-row gap-4 items-start">
-          <div className="grid grid-cols-2 gap-3 lg:w-64 lg:shrink-0 w-full">
+          <div className="flex flex-col gap-2 lg:w-64 lg:shrink-0 w-full max-h-[228px] overflow-y-auto pr-1">
             {regioesComHref.map((r) => (
-              <a key={r.id} href={r.href} className="bg-white rounded-xl shadow-sm p-4 hover:shadow-md transition-shadow">
-                <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">
+              <a
+                key={r.id}
+                href={r.href}
+                className="flex items-center justify-between gap-2 bg-white rounded-lg shadow-sm px-3 py-2 hover:shadow-md transition-shadow shrink-0"
+              >
+                <span className="text-sm text-gray-700 truncate">
                   {r.nome}
-                  {!r.ativa && <span className="ml-1 normal-case text-gray-400">(desativada)</span>}
-                </p>
-                <p className="text-2xl font-bold text-gray-900 mt-1">{r.contagem}</p>
+                  {!r.ativa && <span className="ml-1 text-xs text-gray-400">(desativada)</span>}
+                </span>
+                <span className="text-sm font-semibold text-gray-900 shrink-0">{r.contagem}</span>
               </a>
             ))}
             {regioesComHref.length === 0 && <p className="text-sm text-gray-500">Nenhuma região cadastrada.</p>}
