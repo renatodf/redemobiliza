@@ -65,6 +65,9 @@ model Regiao {
   id         String   @id @default(cuid())
   gabineteId String
   nome       String
+  uf         String?
+  latitude   Float?
+  longitude  Float?
   ativa      Boolean  @default(true)
   criadoEm  DateTime @default(now())
 
