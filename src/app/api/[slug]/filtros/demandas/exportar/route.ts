@@ -28,6 +28,8 @@ export async function GET(request: NextRequest, { params }: { params: { slug: st
     areaId: sp.get('areaId') ?? undefined,
     status: (sp.get('status') as 'atendida' | 'nao_atendida' | 'pendente' | null) ?? undefined,
     regiaoId: sp.get('regiaoId') ?? undefined,
+    dataInicio: sp.get('dataInicio') ?? undefined,
+    dataFim: sp.get('dataFim') ?? undefined,
   }
   const formato: 'pdf' | 'excel' = sp.get('formato') === 'excel' ? 'excel' : 'pdf'
 
