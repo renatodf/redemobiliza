@@ -1,6 +1,6 @@
 # HANDOFF — Rede Mobiliza
 
-> Documento de transição gerado em 2026-07-10, a partir do histórico completo do projeto (245 commits) e dos specs/plans em `docs/superpowers/`. Atualizado em 2026-07-11 com o trabalho da sessão seguinte (Central de Filtros — aba Pessoas e exportação assíncrona, seção 11 abaixo). Atualizado novamente em 2026-07-12 com as abas Demandas e Banco de Talentos da Central de Filtros e o Dashboard "Dados Gerais" (seções 12-14 abaixo). HEAD no momento da última atualização: `83d0341` (branch `main`, deployado em produção).
+> Documento de transição gerado em 2026-07-10, a partir do histórico completo do projeto (245 commits) e dos specs/plans em `docs/superpowers/`. Atualizado em 2026-07-11 com o trabalho da sessão seguinte (Central de Filtros — aba Pessoas e exportação assíncrona, seção 11 abaixo). Atualizado novamente em 2026-07-12 com as abas Demandas e Banco de Talentos da Central de Filtros e o Dashboard "Dados Gerais" (seções 12-14 abaixo). Atualizado novamente em 2026-07-15 com staging/produção separados, a substituição do mapa do Dashboard por um mapa real com geocodificação, e o botão "Visualizar Dados Gerais" nas abas Pessoas e Demandas da Central de Filtros (seções 16-20 abaixo). HEAD no momento desta atualização: `7d24301` (branch `worktree-demandas-periodo-dashboard`, prestes a ser mergeado fast-forward pra `main`).
 
 ## O que é o projeto
 
@@ -106,6 +106,54 @@ Spec: `docs/superpowers/specs/2026-07-12-cadastro-completo-e-demanda-design.md`.
 - **Decisão pós-revisão final**: a busca da aba Cadastros do mobilizador usa a sub-rede inteira (todos os níveis), mas `editarPessoa` só autorizava edição de rede direta (nível 1) — abria a ficha mas falhava ao salvar. Corrigido ampliando `editarPessoa` pra sub-rede inteira, o que também muda a permissão do mobilizador na ficha normal da pessoa (não só nesta aba nova).
 - **Bug pré-existente encontrado no smoke test manual pós-deploy (não introduzido por esta feature)**: o cadastro público nunca completava quando o `<input type="file">` de foto ficava vazio (comum — sem foto é o caso mais frequente) — um `File` vazio embutido no objeto que `submeterCadastro` recebia quebrava a serialização da Server Action do Next ("Only plain objects... Classes or null prototypes are not supported"). **Fix parcial aplicado** (`3310c45`): só incluía `foto` no payload quando um arquivo de verdade foi escolhido — resolvia o caso sem foto. **Upload de foto real no cadastro público foi corrigido em `1493cfc`**, migrando `submeterCadastro` pra receber um `FormData` nativo — ver pendência 10.
 
+### 16. Staging e Produção Separados no EasyPanel (13/07)
+
+Spec: `docs/superpowers/specs/2026-07-13-staging-producao-easypanel-design.md`. Plano: `docs/superpowers/plans/2026-07-13-staging-producao-easypanel.md` (8 tasks).
+
+- Branch `develop` criada a partir de `main`; projeto Supabase separado `rede-mobiliza-staging` (sa-east-1); DNS `staging.redemobiliza.com.br` apontando pra mesma VPS; serviço `app-staging` no EasyPanel (porta 8081, `autoDeploy:false`, fonte no repo canônico, branch `develop`).
+- `.env.staging`/`.env.production` locais (gitignored, nunca versionados); GitHub Actions (`.github/workflows/deploy-staging.yml`) roda testes + typecheck + dispara deploy automático de staging a cada push em `develop` — staging é o único ambiente com deploy automático, produção continua manual.
+- `deploy-prod.sh`: script que promove `develop` → `main` e dispara o deploy de produção, lendo o token de deploy de `~/.config/rede-mobiliza-deploy/` (fora do repo, nunca hardcoded — revisão de segurança automática flagou uma primeira versão que hardcodava o token, corrigido antes de qualquer push).
+- **Incidente de segurança na mesma sessão**: o plano de implementação (`docs/superpowers/plans/2026-07-13-staging-producao-easypanel.md`, commit `22491a9`, fase de brainstorming/planning) continha `SUPABASE_SERVICE_ROLE_KEY` e `RESEND_API_KEY` reais de produção em texto puro, como "exemplo" de valor no passo do `.env.production`. O GitHub Push Protection bloqueou o push pro mirror `easypanel`, mas o remote `origin` já tinha aceitado o commit sem bloqueio antes — as duas chaves ficaram expostas de verdade no histórico do repo canônico por um período desta sessão. **Remediação aplicada**: (1) ambas as chaves rotacionadas antes de qualquer outra coisa (Resend via API, Supabase via painel); (2) histórico reescrito com `git filter-repo --replace-text` numa cópia `--mirror` temporária, redigindo as duas strings em todos os ~329 commits; (3) force-push de `main` e `develop` reescritos pros dois remotes; (4) working dir local resetado (`git reset --hard`) pra bater com o histórico novo. **Lição registrada em memória do projeto**: nunca colar valor real de segredo em documento de spec/plano, mesmo como "exemplo" — sempre usar placeholder, mesmo quando o valor real já é conhecido no momento da escrita.
+
+### 17. Mapa de Regiões do DF no Dashboard (13/07) — substituído em 14/07, ver seção 18
+
+Spec: `docs/superpowers/specs/2026-07-13-mapa-regioes-dashboard-design.md`. Plano: `docs/superpowers/plans/2026-07-13-mapa-regioes-dashboard.md` (5 tasks).
+
+- Primeira versão do mapa de "Pessoas por região" no Dashboard: `MapaRegioesDF.tsx`, um SVG com pan/zoom (arraste, roda do mouse, pinça) e balões proporcionais por região, com posições/tamanhos calculados em `regioes-df-mapa.ts` sobre um contorno geográfico real do DF (dados do IBGE).
+- `GraficoPizza.tsx` ganhou fatias clicáveis via `<path>`/`<circle>` SVG (antes só a legenda era clicável) — essa parte **permanece** no código atual, não foi substituída.
+- Aliases de nome combinado (ex. "Sudoeste/Octogonal", "SCIA/Estrutural") precisaram ser adicionados depois de testar contra as 35 regiões reais de um gabinete de produção — 2 não bateram de primeira com o nome esperado pelo mapa.
+- **Essa abordagem inteira (mapa com posições fixas específicas do DF) foi substituída no dia seguinte** pela seção 18 abaixo, que usa coordenadas geográficas reais de cada `Regiao` em vez de posições fixas — `MapaRegioesDF.tsx`/`regioes-df-mapa.ts` não existem mais no código atual, removidos na mesma leva de commits que introduziu o mapa real.
+
+### 18. Mapa real de pessoas cadastradas — geocodificação por Região (14/07)
+
+Spec: `docs/superpowers/specs/2026-07-14-mapa-cadastros-real-design.md` (+ nota de Fase 2 sobre drill-down por CEP, registrada no spec mas **ainda não implementada**). Plano: `docs/superpowers/plans/2026-07-14-mapa-cadastros-real.md`.
+
+- `Regiao` ganha `uf`, `latitude`, `longitude` (migration) + lista estática dos 27 estados brasileiros pra popular o select de UF.
+- **Geocodificação via Nominatim (OpenStreetMap)**, disparada automaticamente ao criar/editar uma `Regiao` (`criarRegiao` agora exige UF; `editarRegiao` só re-geocodifica quando nome ou UF mudam — evita chamada desnecessária à API externa). Rota órfã `/admin/regioes` removida no mesmo commit.
+- `mapa-pessoas.ts` substitui `regioes-df-mapa.ts` — sem mais contornos fixos do DF, o mapa passa a funcionar pra **qualquer** UF/região do Brasil, não só o Distrito Federal.
+- `MapaCadastros.tsx` (Leaflet + tiles do OpenStreetMap) substitui `MapaRegioesDF.tsx` no Dashboard — pinos reais sobre um mapa mundial de verdade, não mais posições calculadas manualmente. Pinos/pontos memoizados pra não resetar o viewport (zoom/posição de pan) a cada re-render do Dashboard.
+- Tela de Cidades (Configurações) ganha campo UF, indicador visual de "já geocodificada" e edição de região existente.
+
+### 19. Visualizar Dados Gerais a partir de um filtro — aba Pessoas (14/07)
+
+Spec: `docs/superpowers/specs/2026-07-14-visualizar-dados-gerais-design.md`. Plano: `docs/superpowers/plans/2026-07-14-visualizar-dados-gerais.md` (9 tasks, subagent-driven-development em worktree isolado, merge fast-forward pra `main`). **Deployado em produção** — `commit.sha` `ae6fc25` confirmado via API do EasyPanel (`projects.listProjectsAndServices`).
+
+- Sempre que um filtro de Pessoas está ativo (Central de Filtros ou visão de rede de um mobilizador específico na tela de Usuários), um botão **"Visualizar Dados Gerais"** leva ao Dashboard já filtrado pelo mesmo recorte.
+- `src/lib/filtros-ativos.ts` (`CAMPOS_FILTRO_PESSOAS`, `temFiltroAtivo`) é a fonte única de verdade de "o que conta como filtro ativo" (região, sexo, profissão, segmento, escolaridade, religião, `redeDeId` — `periodo` e idade/aniversário não contam, decisão do usuário, já que idade/aniversário não são aplicados de verdade nos números agregados hoje).
+- Novo parâmetro **`redeDeId`**: escopa o Dashboard pela sub-rede completa e recursiva de um mobilizador específico (reaproveita `coletarSubRedeIds`, já existente desde a Central de Filtros), ou pela "Rede Raiz" (`redeDeId=raiz`) — só faz sentido no lado admin, mobilizador já vê só a própria rede.
+- Dashboard ganha badges removíveis por filtro ativo + "Limpar tudo"; corrige de quebra um bug pré-existente onde `profissaoId` era ignorado pelos números agregados do Dashboard (só existia na Central de Filtros).
+- Verificado manualmente contra gabinete real (`amigos-do-izalci`): botão aparece/some corretamente, badges com nomes resolvidos (não id cru), combinação de filtros, remoção individual de badge, "Limpar tudo" preservando `periodo`, clique em fatia de pizza a partir de dashboard filtrado por rede combinando os dois filtros na Central de Filtros.
+
+### 20. Central de Filtros — aba Demandas: filtro de período + Visualizar Dados Gerais (14–15/07)
+
+Spec: `docs/superpowers/specs/2026-07-14-demandas-periodo-e-dashboard-design.md`. Plano: `docs/superpowers/plans/2026-07-14-demandas-periodo-e-dashboard.md` (9 tasks + verificação final, subagent-driven-development em worktree isolado).
+
+- Extensão direta da seção 19 (que só cobriu a aba Pessoas): a aba Demandas da Central de Filtros ganha **filtro de período** (`dataInicio`/`dataFim`, filtra pela data de **criação** da demanda — decisão do usuário, já que não existe campo consultável de "data de atendimento" no schema hoje, só no histórico `MovimentacaoDemanda`) e um botão **"Visualizar Dados Gerais"** que, diferente do da aba Pessoas, **aparece sempre**, mesmo sem nenhum filtro ativo (com nenhum filtro, a população vira "todo mundo que já fez alguma demanda").
+- Mecanismo diferente do `redeDeId`: em vez de resolver uma lista de ids numa consulta separada, usa um **filtro relacional do Prisma** — `pessoa.demandasSolicitadas.some({ areaId, status, criadoEm, ... })` — reaproveitando `buildWhereDemandas` (já existente) aninhado dentro de `buildWherePessoas` (novo 4º parâmetro opcional `filtroDemandas`). Uma única consulta, sem round-trip extra.
+- Novo flag de URL `filtroDemandas=1` + badges dedicadas (Área, Status, Período — com label dinâmico "Todos os solicitantes"/"Solicitantes filtrados" dependendo se há sub-filtro); tipo `FiltroExibivel` do Dashboard generalizado com `camposLimpar?: string[]` pra suportar badges que limpam mais de um parâmetro de URL de uma vez (ex: badge de Período limpa `dataInicio` e `dataFim` juntos).
+- Escopo de segurança do mobilizador: `pessoa.id` entra como `responsavelId` tanto na rota de exportação (já existia) quanto no novo caminho do Dashboard — confirmado presente nos dois pontos em revisão de código dedicada, ponto mais crítico desta feature (sem isso, mobilizador veria demandas de outros responsáveis).
+- Verificado manualmente contra gabinete real: botão sempre visível mesmo sem filtro, badges corretas com nomes resolvidos, `Total pessoas=6` pra 7 demandas confirma que o filtro relacional `some` não duplica pessoas com múltiplas demandas batendo o filtro.
+
 ---
 
 ## Decisões técnicas importantes e por quê
@@ -121,6 +169,8 @@ Spec: `docs/superpowers/specs/2026-07-12-cadastro-completo-e-demanda-design.md`.
 - **Tema dinâmico por gabinete** (`corPrimaria`/`corTextoContraste()`) aplicado em quase toda a UI — **exceção conhecida**: a tela pública `/cadastro/*` ainda usa `bg-blue-600` fixo, nunca recebeu a cor do gabinete.
 - **Sub-rede completa via CTE recursiva**: como Prisma não suporta consulta recursiva nativa, `coletarSubRedeIds` (`src/lib/rede.ts`) usa `prisma.$queryRaw` para percorrer `VinculoRede.indicadoPorId` recursivamente, com proteção explícita contra ciclo — reaproveitável por qualquer tela futura que precise da árvore de indicação completa de um mobilizador, não só um nível.
 - **Exportação em lote usa link assinado, não público**: diferente do padrão de upload de foto/currículo individual (URL pública fixa), arquivos de exportação em massa (potencialmente centenas de registros com dado pessoal de uma vez) usam `createSignedUrl` com expiração — ver seção 11 e pendência 3.
+- **Geocodificação de `Regiao` via Nominatim (OpenStreetMap)**, disparada automaticamente ao criar/editar (não um botão manual) — só re-geocodifica quando nome ou UF mudam, pra não bater a API externa à toa. Ver seção 18.
+- **Escopar o Dashboard por uma população "derivada" (rede de um mobilizador ou solicitantes de demandas filtradas) sempre reaproveita a query já existente que produz esse recorte** (`coletarSubRedeIds` pra rede, `buildWhereDemandas` pra demandas) em vez de duplicar lógica — no caso de demandas, isso vira um filtro relacional do Prisma (`pessoa.demandasSolicitadas.some({...})`) aninhado dentro de `buildWherePessoas`, não uma segunda consulta com lista de ids. Ver seções 19-20.
 
 ---
 
@@ -171,6 +221,7 @@ Spec: `docs/superpowers/specs/2026-07-12-cadastro-completo-e-demanda-design.md`.
 - **Worktrees compartilham o mesmo banco Supabase** e cada `.env.local` copiado trava `NEXT_PUBLIC_APP_URL` na porta de quando foi copiado — testar cruzado entre worktrees serve código antigo na porta errada (gera 404 enganoso). Não é bug de produção, só armadilha de dev local.
 - **`next lint`/`eslint` não roda dentro de worktrees aninhados** (conflito de plugin `@next/next` entre o `node_modules` do worktree e o do checkout principal) — usar `tsc --noEmit` como rede de segurança nesse cenário.
 - **Testes de e-mail falham localmente** (`src/lib/__tests__/email.test.ts`, 2 de 54) por falta de `RESEND_API_KEY` no `.env.local` local — pré-existente, não é regressão de nenhuma feature.
+- **`vitest run` a partir do repo principal conta os testes em dobro se um worktree isolado ainda estiver vivo dentro de `.claude/worktrees/`** — o glob de teste pega tanto `src/__tests__` quanto a cópia aninhada dentro do worktree (fisicamente uma subpasta do repo). Não é regressão real (os 2 arquivos de teste são idênticos, resultado dobra igualmente passes e falhas); some sozinho depois que o worktree é removido (`git worktree remove`). Só gerou confusão momentânea numa sessão (14-15/07) até perceber a causa.
 
 ---
 
@@ -180,3 +231,5 @@ Spec: `docs/superpowers/specs/2026-07-12-cadastro-completo-e-demanda-design.md`.
 - Fluxo: `git push origin main` (canônico) + `git push easypanel main` (o que o EasyPanel observa) → `curl http://187.77.34.212:3000/api/deploy/<token>` para disparar o build manualmente (autoDeploy está desligado) → confirmar `commit.sha` via API tRPC do EasyPanel.
 - Credenciais e detalhes completos: memória do projeto (`project_deploy.md`), não reproduzidos aqui por serem segredos.
 - **Estado em 12/07/2026**: push + deploy manual executados após o Dashboard "Dados Gerais" (seção 14, `commit.sha` `83d0341`) e novamente após o Cadastro Completo + Nova Demanda + aba Cadastros (seção 15, `commit.sha` `f9f42d8`), ambos confirmados via `projects.listProjectsAndServices`. O fix do bug de foto vazia no cadastro público (`3310c45`, pendência 10) ainda **não foi deployado** — feito localmente, aguardando push/deploy.
+- **Ambiente staging separado desde 13/07** (seção 16): `develop` tem deploy automático a cada push via GitHub Actions; produção (`main`) continua exigindo o passo manual acima (ou `deploy-prod.sh`, que automatiza promover `develop` → `main` + disparar o webhook).
+- **Estado em 14-15/07/2026**: `commit.sha` `ae6fc25` (Visualizar Dados Gerais — aba Pessoas, seção 19) **deployado e confirmado em produção** via API do EasyPanel. A feature da seção 20 (Demandas — filtro de período + Visualizar Dados Gerais) está mergeada em `main` localmente neste HEAD (`7d24301`) mas **push/deploy ainda não executados** — verificar se já foram feitos antes de assumir que produção reflete esta seção.
