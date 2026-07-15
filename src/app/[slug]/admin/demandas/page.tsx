@@ -21,6 +21,9 @@ function buildOrderBy(sort?: string, order?: string) {
   const direcao = order === 'asc' ? ('asc' as const) : ('desc' as const)
   if (sort === 'prazoDesfecho') return { prazoDesfecho: direcao }
   if (sort === 'responsavel') return { responsavel: { nome: direcao } }
+  if (sort === 'solicitante') return { solicitante: { nome: direcao } }
+  if (sort === 'area') return { area: { nome: direcao } }
+  if (sort === 'status') return { status: direcao }
   return { criadoEm: 'desc' as const }
 }
 
@@ -219,15 +222,21 @@ export default async function DemandasPage({
           <thead className="bg-gray-50 border-b border-gray-200">
             <tr>
               <th className="text-left px-4 py-3 font-medium text-gray-600">Título</th>
-              <th className="text-left px-4 py-3 font-medium text-gray-600">Solicitante</th>
+              <th className="text-left px-4 py-3">
+                <SortableHeader label="Solicitante" field="solicitante" />
+              </th>
               <th className="text-left px-4 py-3">
                 <SortableHeader label="Responsável" field="responsavel" />
               </th>
-              <th className="text-left px-4 py-3 font-medium text-gray-600">Área</th>
+              <th className="text-left px-4 py-3">
+                <SortableHeader label="Área" field="area" />
+              </th>
               <th className="text-left px-4 py-3">
                 <SortableHeader label="Prazo" field="prazoDesfecho" />
               </th>
-              <th className="text-left px-4 py-3 font-medium text-gray-600">Status</th>
+              <th className="text-left px-4 py-3">
+                <SortableHeader label="Status" field="status" />
+              </th>
               <th className="text-right px-4 py-3 font-medium text-gray-600">Ações</th>
             </tr>
           </thead>
