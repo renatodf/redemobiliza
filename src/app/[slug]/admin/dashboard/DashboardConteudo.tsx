@@ -6,7 +6,7 @@ import { calcularIdade } from '@/lib/aniversario'
 import { calcularFaixaEtaria } from '@/lib/faixa-etaria'
 import { agruparTopEOutros } from '@/lib/agrupar-top-outros'
 import { PALETA_CATEGORICA, COR_NEUTRA, CORES_STATUS_DEMANDA } from '@/lib/cores-graficos'
-import { CAMPOS_FILTRO_PESSOAS } from '@/lib/filtros-ativos'
+import { CAMPOS_FILTRO_PESSOAS, CAMPOS_FILTRO_DEMANDAS } from '@/lib/filtros-ativos'
 
 type ContagemChave = { chave: string | null; contagem: number }
 
@@ -74,6 +74,7 @@ export function DashboardConteudo({
   segmentoAtivo,
   profissaoAtiva,
   redeAtiva,
+  areaAtiva,
 }: {
   slug: string
   dashboardHref: string
@@ -102,6 +103,7 @@ export function DashboardConteudo({
   segmentoAtivo?: { nome: string } | null
   profissaoAtiva?: { nome: string } | null
   redeAtiva?: { nome: string } | null
+  areaAtiva?: { nome: string } | null
 }) {
   // Demandas — cores de status reservadas, sempre as 4 fatias (mesmo 0)
   const mapaDemandas = Object.fromEntries(contagemDemandas.map((c) => [c.chave, c.contagem]))
@@ -189,7 +191,9 @@ export function DashboardConteudo({
 
   // Filtros ativos (badges removíveis + "Limpar tudo")
   const GENERO_LABEL: Record<string, string> = { masculino: 'Masculino', feminino: 'Feminino', outro: 'Outro' }
-  type FiltroExibivel = { chave: string; label: string }
+  const STATUS_DEMANDA_LABEL: Record<string, string> = { pendente: 'Pendente', atendida: 'Atendida', nao_atendida: 'Não atendida' }
+  const formatarDataISOParaBR = (iso: string) => iso.split('-').reverse().join('/')
+  type FiltroExibivel = { chave: string; label: string; camposLimpar?: string[] }
   const filtrosAtivosExibiveis: FiltroExibivel[] = []
   if (searchParams.regiaoId) {
     const regiaoFiltrada = regioes.find((r) => r.id === searchParams.regiaoId)
@@ -212,6 +216,28 @@ export function DashboardConteudo({
   }
   if (searchParams.redeDeId) {
     filtrosAtivosExibiveis.push({ chave: 'redeDeId', label: `Rede: ${redeAtiva?.nome ?? searchParams.redeDeId}` })
+  }
+  if (searchParams.filtroDemandas === '1') {
+    const temSubFiltro = Boolean(searchParams.areaId || searchParams.status || searchParams.dataInicio || searchParams.dataFim)
+    filtrosAtivosExibiveis.push({
+      chave: 'filtroDemandas',
+      label: temSubFiltro ? 'Demandas: Solicitantes filtrados' : 'Demandas: Todos os solicitantes',
+      camposLimpar: ['filtroDemandas', 'areaId', 'status', 'dataInicio', 'dataFim'],
+    })
+  }
+  if (searchParams.areaId) {
+    filtrosAtivosExibiveis.push({ chave: 'areaId', label: `Área: ${areaAtiva?.nome ?? searchParams.areaId}` })
+  }
+  if (searchParams.status) {
+    filtrosAtivosExibiveis.push({ chave: 'status', label: `Status: ${STATUS_DEMANDA_LABEL[searchParams.status] ?? searchParams.status}` })
+  }
+  if (searchParams.dataInicio || searchParams.dataFim) {
+    const label = searchParams.dataInicio && searchParams.dataFim
+      ? `Período: ${formatarDataISOParaBR(searchParams.dataInicio)} a ${formatarDataISOParaBR(searchParams.dataFim)}`
+      : searchParams.dataInicio
+        ? `Período: a partir de ${formatarDataISOParaBR(searchParams.dataInicio)}`
+        : `Período: até ${formatarDataISOParaBR(searchParams.dataFim!)}`
+    filtrosAtivosExibiveis.push({ chave: 'periodoDemanda', label, camposLimpar: ['dataInicio', 'dataFim'] })
   }
 
   return (
@@ -246,7 +272,7 @@ export function DashboardConteudo({
             >
               {f.label}
               <a
-                href={construirHref(dashboardHref, searchParams, {}, [f.chave])}
+                href={construirHref(dashboardHref, searchParams, {}, f.camposLimpar ?? [f.chave])}
                 className="text-gray-400 hover:text-gray-700 leading-none"
                 aria-label={`Remover filtro ${f.label}`}
               >
@@ -255,7 +281,7 @@ export function DashboardConteudo({
             </span>
           ))}
           <a
-            href={construirHref(dashboardHref, searchParams, {}, [...CAMPOS_FILTRO_PESSOAS])}
+            href={construirHref(dashboardHref, searchParams, {}, [...CAMPOS_FILTRO_PESSOAS, 'filtroDemandas', ...CAMPOS_FILTRO_DEMANDAS])}
             className="text-xs text-blue-600 hover:underline"
           >
             Limpar tudo
