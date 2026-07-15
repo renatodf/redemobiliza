@@ -82,6 +82,7 @@ export default async function DemandasPage({
         }),
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- areas/colaboradores/regioes alimentam o formulario de filtros comentado (ocultado, nao removido)
   const [demandas, total, contagens, areas, colaboradores, regioes, contagensMes] = await Promise.all([
     prisma.demanda.findMany({
       where,
