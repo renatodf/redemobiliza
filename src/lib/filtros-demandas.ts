@@ -2,6 +2,8 @@ export type FiltrosDemandasParams = {
   areaId?: string
   status?: 'atendida' | 'nao_atendida' | 'pendente'
   regiaoId?: string
+  dataInicio?: string
+  dataFim?: string
 }
 
 export type WhereDemandas = {
@@ -11,6 +13,7 @@ export type WhereDemandas = {
   areaId?: string
   status?: string | { in: string[] }
   solicitante?: { regiaoId: string }
+  criadoEm?: { gte?: Date; lte?: Date }
 }
 
 export function buildWhereDemandas(
@@ -30,5 +33,10 @@ export function buildWhereDemandas(
     where.status = { in: ['aberta', 'expirada'] }
   }
   if (params.regiaoId) where.solicitante = { regiaoId: params.regiaoId }
+  if (params.dataInicio || params.dataFim) {
+    where.criadoEm = {}
+    if (params.dataInicio) where.criadoEm.gte = new Date(`${params.dataInicio}T00:00:00`)
+    if (params.dataFim) where.criadoEm.lte = new Date(`${params.dataFim}T23:59:59.999`)
+  }
   return where
 }

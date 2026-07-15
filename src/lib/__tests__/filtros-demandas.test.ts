@@ -59,6 +59,29 @@ describe('buildWhereDemandas', () => {
     expect(where.solicitante).toBeUndefined()
   })
 
+  it('filtra por data de início (criadoEm gte)', () => {
+    const where = buildWhereDemandas('gab-1', { dataInicio: '2025-01-01' })
+    expect(where.criadoEm).toEqual({ gte: new Date('2025-01-01T00:00:00') })
+  })
+
+  it('filtra por data de fim (criadoEm lte)', () => {
+    const where = buildWhereDemandas('gab-1', { dataFim: '2025-01-31' })
+    expect(where.criadoEm).toEqual({ lte: new Date('2025-01-31T23:59:59.999') })
+  })
+
+  it('combina data de início e fim', () => {
+    const where = buildWhereDemandas('gab-1', { dataInicio: '2025-01-01', dataFim: '2025-01-31' })
+    expect(where.criadoEm).toEqual({
+      gte: new Date('2025-01-01T00:00:00'),
+      lte: new Date('2025-01-31T23:59:59.999'),
+    })
+  })
+
+  it('sem data de início nem fim, não aplica criadoEm', () => {
+    const where = buildWhereDemandas('gab-1', {})
+    expect(where.criadoEm).toBeUndefined()
+  })
+
   it('combina todos os filtros ao mesmo tempo', () => {
     const where = buildWhereDemandas(
       'gab-1',
