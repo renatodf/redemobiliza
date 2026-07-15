@@ -22,6 +22,8 @@ export default async function AdminFiltrosDemandasPage({
     areaId: searchParams.areaId,
     status: searchParams.status as 'atendida' | 'nao_atendida' | 'pendente' | undefined,
     regiaoId: searchParams.regiaoId,
+    dataInicio: searchParams.dataInicio,
+    dataFim: searchParams.dataFim,
   }
 
   const where = buildWhereDemandas(gabinete.id, filtros)
