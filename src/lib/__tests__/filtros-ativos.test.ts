@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { temFiltroAtivo, CAMPOS_FILTRO_PESSOAS } from '../filtros-ativos'
+import { temFiltroAtivo, CAMPOS_FILTRO_PESSOAS, CAMPOS_FILTRO_DEMANDAS } from '../filtros-ativos'
 
 describe('temFiltroAtivo', () => {
   it('retorna false quando nenhum filtro está presente', () => {
@@ -35,6 +35,14 @@ describe('CAMPOS_FILTRO_PESSOAS', () => {
   it('inclui exatamente os 7 campos esperados', () => {
     expect([...CAMPOS_FILTRO_PESSOAS].sort()).toEqual(
       ['escolaridade', 'genero', 'profissaoId', 'redeDeId', 'regiaoId', 'religiao', 'segmentoId'].sort()
+    )
+  })
+})
+
+describe('CAMPOS_FILTRO_DEMANDAS', () => {
+  it('inclui exatamente os 5 campos esperados', () => {
+    expect([...CAMPOS_FILTRO_DEMANDAS].sort()).toEqual(
+      ['areaId', 'dataFim', 'dataInicio', 'regiaoId', 'status'].sort()
     )
   })
 })
