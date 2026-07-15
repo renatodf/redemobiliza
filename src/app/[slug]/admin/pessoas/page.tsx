@@ -9,6 +9,7 @@ import { corTextoContraste } from '@/lib/cor-contraste'
 import UsuariosTable, { type UsuarioRow } from './UsuariosTable'
 import CadastrarUsuarioModal from './CadastrarUsuarioModal'
 import UsuariosTabs from './UsuariosTabs'
+import VisualizarDadosGeraisButton from '@/components/admin/VisualizarDadosGeraisButton'
 
 const PAGE_SIZE = 20
 
@@ -152,12 +153,21 @@ export default async function PessoasPage({
             </span>
           )}
         </h1>
-        <CadastrarUsuarioModal
-          slug={params.slug}
-          regioes={regioes}
-          profissoes={profissoes}
-          corPrimaria={gabinete.corPrimaria}
-        />
+        <div className="flex items-center gap-2">
+          {rede && (
+            <VisualizarDadosGeraisButton
+              dashboardHref={`/${params.slug}/admin/dashboard`}
+              searchParams={{ redeDeId: rede }}
+              corPrimaria={gabinete.corPrimaria}
+            />
+          )}
+          <CadastrarUsuarioModal
+            slug={params.slug}
+            regioes={regioes}
+            profissoes={profissoes}
+            corPrimaria={gabinete.corPrimaria}
+          />
+        </div>
       </div>
 
       <UsuariosTabs slug={params.slug} corPrimaria={gabinete.corPrimaria} />
