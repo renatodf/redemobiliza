@@ -69,6 +69,7 @@ export default async function MobilizadorFiltrosDemandasPage({
       />
       <DemandasFiltro
         baseHref={`/${params.slug}/mobilizador/filtros/demandas`}
+        dashboardHref={`/${params.slug}/mobilizador/dashboard`}
         exportarHref={`/api/${params.slug}/filtros/demandas/exportar`}
         searchParams={searchParams}
         demandas={demandasPagina}

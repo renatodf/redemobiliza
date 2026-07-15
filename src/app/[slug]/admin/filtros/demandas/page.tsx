@@ -69,6 +69,7 @@ export default async function AdminFiltrosDemandasPage({
       />
       <DemandasFiltro
         baseHref={`/${params.slug}/admin/filtros/demandas`}
+        dashboardHref={`/${params.slug}/admin/dashboard`}
         exportarHref={`/api/${params.slug}/filtros/demandas/exportar`}
         searchParams={searchParams}
         demandas={demandasPagina}

@@ -1,5 +1,6 @@
 // src/app/[slug]/admin/filtros/DemandasFiltro.tsx
 import Pagination from '@/components/admin/Pagination'
+import VisualizarDadosGeraisDemandasButton from '@/components/admin/VisualizarDadosGeraisDemandasButton'
 import { statusDemandaPill } from '@/lib/status-demanda'
 
 type DemandaLinha = {
@@ -14,6 +15,7 @@ type DemandaLinha = {
 
 export default function DemandasFiltro({
   baseHref,
+  dashboardHref,
   exportarHref,
   searchParams,
   demandas,
@@ -25,6 +27,7 @@ export default function DemandasFiltro({
   corPrimaria,
 }: {
   baseHref: string
+  dashboardHref: string
   exportarHref: string
   searchParams: Record<string, string | undefined>
   demandas: DemandaLinha[]
@@ -72,6 +75,14 @@ export default function DemandasFiltro({
             ))}
           </select>
         </div>
+        <div>
+          <label className="block text-xs font-medium text-gray-600">Data início</label>
+          <input type="date" name="dataInicio" defaultValue={searchParams.dataInicio ?? ''} className="mt-1 border border-gray-300 rounded-md px-2 py-1.5 text-sm" />
+        </div>
+        <div>
+          <label className="block text-xs font-medium text-gray-600">Data fim</label>
+          <input type="date" name="dataFim" defaultValue={searchParams.dataFim ?? ''} className="mt-1 border border-gray-300 rounded-md px-2 py-1.5 text-sm" />
+        </div>
         <button
           type="submit"
           style={{ backgroundColor: corPrimaria }}
@@ -90,6 +101,7 @@ export default function DemandasFiltro({
       <div className="flex items-center justify-between flex-wrap gap-2">
         <p className="text-sm text-gray-600">{totalFiltrado.toLocaleString('pt-BR')} demanda(s) encontrada(s)</p>
         <div className="flex gap-2">
+          <VisualizarDadosGeraisDemandasButton dashboardHref={dashboardHref} searchParams={searchParams} corPrimaria={corPrimaria} />
           <a
             href={`${exportarHref}?${queryAtual}${separador}formato=pdf`}
             style={{ backgroundColor: corPrimaria }}
