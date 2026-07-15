@@ -170,10 +170,10 @@ export default async function DemandasPage({
       Filtros - OCULTADO a pedido do usuario em 15/07/2026
       Spec: docs/superpowers/specs/2026-07-15-demandas-listagem-sort-e-filtros-design.md
 
-      A logica de dados (where/temFiltro no topo deste arquivo) continua ativa e
-      respondendo aos mesmos parametros de URL (usados pelos links do Dashboard,
-      ex. clique numa fatia de "Demandas do mes") - so este formulario visual foi
-      ocultado. Para reativar, remova este comentario e descomente o form abaixo.
+      A lógica de dados (where/temFiltro no topo deste arquivo) continua ativa e
+      respondendo aos mesmos parâmetros de URL (usados pelos links do Dashboard,
+      ex. clique numa fatia de "Demandas do mês") - só este formulário visual foi
+      ocultado. Para reativar, remova este comentário e descomente o form abaixo.
 
       <form method="GET" className="bg-white rounded-lg shadow-sm p-4">
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
@@ -182,28 +182,28 @@ export default async function DemandasPage({
             <option value="aberta">Em aberto</option>
             <option value="expirada">Expirada</option>
             <option value="atendida">Atendida</option>
-            <option value="nao_atendida">Nao atendida</option>
+            <option value="nao_atendida">Não atendida</option>
           </select>
 
           <select name="areaId" defaultValue={searchParams.areaId ?? ''} className="border border-gray-300 rounded-md px-2 py-1.5 text-sm">
-            <option value="">Todas as areas</option>
+            <option value="">Todas as áreas</option>
             {areas.map((a) => <option key={a.id} value={a.id}>{a.nome}</option>)}
           </select>
 
           <select name="responsavelId" defaultValue={searchParams.responsavelId ?? ''} className="border border-gray-300 rounded-md px-2 py-1.5 text-sm">
-            <option value="">Todos os responsaveis</option>
+            <option value="">Todos os responsáveis</option>
             {colaboradores.map((c) => <option key={c.id} value={c.id}>{c.nome}</option>)}
           </select>
 
           <select name="regiaoId" defaultValue={searchParams.regiaoId ?? ''} className="border border-gray-300 rounded-md px-2 py-1.5 text-sm">
-            <option value="">Todas as regioes</option>
+            <option value="">Todas as regiões</option>
             {regioes.map((r) => <option key={r.id} value={r.id}>{r.nome}</option>)}
           </select>
 
           <select name="prazoAlterado" defaultValue={searchParams.prazoAlterado ?? ''} className="border border-gray-300 rounded-md px-2 py-1.5 text-sm">
             <option value="">Prazo alterado: todos</option>
             <option value="sim">Sim</option>
-            <option value="nao">Nao</option>
+            <option value="nao">Não</option>
           </select>
 
           <button
