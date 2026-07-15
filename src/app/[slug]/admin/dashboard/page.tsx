@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import { getGabineteBySlug } from '@/lib/gabinete'
 import { buildWherePessoas, type FiltrosPessoasParams } from '@/lib/filtros-pessoas'
+import { buildWhereDemandas } from '@/lib/filtros-demandas'
 import { resolverIdsRedeDe } from '@/lib/rede'
 import { DashboardConteudo } from './DashboardConteudo'
 
@@ -59,9 +60,17 @@ export default async function DashboardPage({
     religiao: searchParams.religiao,
   }
   const idsRede = await resolverIdsRedeDe(searchParams.redeDeId, gabinete.id)
-  const wherePessoas = buildWherePessoas(gabinete.id, filtrosPessoas, idsRede)
+  const filtroDemandas = searchParams.filtroDemandas === '1'
+    ? buildWhereDemandas(gabinete.id, {
+        areaId: searchParams.areaId,
+        status: searchParams.status as 'atendida' | 'nao_atendida' | 'pendente' | undefined,
+        dataInicio: searchParams.dataInicio,
+        dataFim: searchParams.dataFim,
+      })
+    : undefined
+  const wherePessoas = buildWherePessoas(gabinete.id, filtrosPessoas, idsRede, filtroDemandas)
 
-  const [segmentoAtivo, profissaoAtiva, redeAtiva] = await Promise.all([
+  const [segmentoAtivo, profissaoAtiva, redeAtiva, areaAtiva] = await Promise.all([
     searchParams.segmentoId
       ? prisma.segmento.findFirst({ where: { id: searchParams.segmentoId, gabineteId: gabinete.id }, select: { nome: true } })
       : Promise.resolve(null),
@@ -70,6 +79,9 @@ export default async function DashboardPage({
       : Promise.resolve(null),
     searchParams.redeDeId && searchParams.redeDeId !== 'raiz'
       ? prisma.pessoa.findFirst({ where: { id: searchParams.redeDeId, gabineteId: gabinete.id }, select: { nome: true } })
+      : Promise.resolve(null),
+    searchParams.areaId
+      ? prisma.areaDemanda.findFirst({ where: { id: searchParams.areaId, gabineteId: gabinete.id }, select: { nome: true } })
       : Promise.resolve(null),
   ])
 
@@ -226,6 +238,7 @@ export default async function DashboardPage({
       segmentoAtivo={segmentoAtivo}
       profissaoAtiva={profissaoAtiva}
       redeAtiva={searchParams.redeDeId === 'raiz' ? { nome: 'Rede Raiz' } : redeAtiva}
+      areaAtiva={areaAtiva}
     />
   )
 }
