@@ -57,10 +57,20 @@ export default async function MobilizadorDashboardPage({
     idadeMin: searchParams.idadeMin,
     idadeMax: searchParams.idadeMax,
     segmentoId: searchParams.segmentoId,
+    profissaoId: searchParams.profissaoId,
     escolaridade: searchParams.escolaridade,
     religiao: searchParams.religiao,
   }
   const wherePessoas = buildWherePessoas(gabinete.id, filtrosPessoas, idsRede)
+
+  const [segmentoAtivo, profissaoAtiva] = await Promise.all([
+    searchParams.segmentoId
+      ? prisma.segmento.findFirst({ where: { id: searchParams.segmentoId, gabineteId: gabinete.id }, select: { nome: true } })
+      : Promise.resolve(null),
+    searchParams.profissaoId
+      ? prisma.profissao.findFirst({ where: { id: searchParams.profissaoId, gabineteId: gabinete.id }, select: { nome: true } })
+      : Promise.resolve(null),
+  ])
 
   const [
     totalPessoas,
@@ -213,6 +223,8 @@ export default async function MobilizadorDashboardPage({
       totalSemNascimento={totalSemNascimento}
       escolaridade={escolaridadeRaw.map((e) => ({ chave: e.escolaridade, contagem: e._count.id }))}
       religiao={religiaoRaw.map((r) => ({ chave: r.religiao, contagem: r._count.id }))}
+      segmentoAtivo={segmentoAtivo}
+      profissaoAtiva={profissaoAtiva}
     />
   )
 }
