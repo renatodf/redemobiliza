@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { buildWherePessoas, aplicarFiltrosPosConsulta } from '../filtros-pessoas'
+import type { WhereDemandas } from '../filtros-demandas'
 
 describe('buildWherePessoas', () => {
   it('sempre filtra por gabineteId e deletedAt null', () => {
@@ -16,6 +17,17 @@ describe('buildWherePessoas', () => {
   it('não filtra por id quando idsRede não é passado (escopo admin)', () => {
     const where = buildWherePessoas('gab-1', {})
     expect(where.id).toBeUndefined()
+  })
+
+  it('adiciona filtro relacional de demandasSolicitadas quando filtroDemandas é passado', () => {
+    const filtroDemandas: WhereDemandas = { gabineteId: 'gab-1', deletedAt: null, status: 'atendida' }
+    const where = buildWherePessoas('gab-1', {}, undefined, filtroDemandas)
+    expect(where.demandasSolicitadas).toEqual({ some: filtroDemandas })
+  })
+
+  it('não filtra por demandasSolicitadas quando filtroDemandas não é passado', () => {
+    const where = buildWherePessoas('gab-1', {})
+    expect(where.demandasSolicitadas).toBeUndefined()
   })
 
   it('adiciona filtro de segmento via relação', () => {

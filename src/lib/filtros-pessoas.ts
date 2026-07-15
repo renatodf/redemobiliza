@@ -1,4 +1,5 @@
 import { estaNoIntervaloAniversario, calcularIdade } from './aniversario'
+import type { WhereDemandas } from './filtros-demandas'
 
 // Acima disso, a exportação não bloqueia a resposta HTTP esperando o
 // arquivo inteiro ser gerado — vira um fluxo assíncrono por e-mail (ver
@@ -29,12 +30,14 @@ export type WherePessoas = {
   nascimento?: { not: null }
   escolaridade?: string
   religiao?: string
+  demandasSolicitadas?: { some: WhereDemandas }
 }
 
 export function buildWherePessoas(
   gabineteId: string,
   params: FiltrosPessoasParams,
-  idsRede?: string[]
+  idsRede?: string[],
+  filtroDemandas?: WhereDemandas
 ): WherePessoas {
   const where: WherePessoas = {
     gabineteId,
@@ -50,6 +53,7 @@ export function buildWherePessoas(
   }
   if (params.escolaridade) where.escolaridade = params.escolaridade
   if (params.religiao) where.religiao = params.religiao
+  if (filtroDemandas) where.demandasSolicitadas = { some: filtroDemandas }
   return where
 }
 
