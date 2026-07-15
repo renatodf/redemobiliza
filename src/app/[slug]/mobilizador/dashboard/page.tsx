@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma'
 import { assertMobilizadorAccess } from '@/lib/assert-mobilizador-access'
 import { coletarSubRedeIds } from '@/lib/rede'
 import { buildWherePessoas, type FiltrosPessoasParams } from '@/lib/filtros-pessoas'
+import { buildWhereDemandas } from '@/lib/filtros-demandas'
 import { DashboardConteudo } from '../../admin/dashboard/DashboardConteudo'
 
 function calcularIntervalo(periodo: string): { dataInicio: Date; dataFim: Date } {
@@ -61,14 +62,29 @@ export default async function MobilizadorDashboardPage({
     escolaridade: searchParams.escolaridade,
     religiao: searchParams.religiao,
   }
-  const wherePessoas = buildWherePessoas(gabinete.id, filtrosPessoas, idsRede)
+  const filtroDemandas = searchParams.filtroDemandas === '1'
+    ? buildWhereDemandas(
+        gabinete.id,
+        {
+          areaId: searchParams.areaId,
+          status: searchParams.status as 'atendida' | 'nao_atendida' | 'pendente' | undefined,
+          dataInicio: searchParams.dataInicio,
+          dataFim: searchParams.dataFim,
+        },
+        pessoa.id
+      )
+    : undefined
+  const wherePessoas = buildWherePessoas(gabinete.id, filtrosPessoas, idsRede, filtroDemandas)
 
-  const [segmentoAtivo, profissaoAtiva] = await Promise.all([
+  const [segmentoAtivo, profissaoAtiva, areaAtiva] = await Promise.all([
     searchParams.segmentoId
       ? prisma.segmento.findFirst({ where: { id: searchParams.segmentoId, gabineteId: gabinete.id }, select: { nome: true } })
       : Promise.resolve(null),
     searchParams.profissaoId
       ? prisma.profissao.findFirst({ where: { id: searchParams.profissaoId, gabineteId: gabinete.id }, select: { nome: true } })
+      : Promise.resolve(null),
+    searchParams.areaId
+      ? prisma.areaDemanda.findFirst({ where: { id: searchParams.areaId, gabineteId: gabinete.id }, select: { nome: true } })
       : Promise.resolve(null),
   ])
 
@@ -225,6 +241,7 @@ export default async function MobilizadorDashboardPage({
       religiao={religiaoRaw.map((r) => ({ chave: r.religiao, contagem: r._count.id }))}
       segmentoAtivo={segmentoAtivo}
       profissaoAtiva={profissaoAtiva}
+      areaAtiva={areaAtiva}
     />
   )
 }
