@@ -45,11 +45,13 @@ export async function promoverMobilizadorPorMobilizador(
     if ('erro' in resultado) return { erro: resultado.erro }
     const { userId } = resultado
 
+    const tokenMobilizador = crypto.randomUUID().replace(/-/g, '')
+
     try {
       await prisma.$transaction([
         prisma.pessoa.update({
           where: { id: pessoaId },
-          data: { isMobilizador: true, userId },
+          data: { isMobilizador: true, userId, tokenMobilizador },
         }),
         prisma.usuarioGabinete.create({
           data: { userId, gabineteId: gabinete.id, papel: 'mobilizador' },
