@@ -9,7 +9,7 @@ const TAMANHO_MAXIMO_BYTES = 5 * 1024 * 1024
 
 type TipoImagemPermitido = keyof typeof TIPOS_IMAGEM_PERMITIDOS
 
-export function validarImagemUpload(file: File): { ext: string } {
+export function validarImagemUpload(file: File): { ext: string; contentType: string } {
   const tipo = file.type.toLowerCase() as TipoImagemPermitido
 
   if (!(tipo in TIPOS_IMAGEM_PERMITIDOS)) {
@@ -20,5 +20,5 @@ export function validarImagemUpload(file: File): { ext: string } {
     throw new Error('Imagem muito grande — máximo 5MB')
   }
 
-  return { ext: TIPOS_IMAGEM_PERMITIDOS[tipo] }
+  return { ext: TIPOS_IMAGEM_PERMITIDOS[tipo], contentType: tipo }
 }

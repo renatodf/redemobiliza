@@ -9,22 +9,22 @@ function criarArquivo(tipo: string, tamanhoBytes: number, nome = 'arquivo'): Fil
 describe('validarImagemUpload', () => {
   it('aceita JPEG dentro do limite de tamanho', () => {
     const file = criarArquivo('image/jpeg', 1024)
-    expect(validarImagemUpload(file)).toEqual({ ext: 'jpg' })
+    expect(validarImagemUpload(file)).toEqual({ ext: 'jpg', contentType: 'image/jpeg' })
   })
 
   it('aceita PNG dentro do limite de tamanho', () => {
     const file = criarArquivo('image/png', 1024)
-    expect(validarImagemUpload(file)).toEqual({ ext: 'png' })
+    expect(validarImagemUpload(file)).toEqual({ ext: 'png', contentType: 'image/png' })
   })
 
   it('aceita WebP dentro do limite de tamanho', () => {
     const file = criarArquivo('image/webp', 1024)
-    expect(validarImagemUpload(file)).toEqual({ ext: 'webp' })
+    expect(validarImagemUpload(file)).toEqual({ ext: 'webp', contentType: 'image/webp' })
   })
 
   it('aceita GIF dentro do limite de tamanho', () => {
     const file = criarArquivo('image/gif', 1024)
-    expect(validarImagemUpload(file)).toEqual({ ext: 'gif' })
+    expect(validarImagemUpload(file)).toEqual({ ext: 'gif', contentType: 'image/gif' })
   })
 
   it('rejeita SVG (vetor de XSS armazenado)', () => {
@@ -44,16 +44,16 @@ describe('validarImagemUpload', () => {
 
   it('aceita arquivo exatamente no limite de 5MB', () => {
     const file = criarArquivo('image/png', 5 * 1024 * 1024)
-    expect(validarImagemUpload(file)).toEqual({ ext: 'png' })
+    expect(validarImagemUpload(file)).toEqual({ ext: 'png', contentType: 'image/png' })
   })
 
   it('ignora extensão do nome do arquivo — extensão vem sempre do MIME validado', () => {
     const file = criarArquivo('image/png', 1024, '../../../etc/passwd.png')
-    expect(validarImagemUpload(file)).toEqual({ ext: 'png' })
+    expect(validarImagemUpload(file)).toEqual({ ext: 'png', contentType: 'image/png' })
   })
 
   it('é case-insensitive no MIME type', () => {
     const file = criarArquivo('IMAGE/PNG', 1024)
-    expect(validarImagemUpload(file)).toEqual({ ext: 'png' })
+    expect(validarImagemUpload(file)).toEqual({ ext: 'png', contentType: 'image/png' })
   })
 })

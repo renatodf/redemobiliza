@@ -19,7 +19,7 @@ export async function uploadFotoPessoa(formData: FormData) {
   const { data: { user }, error: authError } = await supabase.auth.getUser()
   if (authError || !user) throw new Error('Não autenticado')
 
-  const { ext } = validarImagemUpload(file)
+  const { ext, contentType } = validarImagemUpload(file)
 
   const gabinete = await getGabineteBySlug(slug as string)
   if (!gabinete) throw new Error('Gabinete não encontrado')
@@ -53,7 +53,7 @@ export async function uploadFotoPessoa(formData: FormData) {
 
   const { error } = await getSupabaseAdmin().storage
     .from('gabinete-assets')
-    .upload(path, buffer, { upsert: true, contentType: file.type })
+    .upload(path, buffer, { upsert: true, contentType })
 
   if (error) {
     console.error('[uploadFotoPessoa] storage error:', error)

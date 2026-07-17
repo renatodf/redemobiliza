@@ -13,13 +13,13 @@ export async function uploadBanner(formData: FormData) {
 
   const { gabinete } = await assertAdminAccess(slug)
 
-  const { ext } = validarImagemUpload(file)
+  const { ext, contentType } = validarImagemUpload(file)
   const path = `${gabinete.id}/banner.${ext}`
   const buffer = Buffer.from(await file.arrayBuffer())
 
   const { error } = await getSupabaseAdmin().storage
     .from('gabinete-assets')
-    .upload(path, buffer, { upsert: true, contentType: file.type })
+    .upload(path, buffer, { upsert: true, contentType })
 
   if (error) throw new Error(`Erro no upload: ${error.message}`)
 
