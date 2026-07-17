@@ -5,7 +5,7 @@ import { prisma } from '@/lib/prisma'
 import { getGabineteBySlug } from '@/lib/gabinete'
 import { corTextoContraste } from '@/lib/cor-contraste'
 import { salvarConfiguracao } from '@/actions/admin/salvar-configuracao'
-import { criarAreaDemanda } from '@/actions/admin/criar-area-demanda'
+import CriarAreaDemandaForm from '@/components/admin/CriarAreaDemandaForm'
 import { excluirAreaDemanda } from '@/actions/admin/excluir-area-demanda'
 import { editarAreaDemanda } from '@/actions/admin/editar-area-demanda'
 import RestaurarPessoaButton from './RestaurarPessoaButton'
@@ -89,22 +89,7 @@ export default async function DemandasConfigPage({ params }: { params: { slug: s
 
       <div className="bg-white rounded-lg shadow-sm p-6 space-y-4">
         <h2 className="text-base font-semibold">Áreas da Demanda</h2>
-        <form action={criarAreaDemanda} className="flex gap-2">
-          <input type="hidden" name="slug" value={params.slug} />
-          <input
-            name="nome"
-            required
-            placeholder="Nome da nova área"
-            className="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm"
-          />
-          <button
-            type="submit"
-            style={{ backgroundColor: gabinete.corPrimaria, color: corTexto }}
-            className="px-4 py-2 rounded-md text-sm font-medium"
-          >
-            Criar
-          </button>
-        </form>
+        <CriarAreaDemandaForm slug={params.slug} corPrimaria={gabinete.corPrimaria} corTexto={corTexto} />
         <ul className="divide-y divide-gray-200 border border-gray-200 rounded-md">
           {areas.map((a) => (
             <li key={a.id} className="px-4 py-3">
