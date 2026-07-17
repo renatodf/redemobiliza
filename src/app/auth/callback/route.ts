@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from 'next/server'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { prisma } from '@/lib/prisma'
+import { whereMobilizadorAtivoPorToken } from '@/lib/mobilizador'
 
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = request.nextUrl
@@ -21,7 +22,7 @@ export async function GET(request: NextRequest) {
   const user = data.user
 
   const pessoa = await prisma.pessoa.findFirst({
-    where: { gabineteId, tokenMobilizador: token },
+    where: whereMobilizadorAtivoPorToken(gabineteId, token),
     select: {
       id: true,
       email: true,
