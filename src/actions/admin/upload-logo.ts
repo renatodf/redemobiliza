@@ -6,14 +6,23 @@ import { getSupabaseAdmin } from '@/lib/supabase/admin'
 import { assertAdminAccess } from '@/lib/assert-admin-access'
 import { validarImagemUpload } from '@/lib/validar-imagem-upload'
 
-export async function uploadLogo(formData: FormData) {
+export async function uploadLogo(
+  _prevState: { erro?: string },
+  formData: FormData
+): Promise<{ erro?: string }> {
   const slug = formData.get('slug') as string
   const file = formData.get('logo') as File | null
-  if (!file || file.size === 0) return
+  if (!file || file.size === 0) return {}
 
   const { gabinete } = await assertAdminAccess(slug)
 
-  const { ext, contentType } = validarImagemUpload(file)
+  let ext: string, contentType: string
+  try {
+    ;({ ext, contentType } = validarImagemUpload(file))
+  } catch (e) {
+    return { erro: e instanceof Error ? e.message : 'Erro ao validar imagem' }
+  }
+
   const path = `${gabinete.id}/logo.${ext}`
   const buffer = Buffer.from(await file.arrayBuffer())
 
@@ -21,7 +30,7 @@ export async function uploadLogo(formData: FormData) {
     .from('gabinete-assets')
     .upload(path, buffer, { upsert: true, contentType })
 
-  if (error) throw new Error(`Erro no upload: ${error.message}`)
+  if (error) return { erro: `Erro no upload: ${error.message}` }
 
   const { data: { publicUrl } } = getSupabaseAdmin().storage
     .from('gabinete-assets')
@@ -33,4 +42,6 @@ export async function uploadLogo(formData: FormData) {
   })
 
   revalidatePath(`/${slug}/admin/personalizacao`)
+  revalidatePath(`/${slug}/admin/configuracoes/personalizacao`)
+  return {}
 }

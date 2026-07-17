@@ -1,12 +1,11 @@
 'use client'
 
-import { useRef, useState, useTransition } from 'react'
-import { useRouter } from 'next/navigation'
+import { useFormState } from 'react-dom'
 
 interface UploadImagemGabineteFormProps {
   slug: string
   campo: 'logo' | 'banner'
-  acao: (formData: FormData) => Promise<void>
+  acao: (prevState: { erro?: string }, formData: FormData) => Promise<{ erro?: string }>
   botaoLabel: string
   botaoClassName?: string
   botaoStyle?: React.CSSProperties
@@ -22,51 +21,21 @@ export default function UploadImagemGabineteForm({
   botaoClassName = BOTAO_CLASSNAME_PADRAO,
   botaoStyle,
 }: UploadImagemGabineteFormProps) {
-  const router = useRouter()
-  const inputRef = useRef<HTMLInputElement>(null)
-  const [isPending, startTransition] = useTransition()
-  const [errorMsg, setErrorMsg] = useState<string | null>(null)
-
-  function handleEnviar() {
-    const file = inputRef.current?.files?.[0]
-    if (!file) return
-    setErrorMsg(null)
-
-    const formData = new FormData()
-    formData.set('slug', slug)
-    formData.set(campo, file)
-
-    startTransition(async () => {
-      try {
-        await acao(formData)
-        if (inputRef.current) inputRef.current.value = ''
-        router.refresh()
-      } catch (err) {
-        setErrorMsg(err instanceof Error ? err.message : 'Erro ao enviar imagem')
-      }
-    })
-  }
+  const [state, action] = useFormState(acao, {})
 
   return (
-    <div>
+    <form action={action} encType="multipart/form-data">
+      <input type="hidden" name="slug" value={slug} />
       <input
-        ref={inputRef}
         name={campo}
         type="file"
         accept="image/jpeg,image/png,image/webp,image/gif"
         className="block text-sm"
-        disabled={isPending}
       />
-      <button
-        type="button"
-        onClick={handleEnviar}
-        disabled={isPending}
-        style={botaoStyle}
-        className={botaoClassName}
-      >
-        {isPending ? 'Enviando...' : botaoLabel}
+      <button type="submit" style={botaoStyle} className={botaoClassName}>
+        {botaoLabel}
       </button>
-      {errorMsg && <p className="text-xs text-red-600 mt-1">{errorMsg}</p>}
-    </div>
+      {state.erro && <p className="text-xs text-red-600 mt-1">{state.erro}</p>}
+    </form>
   )
 }
