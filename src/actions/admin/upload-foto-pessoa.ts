@@ -5,13 +5,7 @@ import { prisma } from '@/lib/prisma'
 import { getSupabaseAdmin } from '@/lib/supabase/admin'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { getGabineteBySlug } from '@/lib/gabinete'
-
-const ALLOWED_TYPES = {
-  'image/jpeg': 'jpg',
-  'image/png': 'png',
-  'image/webp': 'webp',
-  'image/gif': 'gif',
-} as const
+import { validarImagemUpload } from '@/lib/validar-imagem-upload'
 
 export async function uploadFotoPessoa(formData: FormData) {
   const slug = formData.get('slug')
@@ -25,9 +19,7 @@ export async function uploadFotoPessoa(formData: FormData) {
   const { data: { user }, error: authError } = await supabase.auth.getUser()
   if (authError || !user) throw new Error('Não autenticado')
 
-  const safeType = file.type.toLowerCase() as keyof typeof ALLOWED_TYPES
-  if (!(safeType in ALLOWED_TYPES)) throw new Error('Tipo de imagem não permitido — use JPEG, PNG, WebP ou GIF')
-  if (file.size > 5 * 1024 * 1024) throw new Error('Imagem muito grande — máximo 5MB')
+  const { ext } = validarImagemUpload(file)
 
   const gabinete = await getGabineteBySlug(slug as string)
   if (!gabinete) throw new Error('Gabinete não encontrado')
@@ -56,13 +48,12 @@ export async function uploadFotoPessoa(formData: FormData) {
     }
   }
 
-  const ext = ALLOWED_TYPES[safeType]
   const path = `${gabinete.id}/pessoas/${pessoaId}/foto.${ext}`
   const buffer = Buffer.from(await file.arrayBuffer())
 
   const { error } = await getSupabaseAdmin().storage
     .from('gabinete-assets')
-    .upload(path, buffer, { upsert: true, contentType: safeType })
+    .upload(path, buffer, { upsert: true, contentType: file.type })
 
   if (error) {
     console.error('[uploadFotoPessoa] storage error:', error)
