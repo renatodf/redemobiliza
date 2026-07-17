@@ -36,9 +36,9 @@ export async function criarDemanda(formData: FormData): Promise<void> {
   })
   if (!autorPessoa) throw new Error('Não foi possível identificar o autor')
 
-  // Validar que solicitante pertence ao gabinete
+  // Validar que solicitante pertence ao gabinete e não está soft-deletado
   const solicitanteCheck = await prisma.pessoa.findFirst({
-    where: { id: solicitanteId, gabineteId: gabinete.id },
+    where: { id: solicitanteId, gabineteId: gabinete.id, deletedAt: null },
     select: { id: true },
   })
   if (!solicitanteCheck) throw new Error('Solicitante não encontrado')
