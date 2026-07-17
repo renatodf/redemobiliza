@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import { getGabineteBySlug } from '@/lib/gabinete'
 import { corTextoContraste } from '@/lib/cor-contraste'
-import { criarProfissao } from '@/actions/admin/criar-profissao'
+import CriarProfissaoForm from '@/components/admin/CriarProfissaoForm'
 import { desativarProfissao } from '@/actions/admin/desativar-profissao'
 
 export default async function ProfissoesPage({ params }: { params: { slug: string } }) {
@@ -20,22 +20,7 @@ export default async function ProfissoesPage({ params }: { params: { slug: strin
     <div className="max-w-2xl mx-auto py-8 px-4 space-y-6">
       <h1 className="text-2xl font-bold">Profissões</h1>
 
-      <form action={criarProfissao} className="flex gap-2">
-        <input type="hidden" name="slug" value={params.slug} />
-        <input
-          name="nome"
-          required
-          placeholder="Nome da nova profissão"
-          className="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm"
-        />
-        <button
-          type="submit"
-          style={{ backgroundColor: gabinete.corPrimaria, color: corTexto }}
-          className="px-4 py-2 rounded-md text-sm font-medium"
-        >
-          Adicionar
-        </button>
-      </form>
+      <CriarProfissaoForm slug={params.slug} corPrimaria={gabinete.corPrimaria} corTexto={corTexto} />
 
       <ul className="divide-y divide-gray-200 bg-white rounded-lg shadow-sm">
         {profissoes.map((p) => (
