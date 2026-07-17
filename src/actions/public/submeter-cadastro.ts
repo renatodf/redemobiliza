@@ -7,6 +7,7 @@ import { normalizeWhatsApp } from '@/lib/whatsapp'
 import { getSupabaseAdmin } from '@/lib/supabase/admin'
 import { parseDataBrasileira } from '@/lib/data-brasileira'
 import { validarImagemUpload } from '@/lib/validar-imagem-upload'
+import { whereMobilizadorAtivoPorToken } from '@/lib/mobilizador'
 
 export async function submeterCadastro(formData: FormData): Promise<{ erro: string } | never> {
   const slug = formData.get('slug') as string
@@ -67,7 +68,7 @@ export async function submeterCadastro(formData: FormData): Promise<{ erro: stri
   let mobilizadorId: string | null = null
   if (mobilizadorToken) {
     const mob = await prisma.pessoa.findFirst({
-      where: { gabineteId: gabinete.id, tokenMobilizador: mobilizadorToken, isMobilizador: true },
+      where: whereMobilizadorAtivoPorToken(gabinete.id, mobilizadorToken),
       select: { id: true },
     })
     mobilizadorId = mob?.id ?? null
