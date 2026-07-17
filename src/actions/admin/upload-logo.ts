@@ -14,34 +14,32 @@ export async function uploadLogo(
   const file = formData.get('logo') as File | null
   if (!file || file.size === 0) return {}
 
-  const { gabinete } = await assertAdminAccess(slug)
-
-  let ext: string, contentType: string
   try {
-    ;({ ext, contentType } = validarImagemUpload(file))
+    const { gabinete } = await assertAdminAccess(slug)
+    const { ext, contentType } = validarImagemUpload(file)
+
+    const path = `${gabinete.id}/logo.${ext}`
+    const buffer = Buffer.from(await file.arrayBuffer())
+
+    const { error } = await getSupabaseAdmin().storage
+      .from('gabinete-assets')
+      .upload(path, buffer, { upsert: true, contentType })
+
+    if (error) return { erro: `Erro no upload: ${error.message}` }
+
+    const { data: { publicUrl } } = getSupabaseAdmin().storage
+      .from('gabinete-assets')
+      .getPublicUrl(path)
+
+    await prisma.gabinete.update({
+      where: { id: gabinete.id },
+      data: { logoUrl: `${publicUrl}?v=${Date.now()}` },
+    })
+
+    revalidatePath(`/${slug}/admin/personalizacao`)
+    revalidatePath(`/${slug}/admin/configuracoes/personalizacao`)
+    return {}
   } catch (e) {
-    return { erro: e instanceof Error ? e.message : 'Erro ao validar imagem' }
+    return { erro: e instanceof Error ? e.message : 'Erro ao enviar imagem' }
   }
-
-  const path = `${gabinete.id}/logo.${ext}`
-  const buffer = Buffer.from(await file.arrayBuffer())
-
-  const { error } = await getSupabaseAdmin().storage
-    .from('gabinete-assets')
-    .upload(path, buffer, { upsert: true, contentType })
-
-  if (error) return { erro: `Erro no upload: ${error.message}` }
-
-  const { data: { publicUrl } } = getSupabaseAdmin().storage
-    .from('gabinete-assets')
-    .getPublicUrl(path)
-
-  await prisma.gabinete.update({
-    where: { id: gabinete.id },
-    data: { logoUrl: `${publicUrl}?v=${Date.now()}` },
-  })
-
-  revalidatePath(`/${slug}/admin/personalizacao`)
-  revalidatePath(`/${slug}/admin/configuracoes/personalizacao`)
-  return {}
 }
