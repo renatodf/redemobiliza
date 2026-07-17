@@ -33,7 +33,7 @@ export async function gerarLinkCadastro(
   let token: string | null = null
   if (mobilizadorPessoaId) {
     const mobilizador = await prisma.pessoa.findFirst({
-      where: { id: mobilizadorPessoaId, gabineteId: gabinete.id, isMobilizador: true },
+      where: { id: mobilizadorPessoaId, gabineteId: gabinete.id, isMobilizador: true, deletedAt: null },
       select: { tokenMobilizador: true },
     })
     if (!mobilizador?.tokenMobilizador) return { erro: 'Mobilizador inválido.' }
