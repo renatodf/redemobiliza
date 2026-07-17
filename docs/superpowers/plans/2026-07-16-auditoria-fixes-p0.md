@@ -577,27 +577,29 @@ git commit -m "fix: verificar-whatsapp/submeter-cadastro ignoram pessoa soft-del
 
 **Files:** nenhum arquivo novo — verificação de todo o plano.
 
-- [ ] **Step 1: Typecheck completo**
+- [x] **Step 1: Typecheck completo**
 
 Run: `npx tsc --noEmit`
-Expected: sem erro.
+Expected: sem erro. **Confirmado 17/07.**
 
-- [ ] **Step 2: Build de produção**
+- [x] **Step 2: Build de produção**
 
 Run: `npm run build`
-Expected: build conclui sem erro.
+Expected: build conclui sem erro. **Confirmado 17/07 (`rm -rf .next` antes, build limpo).**
 
-- [ ] **Step 3: Suite de testes completa**
+- [x] **Step 3: Suite de testes completa**
 
 Run: `npx vitest run`
-Expected: todos os testes passam, incluindo os 10 novos de `validar-imagem-upload.test.ts`; nenhuma regressão nos testes existentes (mesma contagem de falhas pré-existentes de sempre — `email.test.ts`, por falta de `RESEND_API_KEY` local).
+Expected: todos os testes passam, incluindo os 10 novos de `validar-imagem-upload.test.ts`; nenhuma regressão nos testes existentes (mesma contagem de falhas pré-existentes de sempre — `email.test.ts`, por falta de `RESEND_API_KEY` local). **Confirmado 17/07: 176 passaram, 2 falhas pré-existentes em `email.test.ts` (esperado).**
 
-- [ ] **Step 4: Checklist de verificação manual consolidado**
+- [x] **Step 4: Checklist de verificação manual consolidado**
 
-- [ ] C4: mobilizador promovido por outro mobilizador consegue acessar `/mobilizador/rede` sem erro.
-- [ ] C2: upload de `.svg` como logo/banner é rejeitado; upload válido funciona e atualiza a imagem na tela sem precisar de hard-refresh.
-- [ ] C2: upload de foto de pessoa continua funcionando idêntico a antes (regressão da Task 4).
-- [ ] C3: cadastro público com WhatsApp de pessoa soft-deletada cria uma pessoa nova, sem erro e sem fundir com a antiga.
-- [ ] C3: cadastro público com WhatsApp de pessoa **ativa** continua bloqueando duplicata (sem regressão).
+Verificado em `staging.redemobiliza.com.br` (gabinete `staging-teste`) em 17/07. O primeiro round de testes deu falso-negativo porque o serviço `app-staging` no EasyPanel estava com o rollout travado num container de 13/07 (achado à parte, ver HANDOFF seção 22) — corrigido, e todo o checklist foi re-executado do zero contra o código correto.
+
+- [x] C4: mobilizador promovido por outro mobilizador consegue acessar `/mobilizador/rede` sem erro. Verificado simulando no banco o estado exato que a transação da Server Action produz (`isMobilizador=true` + `tokenMobilizador` + `UsuarioGabinete`), já que a UI de promoção do lado mobilizador está órfã (ver HANDOFF seção 22) — login como a pessoa promovida carrega `/mobilizador/rede` sem erro no console.
+- [x] C2: upload de `.svg` como logo/banner é rejeitado (confirmado: resposta 500, nenhum arquivo novo gravado no Storage); upload válido (PNG) funciona e atualiza a imagem na tela sem precisar de hard-refresh (logo e banner).
+- [x] C2: upload de foto de pessoa continua funcionando idêntico a antes (sem regressão da Task 4).
+- [x] C3: cadastro público com WhatsApp de pessoa soft-deletada cria uma pessoa nova (registro distinto no banco, `deletedAt` diferente), sem erro e sem fundir com a antiga.
+- [x] C3: cadastro público com WhatsApp de pessoa **ativa** continua bloqueando duplicata ("Este número já está cadastrado", sem regressão).
 
 Sem commit nesta task — é só verificação. Se algum passo falhar, volte pra task correspondente, corrija, e repita a verificação a partir daí.
