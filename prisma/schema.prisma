@@ -178,7 +178,12 @@ model VinculoRede {
   pessoa      Pessoa   @relation("Indicado", fields: [pessoaId], references: [id])
   indicadoPor Pessoa?  @relation("Indicador", fields: [indicadoPorId], references: [id])
 
-  @@unique([gabineteId, pessoaId, indicadoPorId])
+  // Unicidade de (gabineteId, pessoaId, indicadoPorId) enquanto ativo é
+  // garantida por índice único parcial (WHERE "deletedAt" IS NULL) na
+  // migration 20260717000000_vinculo_rede_soft_delete_partial_unique — não
+  // por @@unique, que bloquearia recriar o vínculo depois de um soft-delete
+  // (mesma correção já aplicada em Pessoa.whatsapp/tokenMobilizador, achado
+  // C3 da auditoria original).
 }
 
 model LogSuporte {

@@ -124,9 +124,13 @@ export async function submeterCadastro(formData: FormData): Promise<{ erro: stri
     })
   }
 
-  // Cria vínculo de rede apenas se ainda não existir (NULL != NULL no SQL)
+  // Cria vínculo de rede apenas se ainda não existir (NULL != NULL no SQL).
+  // deletedAt: null é defensivo — nenhum fluxo soft-deleta VinculoRede hoje,
+  // mas sem esse filtro um vínculo soft-deletado no futuro seria tratado
+  // como "já existe" e nunca recriado (mesmo padrão de todo outro uso de
+  // VinculoRede no código, ver src/lib/rede.ts).
   const vinculoExistente = await prisma.vinculoRede.findFirst({
-    where: { gabineteId: gabinete.id, pessoaId, indicadoPorId: mobilizadorId },
+    where: { gabineteId: gabinete.id, pessoaId, indicadoPorId: mobilizadorId, deletedAt: null },
   })
   if (!vinculoExistente) {
     await prisma.vinculoRede.create({
