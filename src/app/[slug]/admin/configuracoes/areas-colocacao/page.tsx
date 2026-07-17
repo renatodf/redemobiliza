@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import { getGabineteBySlug } from '@/lib/gabinete'
-import { criarAreaColocacao } from '@/actions/admin/criar-area-colocacao'
+import CriarAreaColocacaoForm from '@/components/admin/CriarAreaColocacaoForm'
 import { desativarAreaColocacao } from '@/actions/admin/desativar-area-colocacao'
 
 export default async function AreasColocacaoPage({ params }: { params: { slug: string } }) {
@@ -20,18 +20,7 @@ export default async function AreasColocacaoPage({ params }: { params: { slug: s
       <p className="text-xs text-gray-500">
         Lista de áreas de interesse usada no cadastro do Banco de Talentos. Mantenha padronizada para facilitar os filtros.
       </p>
-      <form action={criarAreaColocacao} className="flex gap-2">
-        <input type="hidden" name="slug" value={params.slug} />
-        <input
-          name="nome"
-          required
-          placeholder="Nome da nova área"
-          className="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm"
-        />
-        <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium">
-          Criar
-        </button>
-      </form>
+      <CriarAreaColocacaoForm slug={params.slug} />
       <ul className="divide-y divide-gray-200 border border-gray-200 rounded-md">
         {areas.map((a) => (
           <li key={a.id} className="flex items-center justify-between px-4 py-3">
