@@ -14,8 +14,8 @@ export async function verificarWhatsApp(
   const whatsapp = normalizeWhatsApp(whatsappRaw)
   if (!whatsapp) return { existe: false, erro: 'Número de WhatsApp inválido' }
 
-  const pessoa = await prisma.pessoa.findUnique({
-    where: { gabineteId_whatsapp: { gabineteId: gabinete.id, whatsapp } },
+  const pessoa = await prisma.pessoa.findFirst({
+    where: { gabineteId: gabinete.id, whatsapp, deletedAt: null },
     select: { id: true },
   })
 

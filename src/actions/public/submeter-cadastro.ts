@@ -58,8 +58,8 @@ export async function submeterCadastro(formData: FormData): Promise<{ erro: stri
     if (!nascimento) return { erro: 'Data de nascimento inválida — use o formato DD/MM/AAAA' }
   }
 
-  const pessoaExistente = await prisma.pessoa.findUnique({
-    where: { gabineteId_whatsapp: { gabineteId: gabinete.id, whatsapp } },
+  const pessoaExistente = await prisma.pessoa.findFirst({
+    where: { gabineteId: gabinete.id, whatsapp, deletedAt: null },
     select: { id: true },
   })
 
