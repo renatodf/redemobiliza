@@ -2,6 +2,7 @@
 
 import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
+import { Prisma } from '@/generated/prisma/client'
 import { getGabineteBySlug } from '@/lib/gabinete'
 import { normalizeWhatsApp } from '@/lib/whatsapp'
 import { getSupabaseAdmin } from '@/lib/supabase/admin'
@@ -82,20 +83,27 @@ export async function submeterCadastro(formData: FormData): Promise<{ erro: stri
     // sem autenticação do titular
     pessoaId = pessoaExistente.id
   } else {
-    const criada = await prisma.pessoa.create({
-      data: {
-        nome: nome.trim(),
-        whatsapp,
-        email: email?.trim() || null,
-        nascimento,
-        genero: genero || null,
-        regiaoId: regiaoId || null,
-        profissaoId: profissaoId || null,
-        gabineteId: gabinete.id,
-        isColaborador: false,
-      },
-    })
-    pessoaId = criada.id
+    try {
+      const criada = await prisma.pessoa.create({
+        data: {
+          nome: nome.trim(),
+          whatsapp,
+          email: email?.trim() || null,
+          nascimento,
+          genero: genero || null,
+          regiaoId: regiaoId || null,
+          profissaoId: profissaoId || null,
+          gabineteId: gabinete.id,
+          isColaborador: false,
+        },
+      })
+      pessoaId = criada.id
+    } catch (e) {
+      if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2002') {
+        return { erro: 'Este WhatsApp já foi cadastrado agora há pouco — atualize a página e tente de novo.' }
+      }
+      throw e
+    }
   }
 
   if (pessoaNova && foto && foto.size > 0 && fotoValidada) {
