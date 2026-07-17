@@ -3,6 +3,7 @@ import { getGabineteBySlug } from '@/lib/gabinete'
 import { salvarPersonalizacao } from '@/actions/admin/salvar-personalizacao'
 import { uploadLogo } from '@/actions/admin/upload-logo'
 import { uploadBanner } from '@/actions/admin/upload-banner'
+import UploadImagemGabineteForm from '@/components/admin/UploadImagemGabineteForm'
 
 export default async function PersonalizacaoPage({
   params,
@@ -66,21 +67,7 @@ export default async function PersonalizacaoPage({
           // eslint-disable-next-line @next/next/no-img-element
           <img src={gabinete.logoUrl} alt="Logo atual" className="h-16 object-contain" />
         )}
-        <form action={uploadLogo} encType="multipart/form-data">
-          <input type="hidden" name="slug" value={params.slug} />
-          <input
-            name="logo"
-            type="file"
-            accept="image/png,image/jpeg,image/webp,image/svg+xml"
-            className="block text-sm"
-          />
-          <button
-            type="submit"
-            className="mt-2 bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700"
-          >
-            Enviar logo
-          </button>
-        </form>
+        <UploadImagemGabineteForm slug={params.slug} campo="logo" acao={uploadLogo} botaoLabel="Enviar logo" />
       </section>
 
       <section className="bg-white rounded-lg p-6 shadow-sm space-y-4">
@@ -93,21 +80,7 @@ export default async function PersonalizacaoPage({
             className="w-full h-32 object-cover rounded"
           />
         )}
-        <form action={uploadBanner} encType="multipart/form-data">
-          <input type="hidden" name="slug" value={params.slug} />
-          <input
-            name="banner"
-            type="file"
-            accept="image/png,image/jpeg,image/webp"
-            className="block text-sm"
-          />
-          <button
-            type="submit"
-            className="mt-2 bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700"
-          >
-            Enviar banner
-          </button>
-        </form>
+        <UploadImagemGabineteForm slug={params.slug} campo="banner" acao={uploadBanner} botaoLabel="Enviar banner" />
       </section>
     </div>
   )

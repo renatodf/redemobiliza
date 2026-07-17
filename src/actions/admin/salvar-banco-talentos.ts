@@ -45,7 +45,8 @@ export async function salvarBancoTalentos(
 
   let curriculoUrl: string | undefined
   if (curriculo && curriculo.size > 0) {
-    const tipo = TIPOS_PERMITIDOS[curriculo.type.toLowerCase()]
+    const contentType = curriculo.type.toLowerCase()
+    const tipo = TIPOS_PERMITIDOS[contentType]
     if (!tipo) return { erro: 'Formato de arquivo não permitido — use PDF, Word (doc/docx), JPG ou PNG.' }
     if (curriculo.size > 10 * 1024 * 1024) return { erro: 'Arquivo muito grande — máximo 10MB.' }
 
@@ -53,7 +54,7 @@ export async function salvarBancoTalentos(
     const buffer = Buffer.from(await curriculo.arrayBuffer())
     const { error } = await getSupabaseAdmin().storage
       .from('gabinete-assets')
-      .upload(path, buffer, { upsert: true, contentType: curriculo.type })
+      .upload(path, buffer, { upsert: true, contentType })
     if (error) return { erro: `Erro no upload do currículo: ${error.message}` }
 
     const { data: { publicUrl } } = getSupabaseAdmin().storage.from('gabinete-assets').getPublicUrl(path)

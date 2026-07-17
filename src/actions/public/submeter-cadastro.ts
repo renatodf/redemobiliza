@@ -6,13 +6,7 @@ import { getGabineteBySlug } from '@/lib/gabinete'
 import { normalizeWhatsApp } from '@/lib/whatsapp'
 import { getSupabaseAdmin } from '@/lib/supabase/admin'
 import { parseDataBrasileira } from '@/lib/data-brasileira'
-
-const TIPOS_FOTO_PERMITIDOS = {
-  'image/jpeg': 'jpg',
-  'image/png': 'png',
-  'image/webp': 'webp',
-  'image/gif': 'gif',
-} as const
+import { validarImagemUpload } from '@/lib/validar-imagem-upload'
 
 export async function submeterCadastro(formData: FormData): Promise<{ erro: string } | never> {
   const slug = formData.get('slug') as string
@@ -31,11 +25,13 @@ export async function submeterCadastro(formData: FormData): Promise<{ erro: stri
   const gabinete = await getGabineteBySlug(slug)
   if (!gabinete || !gabinete.ativo) return { erro: 'Gabinete não encontrado' }
 
-  let tipoFoto: string | undefined
+  let fotoValidada: { ext: string; contentType: string } | undefined
   if (foto && foto.size > 0) {
-    tipoFoto = TIPOS_FOTO_PERMITIDOS[foto.type.toLowerCase() as keyof typeof TIPOS_FOTO_PERMITIDOS]
-    if (!tipoFoto) return { erro: 'Tipo de imagem não permitido — use JPEG, PNG, WebP ou GIF' }
-    if (foto.size > 5 * 1024 * 1024) return { erro: 'Imagem muito grande — máximo 5MB' }
+    try {
+      fotoValidada = validarImagemUpload(foto)
+    } catch (e) {
+      return { erro: e instanceof Error ? e.message : 'Erro ao validar imagem' }
+    }
   }
 
   // Segmento é opcional — o link fixo do mobilizador (sem segmento, só ?m=token)
@@ -78,6 +74,7 @@ export async function submeterCadastro(formData: FormData): Promise<{ erro: stri
   }
 
   let pessoaId: string
+  const pessoaNova = !pessoaExistente
 
   if (pessoaExistente) {
     // Pessoa já existe — apenas registra a participação, NÃO altera dados do perfil
@@ -100,12 +97,12 @@ export async function submeterCadastro(formData: FormData): Promise<{ erro: stri
     pessoaId = criada.id
   }
 
-  if (foto && foto.size > 0 && tipoFoto) {
-    const path = `${gabinete.id}/pessoas/${pessoaId}/foto.${tipoFoto}`
+  if (pessoaNova && foto && foto.size > 0 && fotoValidada) {
+    const path = `${gabinete.id}/pessoas/${pessoaId}/foto.${fotoValidada.ext}`
     const buffer = Buffer.from(await foto.arrayBuffer())
     const { error } = await getSupabaseAdmin().storage
       .from('gabinete-assets')
-      .upload(path, buffer, { upsert: true, contentType: foto.type })
+      .upload(path, buffer, { upsert: true, contentType: fotoValidada.contentType })
 
     if (!error) {
       const { data: { publicUrl } } = getSupabaseAdmin().storage.from('gabinete-assets').getPublicUrl(path)

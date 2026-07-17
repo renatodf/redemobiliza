@@ -8,7 +8,7 @@ import { salvarConfiguracao } from '@/actions/admin/salvar-configuracao'
 import { criarAreaDemanda } from '@/actions/admin/criar-area-demanda'
 import { excluirAreaDemanda } from '@/actions/admin/excluir-area-demanda'
 import { editarAreaDemanda } from '@/actions/admin/editar-area-demanda'
-import { restaurarPessoa } from '@/actions/admin/restaurar-pessoa'
+import RestaurarPessoaButton from './RestaurarPessoaButton'
 
 export default async function DemandasConfigPage({ params }: { params: { slug: string } }) {
   const gabinete = await getGabineteBySlug(params.slug)
@@ -156,13 +156,7 @@ export default async function DemandasConfigPage({ params }: { params: { slug: s
                     {p.whatsapp} · excluído em {p.deletedAt!.toLocaleDateString('pt-BR')}
                   </p>
                 </div>
-                <form action={restaurarPessoa}>
-                  <input type="hidden" name="slug" value={params.slug} />
-                  <input type="hidden" name="pessoaId" value={p.id} />
-                  <button type="submit" className="text-blue-600 text-xs hover:underline">
-                    Restaurar
-                  </button>
-                </form>
+                <RestaurarPessoaButton slug={params.slug} pessoaId={p.id} />
               </li>
             ))}
           </ul>

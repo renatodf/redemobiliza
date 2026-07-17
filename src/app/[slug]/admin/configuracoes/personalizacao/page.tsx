@@ -3,6 +3,7 @@ import { getGabineteBySlug } from '@/lib/gabinete'
 import { corTextoContraste } from '@/lib/cor-contraste'
 import { salvarPersonalizacao } from '@/actions/admin/salvar-personalizacao'
 import { uploadLogo } from '@/actions/admin/upload-logo'
+import UploadImagemGabineteForm from '@/components/admin/UploadImagemGabineteForm'
 
 export default async function PersonalizacaoConfigPage({ params }: { params: { slug: string } }) {
   const gabinete = await getGabineteBySlug(params.slug)
@@ -65,17 +66,14 @@ export default async function PersonalizacaoConfigPage({ params }: { params: { s
             círculo no menu lateral, então evite conteúdo importante perto das bordas.
           </p>
         </div>
-        <form action={uploadLogo} encType="multipart/form-data">
-          <input type="hidden" name="slug" value={params.slug} />
-          <input name="logo" type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" className="block text-sm" />
-          <button
-            type="submit"
-            style={{ backgroundColor: gabinete.corPrimaria, color: corTexto }}
-            className="mt-2 px-4 py-2 rounded-md text-sm font-medium hover:opacity-90"
-          >
-            Enviar logo
-          </button>
-        </form>
+        <UploadImagemGabineteForm
+          slug={params.slug}
+          campo="logo"
+          acao={uploadLogo}
+          botaoLabel="Enviar logo"
+          botaoStyle={{ backgroundColor: gabinete.corPrimaria, color: corTexto }}
+          botaoClassName="mt-2 px-4 py-2 rounded-md text-sm font-medium hover:opacity-90 disabled:opacity-50"
+        />
       </div>
     </div>
   )

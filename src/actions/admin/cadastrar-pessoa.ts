@@ -5,13 +5,7 @@ import { prisma } from '@/lib/prisma'
 import { assertAdminAccess } from '@/lib/assert-admin-access'
 import { normalizeWhatsApp } from '@/lib/whatsapp'
 import { getSupabaseAdmin } from '@/lib/supabase/admin'
-
-const TIPOS_FOTO_PERMITIDOS = {
-  'image/jpeg': 'jpg',
-  'image/png': 'png',
-  'image/webp': 'webp',
-  'image/gif': 'gif',
-} as const
+import { validarImagemUpload } from '@/lib/validar-imagem-upload'
 
 export async function cadastrarPessoa(formData: FormData) {
   const slug = formData.get('slug') as string
@@ -31,11 +25,9 @@ export async function cadastrarPessoa(formData: FormData) {
   const whatsapp = normalizeWhatsApp(whatsappRaw)
   if (!whatsapp) throw new Error('Número de WhatsApp inválido')
 
-  let tipoFoto: string | undefined
+  let fotoValidada: { ext: string; contentType: string } | undefined
   if (foto && foto.size > 0) {
-    tipoFoto = TIPOS_FOTO_PERMITIDOS[foto.type.toLowerCase() as keyof typeof TIPOS_FOTO_PERMITIDOS]
-    if (!tipoFoto) throw new Error('Tipo de imagem não permitido — use JPEG, PNG, WebP ou GIF')
-    if (foto.size > 5 * 1024 * 1024) throw new Error('Imagem muito grande — máximo 5MB')
+    fotoValidada = validarImagemUpload(foto)
   }
 
   const pessoa = await prisma.pessoa.create({
@@ -51,12 +43,12 @@ export async function cadastrarPessoa(formData: FormData) {
     },
   })
 
-  if (foto && foto.size > 0 && tipoFoto) {
-    const path = `${gabinete.id}/pessoas/${pessoa.id}/foto.${tipoFoto}`
+  if (foto && foto.size > 0 && fotoValidada) {
+    const path = `${gabinete.id}/pessoas/${pessoa.id}/foto.${fotoValidada.ext}`
     const buffer = Buffer.from(await foto.arrayBuffer())
     const { error } = await getSupabaseAdmin().storage
       .from('gabinete-assets')
-      .upload(path, buffer, { upsert: true, contentType: foto.type })
+      .upload(path, buffer, { upsert: true, contentType: fotoValidada.contentType })
 
     if (!error) {
       const { data: { publicUrl } } = getSupabaseAdmin().storage.from('gabinete-assets').getPublicUrl(path)
