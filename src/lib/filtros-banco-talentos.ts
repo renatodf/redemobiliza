@@ -8,7 +8,7 @@ export type FiltrosBancoTalentosParams = {
 export type WhereBancoTalentos = {
   colocado: false
   curriculoUrl: { not: null }
-  pessoa: { gabineteId: string; regiaoId?: string }
+  pessoa: { gabineteId: string; deletedAt: null; regiaoId?: string }
   prioridade?: number
   isPcd?: boolean
   areas?: { some: { areaColocacaoId: { in: string[] } } }
@@ -21,7 +21,7 @@ export function buildWhereBancoTalentos(
   const where: WhereBancoTalentos = {
     colocado: false,
     curriculoUrl: { not: null },
-    pessoa: { gabineteId },
+    pessoa: { gabineteId, deletedAt: null },
   }
   if (params.regiaoId) where.pessoa.regiaoId = params.regiaoId
   if (params.prioridade) where.prioridade = Number(params.prioridade)

@@ -77,10 +77,20 @@ describe('buildWhereBancoTalentos', () => {
     expect(where).toEqual({
       colocado: false,
       curriculoUrl: { not: null },
-      pessoa: { gabineteId: 'gab-1', regiaoId: 'regiao-1' },
+      pessoa: { gabineteId: 'gab-1', regiaoId: 'regiao-1', deletedAt: null },
       prioridade: 1,
       isPcd: true,
       areas: { some: { areaColocacaoId: { in: ['area-1'] } } },
     })
+  })
+
+  it('sempre filtra deletedAt: null via relação pessoa', () => {
+    const where = buildWhereBancoTalentos('gab-1', {})
+    expect(where.pessoa.deletedAt).toBeNull()
+  })
+
+  it('inclui deletedAt: null mesmo combinando outros filtros', () => {
+    const where = buildWhereBancoTalentos('gab-1', { regiaoId: 'regiao-1' })
+    expect(where.pessoa).toEqual({ gabineteId: 'gab-1', regiaoId: 'regiao-1', deletedAt: null })
   })
 })
