@@ -25,7 +25,7 @@ export async function uploadFotoPessoa(formData: FormData) {
   if (!gabinete) throw new Error('Gabinete não encontrado')
 
   const pessoa = await prisma.pessoa.findFirst({
-    where: { id: pessoaId as string, gabineteId: gabinete.id },
+    where: { id: pessoaId as string, gabineteId: gabinete.id, deletedAt: null },
     select: { id: true, userId: true, fotoUrl: true },
   })
   if (!pessoa) throw new Error('Pessoa não encontrada')
