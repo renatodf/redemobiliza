@@ -152,6 +152,13 @@ model Segmento {
   gabinete       Gabinete         @relation(fields: [gabineteId], references: [id])
   pessoas        PessoaSegmento[]
   linksCompostos LinkComposto[]
+
+  // Unicidade de (gabineteId, nome) e (gabineteId, slug) entre segmentos
+  // com status='ativo' é garantida por índices únicos parciais na migration
+  // 20260718000001_segmento_partial_unique — não por @@unique, que
+  // bloquearia recriar um segmento com o mesmo nome/slug de um segmento
+  // inativado (a lógica de criarSegmento já permite isso, filtrando por
+  // status: 'ativo'). Mesma técnica já aplicada em Pessoa/VinculoRede.
 }
 
 model PessoaSegmento {

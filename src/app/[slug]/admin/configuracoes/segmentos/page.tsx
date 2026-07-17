@@ -3,8 +3,8 @@ import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 import { getGabineteBySlug } from '@/lib/gabinete'
 import { corTextoContraste } from '@/lib/cor-contraste'
-import { criarSegmento } from '@/actions/admin/criar-segmento'
 import { inativarSegmento } from '@/actions/admin/inativar-segmento'
+import CriarSegmentoForm from '@/components/admin/CriarSegmentoForm'
 
 export default async function SegmentosConfigPage({ params }: { params: { slug: string } }) {
   const gabinete = await getGabineteBySlug(params.slug)
@@ -20,22 +20,7 @@ export default async function SegmentosConfigPage({ params }: { params: { slug: 
   return (
     <div className="bg-white rounded-lg shadow-sm p-6 space-y-4">
       <h2 className="text-base font-semibold">Segmentos</h2>
-      <form action={criarSegmento} className="flex gap-2">
-        <input type="hidden" name="slug" value={params.slug} />
-        <input
-          name="nome"
-          required
-          placeholder="Nome do novo segmento"
-          className="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm"
-        />
-        <button
-          type="submit"
-          style={{ backgroundColor: gabinete.corPrimaria, color: corTexto }}
-          className="px-4 py-2 rounded-md text-sm font-medium"
-        >
-          Criar
-        </button>
-      </form>
+      <CriarSegmentoForm slug={params.slug} corPrimaria={gabinete.corPrimaria} corTexto={corTexto} />
       <ul className="divide-y divide-gray-200 border border-gray-200 rounded-md">
         {segmentos.map((s) => (
           <li key={s.id} className="flex items-center justify-between px-4 py-3">
