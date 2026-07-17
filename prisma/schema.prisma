@@ -130,8 +130,10 @@ model Pessoa {
   movimentacoesDemanda   MovimentacaoDemanda[]  @relation("MovimentacaoAutor")
   bancoTalentos          BancoTalentos?
 
-  @@unique([gabineteId, whatsapp])
-  @@unique([gabineteId, tokenMobilizador])
+  // Unicidade de whatsapp/tokenMobilizador enquanto ativo é garantida por
+  // índice único parcial (WHERE "deletedAt" IS NULL) na migration
+  // 20260716120000_pessoa_soft_delete_partial_unique — não por @@unique,
+  // que bloquearia recriar o registro depois de um soft-delete.
 }
 
 model Segmento {
