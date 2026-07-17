@@ -1,6 +1,7 @@
 'use client'
 
 import { useRef, useState } from 'react'
+import { useFormState } from 'react-dom'
 import Modal from '@/components/admin/Modal'
 import { cadastrarPessoa } from '@/actions/admin/cadastrar-pessoa'
 import { corTextoContraste } from '@/lib/cor-contraste'
@@ -22,6 +23,7 @@ export default function CadastrarUsuarioModal({
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [comprimindo, setComprimindo] = useState(false)
   const inputFotoRef = useRef<HTMLInputElement>(null)
+  const [state, action] = useFormState(cadastrarPessoa, {})
 
   async function handleFotoChange(e: React.ChangeEvent<HTMLInputElement>) {
     const arquivo = e.target.files?.[0]
@@ -58,7 +60,7 @@ export default function CadastrarUsuarioModal({
       </button>
 
       <Modal open={open} onClose={() => setOpen(false)} title="Cadastrar usuário">
-        <form action={cadastrarPessoa} encType="multipart/form-data" className="space-y-3">
+        <form action={action} encType="multipart/form-data" className="space-y-3">
           <input type="hidden" name="slug" value={slug} />
           <div>
             <label className="block text-sm font-medium text-gray-700">Foto (opcional)</label>
@@ -137,6 +139,7 @@ export default function CadastrarUsuarioModal({
               <option value="outro">Outro</option>
             </select>
           </div>
+          {state.erro && <p className="text-xs text-red-600">{state.erro}</p>}
           <button
             type="submit"
             style={{ backgroundColor: corPrimaria, color: corTexto }}
