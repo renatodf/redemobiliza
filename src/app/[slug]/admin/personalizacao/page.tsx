@@ -4,6 +4,7 @@ import { salvarPersonalizacao } from '@/actions/admin/salvar-personalizacao'
 import { uploadLogo } from '@/actions/admin/upload-logo'
 import { uploadBanner } from '@/actions/admin/upload-banner'
 import UploadImagemGabineteForm from '@/components/admin/UploadImagemGabineteForm'
+import SalvarPersonalizacaoForm from '@/components/admin/SalvarPersonalizacaoForm'
 
 export default async function PersonalizacaoPage({
   params,
@@ -19,46 +20,13 @@ export default async function PersonalizacaoPage({
 
       <section className="bg-white rounded-lg p-6 shadow-sm space-y-4">
         <h2 className="text-lg font-semibold">Identidade</h2>
-        <form action={salvarPersonalizacao} className="space-y-4">
-          <input type="hidden" name="slug" value={params.slug} />
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Nome do sistema
-            </label>
-            <input
-              name="nomeSistema"
-              defaultValue={gabinete.nomeSistema ?? ''}
-              className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 text-sm"
-              placeholder="Ex: Mobiliza Fulano"
-            />
-          </div>
-          <div className="flex gap-4">
-            <div className="flex-1">
-              <label className="block text-sm font-medium text-gray-700">Cor primária</label>
-              <input
-                name="corPrimaria"
-                type="color"
-                defaultValue={gabinete.corPrimaria ?? '#3B82F6'}
-                className="mt-1 h-10 w-full border border-gray-300 rounded-md"
-              />
-            </div>
-            <div className="flex-1">
-              <label className="block text-sm font-medium text-gray-700">Cor secundária</label>
-              <input
-                name="corSecundaria"
-                type="color"
-                defaultValue={gabinete.corSecundaria ?? '#1E40AF'}
-                className="mt-1 h-10 w-full border border-gray-300 rounded-md"
-              />
-            </div>
-          </div>
-          <button
-            type="submit"
-            className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700"
-          >
-            Salvar
-          </button>
-        </form>
+        <SalvarPersonalizacaoForm
+          slug={params.slug}
+          nomeSistema={gabinete.nomeSistema ?? ''}
+          corPrimaria={gabinete.corPrimaria ?? '#3B82F6'}
+          corSecundaria={gabinete.corSecundaria ?? '#1E40AF'}
+          acao={salvarPersonalizacao}
+        />
       </section>
 
       <section className="bg-white rounded-lg p-6 shadow-sm space-y-4">
