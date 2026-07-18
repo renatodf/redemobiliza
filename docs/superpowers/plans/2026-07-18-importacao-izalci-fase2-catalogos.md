@@ -211,7 +211,7 @@ cd /Users/renato/Documents/meubd
 python3 scripts/importacao-izalci/extrair_catalogos.py
 ```
 
-Expected: `profissoes=232 areasColocacao=100 segmentos=203 cidades=75 bairros=408 (com_pai=283 sem_pai=125)`
+Expected: `profissoes=232 areasColocacao=100 segmentos=202 cidades=75 bairros=408 (com_pai=283 sem_pai=125)` — nota pós-execução: o número de segmentos aqui foi corrigido de 203 para 202 pelo commit `62d55b0` (fusão adicional de `Acao social`/`Ação social .`, achada durante a Task 3, não prevista neste plano original).
 
 - [ ] **Step 3: Validar o JSON gerado contra os achados do spec**
 
@@ -222,7 +222,7 @@ import json
 d = json.load(open('scripts/importacao-izalci/catalogos-fase2.json', encoding='utf-8'))
 assert len(d['profissoes']) == 232
 assert len(d['areasColocacao']) == 100
-assert len(d['segmentos']) == 203
+assert len(d['segmentos']) == 202  # corrigido de 203 pelo commit 62d55b0, achado pós-plano
 assert len(d['cidades']) == 75
 assert len(d['bairros']) == 408
 assert 'ABEDUQ' in d['segmentos'] and 'ABEDUQ - CHEQUE-EDUCAÇÃO' not in d['segmentos']
@@ -595,7 +595,9 @@ import('pg').then(async ({Client}) => {
 " -- izalci
 ```
 
-Expected: `Profissao` = 232 (ou mais, se o gabinete já tinha alguma da seed genérica que não bateu nome), `Segmento` = 203, `AreaColocacao` = 100 (mais os defaults do seed genérico não coincidentes), `Regiao` >= 483, `Regiao com regiaoPaiId` >= 283. `Regiao sem coordenada` deve listar principalmente `Entorno do DF` (esperado, não é um município real) e talvez alguns poucos casos de falha pontual do Nominatim — nada em massa.
+Expected: `Profissao` = 232 (ou mais, se o gabinete já tinha alguma da seed genérica que não bateu nome), `Segmento` = 202, `AreaColocacao` = 100 (mais os defaults do seed genérico não coincidentes), `Regiao` >= 453, `Regiao com regiaoPaiId` >= 253. `Regiao sem coordenada` deve listar principalmente `Entorno do DF` (esperado, não é um município real) e talvez alguns poucos casos de falha pontual do Nominatim — nada em massa.
+
+Nota pós-execução: os números `483`/`283` originais deste plano foram corrigidos para `453`/`253` pelos commits `692355b`/`fe3c346`/`4952d40` — 30 dos 408 bairros (homônimos da própria cidade-mãe, ex. bairro "Sobradinho" dentro da cidade "Sobradinho") passaram a ser pulados por completo em vez de gerar uma `Regiao` redundante ou auto-referente, achado durante a execução real desta mesma task contra staging.
 
 - [ ] **Step 6: Reportar ao usuário**
 
