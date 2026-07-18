@@ -11,9 +11,40 @@ import * as dotenv from 'dotenv'
 import * as fs from 'fs'
 import * as path from 'path'
 import { toSlug } from '../../src/lib/slug'
-import { geocodificarRegiao } from '../../src/lib/geocodificar-regiao'
 
 dotenv.config({ path: '.env.local' })
+
+const NOMINATIM_URL = 'https://nominatim.openstreetmap.org/search'
+const GEOCODE_TIMEOUT_MS = 5000
+
+async function geocodificarRegiao(nome: string, uf: string): Promise<{ latitude: number; longitude: number } | null> {
+  const query = `${nome}, ${uf}, Brasil`
+  const url = `${NOMINATIM_URL}?format=json&limit=1&q=${encodeURIComponent(query)}`
+
+  const controller = new AbortController()
+  const timeoutId = setTimeout(() => controller.abort(), GEOCODE_TIMEOUT_MS)
+
+  try {
+    const resposta = await fetch(url, {
+      signal: controller.signal,
+      headers: { 'User-Agent': 'RedeMobiliza/1.0 (importacao de catalogos Izalci via script)' },
+    })
+    if (!resposta.ok) return null
+
+    const dados = (await resposta.json()) as { lat: string; lon: string }[]
+    if (dados.length === 0) return null
+
+    const latitude = Number(dados[0].lat)
+    const longitude = Number(dados[0].lon)
+    if (Number.isNaN(latitude) || Number.isNaN(longitude)) return null
+
+    return { latitude, longitude }
+  } catch {
+    return null
+  } finally {
+    clearTimeout(timeoutId)
+  }
+}
 
 const adapter = new PrismaPg(process.env.DATABASE_URL!)
 const prisma = new PrismaClient({ adapter } as never)
