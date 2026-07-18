@@ -16,8 +16,12 @@ Trazer os dados reais do sistema antigo do senador Izalci Lucas (hoje em MongoDB
 
 ## Destino
 
-- Gabinete novo: **IZALCI** (criar via `criarGabinete`, super-admin).
+- Gabinete novo: **IZALCI** — **criado em produção em 18/07** pelo usuário via tela de super-admin (ação manual, fora do escopo de código da Fase 1).
 - Catálogos padrão (Regiao/Profissao/AreaDemanda/AreaColocacao) que o `criarGabinete` semeia por padrão **serão substituídos/complementados** pelos catálogos reais construídos a partir dos dados do Mongo (Fase 2) — não usar os genéricos.
+
+## Princípio geral: completude de catálogos
+
+Decisão do usuário (18/07, sessão de acompanhamento): **toda informação de catálogo que existir no banco antigo (Mongo) e não tiver correspondência no Rede Mobiliza é criada durante a importação** — nada é descartado por falta de correspondência prévia. Vale para `Regiao` (cidade e bairro), `Segmento`, `Profissao`, `AreaColocacao` (cargos almejados do Banco de Talentos, via tag `EmploymentRole`) e os telefones extras (`TelefoneExtra`). A única forma de dois valores do Mongo virarem **um só** registro no Rede Mobiliza é uma fusão **explicitamente confirmada** pelo usuário (ver as fusões de Região e Segmento documentadas abaixo) — fora essas fusões nomeadas, cada valor distinto do Mongo vira seu próprio registro, mesmo que pareça redundante ou de baixo valor à primeira vista (ex.: `BANCO ANTIGO`, ver seção de Segmentos).
 
 ## Escopo — o que entra
 
@@ -84,7 +88,7 @@ Nenhuma coleção "genders"/"religions"/"cities" existe no cluster — `gender_i
 | `religion_id` | `religiao` | Ver decodificação acima |
 | tag type=Schooling | `escolaridade` | Via `tag_ids` |
 | tag type=Profession | `profissaoId` | Via `tag_ids`, criar/casar com catálogo `Profissao` |
-| tag type=Segment | `Segmento` (relação `PessoaSegmento`) | Via `tag_ids` |
+| tag type=Segment | `Segmento` (relação `PessoaSegmento`) | Via `tag_ids` — ver "Segmentos (deduplicação e casos especiais)" abaixo para as 4 fusões confirmadas |
 | `deleted` | `deletedAt` | `true` → timestamp de soft-delete (usar `updated_at` como aproximação); `false`/ausente → `null` |
 | `coordinates` | reaproveitar, sem geocodificar de novo | Campo `[longitude, latitude]` (confirmar ordem antes de gravar) |
 | `role` (valores: none/null, leader_agent, agent, staff, admin, senator, superadmin, candidate) | **Não vira `isMobilizador`/`isColaborador` nesta importação.** Todos entram como `Pessoa` comum, sem acesso ao sistema. | Usuário decide promoção depois, pessoa por pessoa. Preservar o valor de `role` como anotação/observação visível para orientar essa decisão futura (ex: `ObservacaoPessoa` com texto "Papel no sistema anterior: leader_agent") — aplica-se a ~292 pessoas com role diferente de none/null. |
@@ -106,9 +110,14 @@ Nenhuma coleção "genders"/"religions"/"cities" existe no cluster — `gender_i
 
 Decisão confirmada: adicionar campo opcional `regiaoPaiId` (autorreferente) ao modelo `Regiao` — uma região pode ter uma "região-mãe". Uma pessoa sempre é vinculada ao nível mais granular (bairro); filtrar pela região-mãe (cidade) deve incluir automaticamente todos os filhos.
 
-- Fonte: tags `type: "City"` (75 valores, nem todos do DF — inclui cidades do Entorno em Goiás e alguns contatos raros de outros estados) viram as regiões-mãe; tags `type: "Neighborhood"` (centenas de valores, muitos com sufixo entre parênteses indicando a cidade-mãe, ex: "Taguatinga Norte (Taguatinga)") viram as regiões-filhas.
-- Decisão do usuário: **importar toda a granularidade real** (não simplificar agora). Nenhuma limpeza/mesclagem de nomes parecidos (erros de digitação, abreviação, diferença de acentuação — ex: "Ceilandia" vs "Ceilândia", "ParanoA" vs "Paranoá") será feita automaticamente durante a importação.
-- **Funcionalidade nova pedida para o próximo sprint** (fora deste projeto): uma ferramenta de admin para escolher uma região e mesclá-la com outra, mantendo um nome só e re-apontando as pessoas vinculadas — isso resolve os casos de digitação/abreviação depois, com curadoria humana, em vez de tentar adivinhar automaticamente agora.
+- Fonte: tags `type: "City"` (77 valores no tenant Izalci, confirmado por query direta no backup — nem todos do DF, ver abaixo) viram as regiões-mãe; tags `type: "Neighborhood"` (centenas de valores, muitos com sufixo entre parênteses indicando a cidade-mãe, ex: "Taguatinga Norte (Taguatinga)") viram as regiões-filhas.
+- Decisão do usuário: **importar toda a granularidade real** (não simplificar agora) — mas isso **não significa nenhuma fusão**: pares de tag `City` confirmados pelo usuário como o mesmo lugar (revisão manual da lista completa das 77 cidades em sessão de acompanhamento, 18/07) fundem durante a importação; qualquer outra semelhança de texto (abreviação, sufixo, nome parecido) **não funde automaticamente por algoritmo** — só por confirmação humana como esta, caso a caso.
+- **Fusões de cidade confirmadas** (Fase 2):
+  - `Sol Nascente - Pôr do Sol` + `Sol Nascente/Pôr do Sol` → mesma cidade (só diferença de pontuação).
+  - `Guará` + `Guará / Lúcio Costa` → cidade vira só `Guará`. Sem perda de informação: já existe um bairro (`Neighborhood`) próprio chamado `LUCIO COSTA` no tenant — pessoas com esse bairro continuam com ele; só a tag de cidade composta deixa de existir como cidade própria.
+- **Confirmado como NÃO-duplicata** (aparência parecida, lugares reais distintos — nunca fundir): `Riacho Fundo` / `Riacho Fundo II`, `Sobradinho` / `Sobradinho II`, `Planaltina` (RA do DF) / `Planaltina Goiás` (município de Goiás, cidade vizinha diferente), `Guará` / `Guará II` (bairros). O usuário confirmou cada um desses como Região Administrativa/bairro genuinamente distinto — reforça por que a fusão automática por semelhança de texto foi descartada como regra geral.
+- **Cidades fora do DF**: das 77 tags `City` do tenant, 41 são de fora do DF (municípios do Entorno em Goiás e contatos raros de outros estados — lista revisada e confirmada uma a uma com o usuário em 18/07). **Não são removidas nem fundidas** — continuam no banco normalmente, como qualquer outra `Regiao`. Pedido do usuário para um **sprint futuro** (fora desta importação): filtro na Central de Filtros com 3 modos — "Somente DF", "DF + uma ou mais regiões/cidades específicas" e "Somente fora do DF".
+- **Funcionalidade nova pedida para o próximo sprint** (fora deste projeto): uma ferramenta de admin para escolher uma região e mesclá-la com outra, mantendo um nome só e re-apontando as pessoas vinculadas — isso resolve os casos de digitação/abreviação que não foram confirmados nesta sessão, com curadoria humana, em vez de tentar adivinhar automaticamente.
 - Onde o `Neighborhood` tag não tiver cidade-mãe óbvia (nem sufixo entre parênteses, nem correspondência clara), decidir caso a caso na Fase 2.
 
 ## Rede de indicação (`created_by_id` → `VinculoRede`)
@@ -128,6 +137,19 @@ Juntas, essas 2 contas respondem por ~85% de todos os `created_by_id` preenchido
 4. `network_id`/coleção `user_networks` — **não usar**. Representa algo mais grosso (qual "sistema"/rede geral a pessoa pertence, ex: "Sistema IZALCI" com uma lista de 38 IDs de quem-sabe-o-quê), não uma relação de indicação individual utilizável.
 
 `VinculoRede.nivel` — calcular a partir da profundidade da cadeia de `created_by_id` (quantos saltos até chegar em alguém sem indicador, respeitando a exclusão das 2 contas de desenvolvedor como "raiz").
+
+## Segmentos (deduplicação e casos especiais)
+
+Investigação direta no backup (`tags.bson.gz`/`people.bson.gz`, tenant Izalci, sessão de acompanhamento 18/07): 207 tags `type: "Segment"`, e **77.638 de 142.489 pessoas (~54%)** têm ao menos uma — é um campo de altíssimo uso, não um extra de baixa prioridade.
+
+- **Fusões confirmadas pelo usuário** (mesmo padrão de curadoria humana da seção de Região acima — não é fusão automática por algoritmo):
+  - `ABEDUQ` + `ABEDUQ - CHEQUE-EDUCAÇÃO` → mesmo segmento.
+  - `BOLSA UNIVERSITÁRIA` + `B. UNIVERSITARIA` → mesmo segmento.
+  - `CRC-DF` + `CRC-DF - CONSELHO REGIONAL DE CONTABILIDADE` → mesmo segmento.
+  - `DF DIGITAL` + `TELECENTROS - DF DIGITAL` → mesmo segmento.
+  - (nome canônico final de cada par — qual dos dois textos vira o `Segmento.nome` — fica pra Fase 2, sem impacto funcional na escolha.)
+- **`BANCO ANTIGO`** (66.511 pessoas — o segmento mais usado de todos, quase metade do tenant): investigação inicial suspeitou que fosse ruído técnico de migração. **Não é** — decisão do usuário (18/07): representa pessoas vindas de um sistema de campanha **anterior a este** (mais antigo que o sistema Legislapp, que por sua vez é mais antigo que o Rede Mobiliza). Mantém como `Segmento` normal, importado sem exclusão — o usuário quer poder filtrar quem vem desse sistema legado mais antigo.
+- Nenhuma outra tag de Segmento foi identificada como duplicata nesta revisão — as 207 menos os 4 pares acima entram uma a uma, sem fusão.
 
 ## Banco de Talentos (`curriculums` → `BancoTalentos`)
 
