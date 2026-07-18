@@ -73,6 +73,13 @@ model Regiao {
 
   gabinete Gabinete @relation(fields: [gabineteId], references: [id])
   pessoas  Pessoa[]
+
+  // Unicidade de (gabineteId, nome) entre regiões com ativa=true é
+  // garantida por índice único parcial case-insensitive (lower(nome)) na
+  // migration 20260718000003_regiao_partial_unique (atualizada para
+  // lower(nome) em 20260719000002_regiao_case_insensitive_unique) — não
+  // por @@unique, que bloquearia reativar uma região desativada. Mesma
+  // técnica já aplicada em Pessoa/VinculoRede/Segmento/Profissao.
 }
 
 model Profissao {
@@ -84,6 +91,13 @@ model Profissao {
 
   gabinete Gabinete @relation(fields: [gabineteId], references: [id])
   pessoas  Pessoa[]
+
+  // Unicidade de (gabineteId, nome) entre profissões com ativa=true é
+  // garantida por índice único parcial case-insensitive (lower(nome)) na
+  // migration 20260718000002_profissao_partial_unique (atualizada para
+  // lower(nome) em 20260719000001_profissao_case_insensitive_unique) —
+  // não por @@unique, que bloquearia reativar uma profissão desativada.
+  // Mesma técnica já aplicada em Pessoa/VinculoRede/Segmento.
 }
 
 model Pessoa {
@@ -228,8 +242,15 @@ model AreaDemanda {
   gabinete   Gabinete  @relation(fields: [gabineteId], references: [id])
   demandas   Demanda[]
 
-  @@unique([gabineteId, nome])
   @@index([gabineteId])
+
+  // Unicidade de (gabineteId, nome) é garantida por índice único
+  // case-insensitive (lower(nome)) na migration
+  // 20260719000000_area_demanda_case_insensitive_unique — não por
+  // @@unique, que não expressa lower() e ficaria inconsistente com o
+  // findFirst de criarAreaDemanda, que já checa duplicata com
+  // mode: 'insensitive' (achado Minor da revisão final do plano de
+  // 2026-07-17, corrigido em 2026-07-18).
 }
 
 model Demanda {

@@ -138,13 +138,15 @@ CREATE UNIQUE INDEX IF NOT EXISTS "Segmento_gabineteId_nome_ativo_idx"
 CREATE UNIQUE INDEX IF NOT EXISTS "Segmento_gabineteId_slug_ativo_idx"
   ON "Segmento"("gabineteId", "slug") WHERE status = 'ativo';
 
--- Regiao: nome único entre regiões ativas
+-- Regiao: nome único entre regiões ativas (case-insensitive, alinhado com
+-- o findFirst de criarRegiao que usa mode: 'insensitive')
 CREATE UNIQUE INDEX IF NOT EXISTS "Regiao_gabineteId_nome_ativo_idx"
-  ON "Regiao"("gabineteId", "nome") WHERE ativa = true;
+  ON "Regiao"("gabineteId", lower(nome)) WHERE ativa = true;
 
--- Profissao: nome único entre profissões ativas
+-- Profissao: nome único entre profissões ativas (case-insensitive, alinhado
+-- com o findFirst de criarProfissao que usa mode: 'insensitive')
 CREATE UNIQUE INDEX IF NOT EXISTS "Profissao_gabineteId_nome_ativo_idx"
-  ON "Profissao"("gabineteId", "nome") WHERE ativa = true;
+  ON "Profissao"("gabineteId", lower(nome)) WHERE ativa = true;
 
 -- VinculoRede: pessoaId único por gabinete QUANDO não tem indicador.
 -- NULL != NULL em UNIQUE convencional — este índice resolve a race condition.
