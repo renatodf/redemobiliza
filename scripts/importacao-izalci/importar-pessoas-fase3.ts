@@ -255,7 +255,7 @@ async function main() {
   // banco no meio do lote, corrompendo o mapeamento posicional de
   // createManyAndReturn (ver Task 3, achado da sessão de planejamento).
   const existentes = await prisma.pessoa.findMany({
-    where: { gabineteId, deletedAt: null },
+    where: { gabineteId },
     select: { whatsapp: true },
   })
   const whatsappsUsados = new Set<string>(existentes.map((p) => p.whatsapp))
