@@ -212,7 +212,7 @@ function montarDadosPessoa(
     escolaridade: tagEscolaridade?.label ?? null,
     zonaEleitoral: typeof doc.electoral_zone === 'string' && doc.electoral_zone ? doc.electoral_zone : null,
     secaoEleitoral: typeof doc.electoral_section === 'string' && doc.electoral_section ? doc.electoral_section : null,
-    deletedAt: doc.deleted === true ? (doc.updated_at instanceof Date ? doc.updated_at : new Date()) : null,
+    deletedAt: doc.deleted === true ? (validarNascimento(doc.updated_at) ?? new Date()) : null,
     origem: 'Importado do sistema anterior (MongoDB)',
     segmentoIds,
     role: typeof doc.role === 'string' && doc.role && doc.role !== 'none' ? doc.role : null,
