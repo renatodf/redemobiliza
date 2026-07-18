@@ -194,12 +194,22 @@ async function main() {
   }
   console.log(`✓ Regiao (cidades): ${catalogos.cidades.length} processadas`)
 
+  let bairrosProcessados = 0
   for (const bairro of catalogos.bairros) {
+    if (bairro.nome === bairro.cidadeMae) {
+      // Bairro homônimo da cidade-mãe (ex. "Sobradinho" bairro dentro de
+      // "Sobradinho" cidade) — é a mesma Regiao já criada no loop de
+      // cidades acima; processar de novo criaria regiaoPaiId apontando
+      // pra si mesma (achado real da Task 3, confirmado em staging: 26
+      // regiões reais do DF/entorno corrompidas dessa forma).
+      continue
+    }
     const uf = bairro.cidadeMae ? (UF_POR_CIDADE[bairro.cidadeMae] ?? null) : 'DF'
     const regiaoPaiId = bairro.cidadeMae ? cidadeIdPorNome.get(bairro.cidadeMae) ?? null : null
     await upsertRegiao(bairro.nome, gabinete.id, uf, regiaoPaiId)
+    bairrosProcessados++
   }
-  console.log(`✓ Regiao (bairros): ${catalogos.bairros.length} processados`)
+  console.log(`✓ Regiao (bairros): ${bairrosProcessados} processados (de ${catalogos.bairros.length} no JSON, ${catalogos.bairros.length - bairrosProcessados} pulados por serem homônimos da própria cidade-mãe)`)
 
   console.log('\n✅ Importação de catálogos da Fase 2 concluída.')
 }
