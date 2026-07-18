@@ -33,6 +33,7 @@ model Gabinete {
   demandas             Demanda[]
   configuracaoSistema  ConfiguracaoSistema?
   areasColocacao       AreaColocacao[]
+  telefonesExtras      TelefoneExtra[]
 }
 
 model UsuarioGabinete {
@@ -62,17 +63,20 @@ model LinkComposto {
 }
 
 model Regiao {
-  id         String   @id @default(cuid())
-  gabineteId String
-  nome       String
-  uf         String?
-  latitude   Float?
-  longitude  Float?
-  ativa      Boolean  @default(true)
-  criadoEm  DateTime @default(now())
+  id          String   @id @default(cuid())
+  gabineteId  String
+  nome        String
+  uf          String?
+  latitude    Float?
+  longitude   Float?
+  ativa       Boolean  @default(true)
+  regiaoPaiId String?
+  criadoEm   DateTime @default(now())
 
-  gabinete Gabinete @relation(fields: [gabineteId], references: [id])
-  pessoas  Pessoa[]
+  gabinete  Gabinete @relation(fields: [gabineteId], references: [id])
+  pessoas   Pessoa[]
+  regiaoPai Regiao?  @relation("RegiaoHierarquia", fields: [regiaoPaiId], references: [id])
+  filhas    Regiao[] @relation("RegiaoHierarquia")
 
   // Unicidade de (gabineteId, nome) entre regiões com ativa=true é
   // garantida por índice único parcial case-insensitive (lower(nome)) na
@@ -80,6 +84,12 @@ model Regiao {
   // lower(nome) em 20260719000002_regiao_case_insensitive_unique) — não
   // por @@unique, que bloquearia reativar uma região desativada. Mesma
   // técnica já aplicada em Pessoa/VinculoRede/Segmento/Profissao.
+  //
+  // regiaoPaiId (hierarquia cidade -> bairro, Fase 1 da importação Izalci,
+  // docs/superpowers/specs/2026-07-18-importacao-izalci-fase1-fundacao-schema-design.md):
+  // uma pessoa é sempre vinculada ao nível mais granular (bairro); filtrar
+  // pela região-mãe (cidade) deve incluir os filhos — lógica de consulta
+  // fica para a Fase 2, que constrói a árvore real a partir das tags do Mongo.
 }
 
 model Profissao {
@@ -126,6 +136,8 @@ model Pessoa {
   isMobilizador    Boolean   @default(false)
   tokenMobilizador String?
   userId           String?
+  zonaEleitoral    String?
+  secaoEleitoral   String?
   criadoEm        DateTime  @default(now())
   atualizadoEm    DateTime  @updatedAt
   deletedAt       DateTime?
@@ -138,6 +150,7 @@ model Pessoa {
   redesComoIndicador     VinculoRede[]          @relation("Indicador")
   linksCompostos         LinkComposto[]         @relation("LinksMobilizador")
   observacoes            ObservacaoPessoa[]
+  telefonesExtras        TelefoneExtra[]
   demandasSolicitadas    Demanda[]              @relation("DemandaSolicitante")
   demandasResponsavel    Demanda[]              @relation("DemandaResponsavel")
   demandasCriadas        Demanda[]              @relation("DemandaCriadoPor")
@@ -233,6 +246,27 @@ model ObservacaoPessoa {
 
   gabinete Gabinete @relation(fields: [gabineteId], references: [id])
   pessoa   Pessoa   @relation(fields: [pessoaId], references: [id])
+}
+
+model TelefoneExtra {
+  id         String    @id @default(cuid())
+  gabineteId String
+  pessoaId   String
+  numero     String
+  tipo       String?
+  criadoEm   DateTime  @default(now())
+  deletedAt  DateTime?
+
+  gabinete Gabinete @relation(fields: [gabineteId], references: [id])
+  pessoa   Pessoa   @relation(fields: [pessoaId], references: [id])
+
+  // Telefones adicionais de uma pessoa, além de whatsapp (principal) e
+  // telefoneFixo. Fase 1 da importação Izalci
+  // (docs/superpowers/specs/2026-07-18-importacao-izalci-fase1-fundacao-schema-design.md):
+  // schema só, sem UI de "adicionar telefone" (fora deste projeto) e sem
+  // constraint de unicidade em `numero` (decisão de deduplicação fica para
+  // a Fase 3). gabineteId direto (não só via pessoaId) segue o padrão de
+  // ObservacaoPessoa, para manter a política RLS simples.
 }
 
 model AreaDemanda {
