@@ -53,6 +53,21 @@ export async function criarOuReaproveitarUsuarioMobilizador(
     return { erro: 'Já existe uma conta com este e-mail vinculada a outra pessoa. Verifique com o suporte.' }
   }
 
+  // Corrida rara: duas promoções quase simultâneas do mesmo e-mail — a
+  // primeira pode ainda não ter commitado o vínculo Pessoa/UsuarioGabinete
+  // no instante em que a segunda chega aqui, gerando um falso positivo de
+  // "conta órfã" (achado 2.1 da auditoria de terceira ordem). Um segundo
+  // re-check, depois de uma pequena espera, cobre essa janela sem custo
+  // perceptível no caminho comum (conta realmente órfã).
+  await new Promise((resolve) => setTimeout(resolve, 500))
+  const vinculoExistenteRecheck = await prisma.pessoa.findFirst({
+    where: { userId: usuarioExistente.id },
+    select: { id: true },
+  })
+  if (vinculoExistenteRecheck) {
+    return { erro: 'Já existe uma conta com este e-mail vinculada a outra pessoa. Verifique com o suporte.' }
+  }
+
   return {
     erro:
       `Este e-mail já tem uma conta de acesso, mas sem vínculo com nenhuma pessoa cadastrada — ` +
