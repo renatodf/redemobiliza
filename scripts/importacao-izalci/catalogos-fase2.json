@@ -1,0 +1,2662 @@
+{
+  "profissoes": [
+    "ACUPUNTURISTA",
+    "ADMINISTRADOR(A)",
+    "ADVOGADO(A)",
+    "AGENTE DE PORTARIA",
+    "AGENTE DE SAÚDE",
+    "AGENTE DE SEGURANÇA PRIVADA",
+    "AGRICULTOR(A)",
+    "AJUDANTE DE PEDREIRO",
+    "ANALISTA DE SISTEMAS",
+    "APOSENTADO(A)",
+    "ARQUITETO(A)",
+    "ARTESÃO(Ã)",
+    "ASSESSOR(A)",
+    "ASSESSOR(A) FINANCEIRO(A)",
+    "ASSISTENTE SOCIAL",
+    "ATENDENTE DE FARMÁCIA",
+    "ATRIZ/ATOR",
+    "AUDIO VISUAL",
+    "AUDITOR(A)",
+    "AUTÔNOMO(A)",
+    "AUXILIAR DE EDUCAÇÃO",
+    "AUXILIAR DE ESCRITÓRIO",
+    "AUXILIAR DE SERVIÇOS GERAIS",
+    "Almoxarife",
+    "Alpinista",
+    "Ambientalistas",
+    "Analisa de faturamento",
+    "Analista de Segurança",
+    "Apicultor",
+    "Aposentado",
+    "Arquivista",
+    "Artista",
+    "Atendente",
+    "Atendente Comercial",
+    "Atleta",
+    "Auxiliar Veterinária",
+    "Auxiliar de Despachante",
+    "Auxiliar de cinegrafista",
+    "Auxiliar de dentista",
+    "Auxiliar de laboratório",
+    "Auxiliar de manutenção",
+    "Auxiliar de produção",
+    "AÇOUGUEIRO(A)",
+    "BACHAREL EM DIREITO",
+    "BALCONISTA",
+    "BANCÁRIO(A)",
+    "BIBLIOTECÁRIO(A)",
+    "BIÓLOGO(A)",
+    "BOMBEIRO(A) CIVIL",
+    "BOMBEIRO(A) MILITAR",
+    "BRIGADISTA",
+    "Babá",
+    "Banhista",
+    "Barbeiro",
+    "Biomédica esteta",
+    "Bispo",
+    "CABELEIREIRO(A)",
+    "CAMAREIRO(A)",
+    "CARPINTEIRO(A)",
+    "CASEIRO",
+    "CATADOR DE MATERIAL RECICLÁVEL",
+    "CIENTISTA POLÍTICO",
+    "CINEASTA",
+    "COBRADOR(A)",
+    "COLETOR DE RECICLÁVEIS",
+    "COMERCIANTE",
+    "COMISSÁRIO(A) DE BORDO",
+    "CONSULTOR(A) DE MARKETING DIGITAL",
+    "CONSULTORA",
+    "CONTADOR(A)",
+    "COPEIRO",
+    "CORRETOR(A) DE IMÓVEIS",
+    "CORRETOR(A) DE SEGUROS",
+    "CORRETOR(A) DE VIAGENS",
+    "COSTUREIRA",
+    "COZINHEIRO(A)",
+    "CUIDADOR(A) DE IDOSO",
+    "Carregador",
+    "Chefe de equipamentos",
+    "Chefe de produção",
+    "Confeiteiro",
+    "Conferente",
+    "Conselheiro tutelar",
+    "Consultoria",
+    "Correspondente Bancário",
+    "Corretora",
+    "DENTISTA",
+    "DESEMBARGADOR(A)",
+    "DESEMPREGADO(A)",
+    "DESIGNER",
+    "DIPLOMATA",
+    "DONA DE CASA",
+    "Dançarino",
+    "Decoradora",
+    "Do Comércio",
+    "Doméstica",
+    "ECONOMISTA",
+    "EDUCADOR(A) FÍSICO(A)",
+    "ELETRICISTA",
+    "ELETROTÉCNICO",
+    "EMPRESÁRIO(A)",
+    "ENFERMEIRO(A)",
+    "ENGENHEIRO(A)",
+    "ESTUDANTE",
+    "Empacotador",
+    "Entregador",
+    "Entrevistador",
+    "Estagiário",
+    "Estilista",
+    "Estoquista",
+    "FARMACÊUTICO(A)",
+    "FEIRANTE",
+    "FISIOTERAPEUTA",
+    "FOTOGRAFO(A)",
+    "FRENTISTA",
+    "Funcionário",
+    "GASTRONOMIA ",
+    "GESSEIRO(A)",
+    "GESTOR",
+    "GESTOR(A) DE RH",
+    "GESTOR(A) DO AGRONEGÓCIO",
+    "GESTOR(A) EDUCACIONAL",
+    "GESTOR(A) FINANCEIRO",
+    "GESTOR(A) HOSPITALAR",
+    "GESTOR(A) PÚBLICO(A)",
+    "GESTÃO EM MARKETING",
+    "Garçom",
+    "Gestora em Recursos humanos",
+    "Historiador",
+    "INSTRUTOR(A) DE AUTOESCOLA",
+    "INSTRUTOR(A) DE DANÇA",
+    "Impressor",
+    "Inspetor de disciplina",
+    "Instrumentadora Cirúrgica",
+    "Investidor",
+    "JORNALISTA",
+    "JUIZ(A)",
+    "Jogador",
+    "LOCUTOR(A)",
+    "LOGÍSTICA",
+    "MANICURE",
+    "MASSOTERAPEUTA",
+    "MECÂNICO(A)",
+    "MENSAGEIRO",
+    "MERENDEIRO(A)",
+    "MESTRE DE OBRAS",
+    "MONITOR(A)",
+    "MOTORISTA",
+    "Marceneiro",
+    "Micropgmentadora",
+    "Militar",
+    "Militar aposentado",
+    "Modelo Plus Size Suell",
+    "Monitora de creche",
+    "MÉDICO(A)",
+    "MÚSICO",
+    "Nutricionista",
+    "OPERADOR DE MÁQUINAS",
+    "OPERADOR(A) DE CAIXA",
+    "OPERADORA DE CRÉDITO",
+    "ORIENTADOR(A) EDUCACIONAL",
+    "Operador logístico",
+    "Operadora de Telemarketing",
+    "PEDAGOGO(A)",
+    "PEDREIRO(A)",
+    "PINTOR(A)",
+    "POLICIAL CIVIL",
+    "POLICIAL MILITAR",
+    "POLÍTICAS SOCIAIS",
+    "PORTEIRO(A)",
+    "PROCURADOR(A)",
+    "PRODUTOR CULTURAL",
+    "PRODUTOR(A) DE EVENTOS",
+    "PRODUTOR(A) RURAL",
+    "PROFESSOR(A)",
+    "PSICOPEDAGOGO(A)",
+    "PSICÓLOGO(A)",
+    "PUBLICITÁRIO(A)",
+    "Padeiro",
+    "Paisagista",
+    "Picineiro",
+    "Presidente da cooperativa sonho de liberdade",
+    "Projetista",
+    "Promotor",
+    "Quadrilheira",
+    "Quimico",
+    "RECEPCIONISTA",
+    "RELAÇÕES INTERNACIONAIS",
+    "RELAÇÕES PÚBLICAS",
+    "Rodoviário/palhaço",
+    "SECRETARIADO EXECUTIVO",
+    "SECRETÁRIO(A)",
+    "SERRALHEIRO(A)",
+    "SERVIDOR(A) PÚBLICO(A)",
+    "SERVIDOR(A) PÚBLICO(A) ESTADUAL",
+    "SERVIDOR(A) PÚBLICO(A) FEDERAL",
+    "SISTEMAS DE INFORMAÇÃO",
+    "SLU",
+    "Salva vidas socorrista",
+    "Serigrafo",
+    "Servente/ajudante",
+    "Sindicalista",
+    "Supervisor",
+    "SÍNDICO(A)",
+    "TEÓLOGO(A) - PASTOR(A)",
+    "TRADUTOR(A)",
+    "TURISMÓLOGO(A)",
+    "Tecn8ca analise clinica",
+    "Tecnico infroestrutura",
+    "Turismóloga",
+    "TÉCNICO DE LABORATÓRIO",
+    "TÉCNICO EM AGROPECUÁRIA",
+    "TÉCNICO EM BIOSEGURANÇA",
+    "TÉCNICO EM ENFERMAGEM",
+    "TÉCNICO EM INFORMÁTICA",
+    "TÉCNICO(A) EM MEIO AMBIENTE",
+    "TÉCNICO(A) EM NECROPSIA",
+    "TÉCNICO(A) EM RADIOLOGIA",
+    "Técnica Saúde Bucal",
+    "Técnico Administrativo",
+    "Técnico Telecomunicações",
+    "Técnico de segurança do trabalho",
+    "Técnico em Edificações",
+    "Técnico em segurança eletrônica",
+    "VENDEDOR(A)",
+    "VETERINÁRIO(A)",
+    "VIGILANTE",
+    "Varredora",
+    "auxiliar de saude bucal",
+    "encarregado",
+    "vistoriador",
+    "Árbitro juridico"
+  ],
+  "areasColocacao": [
+    "ADVOGADO(A)",
+    "AGENTE AEROPORTUÁRIO",
+    "AGENTE COMUNITÁRIO DE SAÚDE",
+    "AGENTE DE SEGURANÇA PRIVADA",
+    "AJUDANTE DE COZINHA",
+    "ALMOXARIFE",
+    "APRENDIZ",
+    "ARMADOR EM CONSTRUÇÃO CIVIL",
+    "ARQUITETO",
+    "ASCENSORISTA",
+    "ASSESSOR(A) ADMINISTRATIVO",
+    "ASSISTENTE JURÍDICO",
+    "ATENDENTE / BALCONISTA",
+    "AUXILIAR ADMINISTRATIVO",
+    "AUXILIAR DE BIBLIOTECA",
+    "AUXILIAR DE COZINHA",
+    "AUXILIAR JURÍDICO",
+    "AÇOUGUEIRO",
+    "BOMBEIRO HIDRÁULICO",
+    "BRIGADISTA / BOMBEIRO CIVIL",
+    "CABELEIREIRO(A)",
+    "CAMINHONEIRO",
+    "CHEFE DE COZINHA",
+    "COBRADOR(A) DE ÔNIBUS",
+    "CONFEITEIRO(A)",
+    "CONFERENTE DE SUPERMERCADO",
+    "CONTADOR(A)",
+    "COPEIRO(A)",
+    "CORRETOR(A) DE IMÓVEIS",
+    "COSTUREIRA",
+    "CUIDADOR(A) DE IDOSO",
+    "DENTISTA",
+    "DESIGNER DE SOBRANCELHA",
+    "EDUCADOR(A) FÍSICO",
+    "ELETRICISTA",
+    "EMPACOTADOR(A)",
+    "ENCARREGADO(A)",
+    "ENFERMEIRO(A)",
+    "ENGENHEIRO(A)",
+    "ENTREGADOR(A)",
+    "ESTETICISTA",
+    "ESTOQUISTA",
+    "ESTÁGIO",
+    "ESTÁGIO NO SENADO",
+    "FARMACÊUTICO(A)",
+    "FISIOTERAPEUTA",
+    "FOTÓGRAFO(A)",
+    "FRENTISTA",
+    "GARI",
+    "GARÇON",
+    "GESSEIRO(A)",
+    "GESTOR(A) DE RH",
+    "HOTELARIA",
+    "JORNALISTA",
+    "LIMPEZA DE AUTOMÓVEIS",
+    "MANICURE",
+    "MARCENEIRO",
+    "MASSOTERAPEUTA",
+    "MERENDEIRO(A)",
+    "MONITOR(A) DE FESTA INFANTIL",
+    "MONITORA DE EDUCAÇÃO INFANTIL",
+    "MONTADOR(A) DE MÓVEIS",
+    "MOTOBOY",
+    "MOTORISTA",
+    "MÉDICO",
+    "NUTRICIONISTA",
+    "OPERADOR DE TELEMARKETING",
+    "OPERADOR(A) DE CAIXA",
+    "ORIENTADOR(A) EDUCACIONAL",
+    "PADEIRO",
+    "PEDREIRO",
+    "PEIXEIRO(A)",
+    "PERSONAL TRAINER",
+    "PINTOR(A)",
+    "PIZZAIOLO",
+    "PODÓLOGO(A)",
+    "PORTEIRO(A)",
+    "PROFESSOR DE LÍNGUA ESTRANGEIRA",
+    "PROFESSOR(A)",
+    "PROGRAMADOR(A) - DESENVOLVEDOR(A) DE SISTEMAS",
+    "PROMOTOR(A) DE VENDAS",
+    "RECEPCIONISTA",
+    "RELAÇÕES INTERNACIONAIS",
+    "REPOSITOR(A)",
+    "SALADEIRO(A)",
+    "SECRETARIADO EXECUTIVO",
+    "SEGURANÇA",
+    "SERRALHEIRO",
+    "SERVIÇOS GERAIS",
+    "TÉCNICO DE INFORMÁTICA",
+    "TÉCNICO DE INSTALAÇÃO",
+    "TÉCNICO EM ENFERMAGEM",
+    "TÉCNICO EM RADIOLOGIA",
+    "TÉCNICO(A) EM NECROPSIA",
+    "TÉCNICO(A) EM TELECOMUNICAÇÕES",
+    "VENDEDOR(A)",
+    "VIDRACEIRO(A)",
+    "VIGILANTE",
+    "ÁREA ECONÔMICA",
+    "ÁREA GOVERNAMENTAL"
+  ],
+  "segmentos": [
+    "ABEDUQ",
+    "ACDF - ASSOCIAÇÃO COMERCIAL DO DF",
+    "ADVOCACIA",
+    "AGENDA DAS ELEIÇÕES",
+    "AGENDA IZALCI",
+    "AGRONEGÓCIO",
+    "ALUNOS SENAC",
+    "ANUARIO ARQ",
+    "ASFAM",
+    "ASSOCIACOES",
+    "ATENDIMENTO",
+    "ATENDIMENTO ESCRITÓRIO POLÍTICO",
+    "ATENDIMENTO NO GABINETE",
+    "ATIVO",
+    "AUTORIDADES",
+    "Acao social",
+    "Aluno-Senac",
+    "Artesanato",
+    "Assistência Social",
+    "Associaçào",
+    "Associação Comercial",
+    "Associação de Catadores Recicla Mais Brasil",
+    "Associação de Moradores Aguaslindense",
+    "Associação de moradores",
+    "Ação social .",
+    "BANCO ANTIGO",
+    "BOLSA UNIVERSITÁRIA",
+    "BOMBEIRO MILITAR",
+    "BRASÍLIA NA PONTA DO LÁPIS",
+    "CAMPANHA 1998",
+    "CANDIDATO(A) CONSELHEIRO(A) TUTELAR",
+    "CANDIDATO(A) DEPUTADO(A) DISTRITAL",
+    "CANDIDATO(A) DEPUTADO(A) FEDERAL",
+    "CANDIDATO(A) VEREADOR(A)",
+    "CCI - COMUNIDADE CRISTÃ IZALCI",
+    "CE98",
+    "COHAPI - COOPERATIVA HABITACIONAL PIAUÍ",
+    "COLABORADORES EQUIPE IZALCI",
+    "COMISSÁRIÁO DE PROTEÇÃO DA INFÂNCIA E JUVENTUDE - VIJ",
+    "CONFRARIA",
+    "CONSELHO TUTELAR",
+    "CRA-DF - CONSELHO REGIONAL DE ADMINISTRAÇÃO",
+    "CRC-DF - CONSELHO REGIONAL DE CONTABILIDADE",
+    "CRECI-DF",
+    "CULTURA",
+    "CURRICULUM",
+    "CURRÍCULO",
+    "CURSO",
+    "Capoeira",
+    "Capoterapia",
+    "Comercial",
+    "Comerciante",
+    "Comunicação",
+    "Comunicação- Rádio - Jornalismo",
+    "Comunidade",
+    "Comunitária",
+    "Comunitária e sócial",
+    "Comércio",
+    "Condomínio",
+    "Condomínios",
+    "Conselheira Tutelar",
+    "Conselheiro Tutelar",
+    "Contabilidade",
+    "Coordenadora",
+    "Corretora de Imóveis",
+    "Cultural",
+    "DF DIGITAL",
+    "EDUCAÇÃO",
+    "EMENDA POPPULAR - CHEQUE EDUCAÇÃO",
+    "ESCOLAS PARTICULARES",
+    "ESCRITÓRIOS DE CONTABILIDADE",
+    "ESP/OBREIRO",
+    "EUREKA",
+    "Empreendedorismo",
+    "Empresa privada",
+    "Empresarial",
+    "Esporte",
+    "Esportes",
+    "Esportivo",
+    "Evangelico",
+    "FACITEC",
+    "FAMILIA",
+    "FAP",
+    "FECOMERCIO",
+    "FEDF",
+    "FILIADOS",
+    "FILIADOS PSL",
+    "FILIAÇÃO PL  2024",
+    "FORMANDOS",
+    "Famílias carentes",
+    "Feirante",
+    "Filantropia",
+    "HABITAÇÃO",
+    "IDOSO",
+    "IGREJA",
+    "Idosos",
+    "JUVENTUDE RURAL",
+    "Jornalismo",
+    "Juventude",
+    "LISTA QUENTE - CAMPANHA 2010",
+    "Lazer",
+    "Liderança Comunitária",
+    "LÍDER COMUNITÁRIO",
+    "Líder",
+    "Líder comunitária",
+    "Líder de quadra",
+    "Líder espiritual",
+    "MBTC",
+    "MEIO AMBIENTE",
+    "MG",
+    "MILITAR",
+    "MOVIMENTO JUNINO",
+    "MURO",
+    "Moradia",
+    "Moradia/ocupação e comunidade",
+    "Mulheres",
+    "Música",
+    "NOTEBOOK",
+    "OBREIRO",
+    "PAIS DE ALUNO",
+    "PALESTRAS SENADOR IZALCI - 2025",
+    "PESQUISA",
+    "PESQUISA - 19/03 A 25/05 DE 2025",
+    "PESQUISADORES",
+    "PFL",
+    "PGT",
+    "PJ",
+    "PL",
+    "PLACA",
+    "PMDF",
+    "POLICIAL MILITAR",
+    "PR-ANTIGO",
+    "PR-NOVO",
+    "PREFEITO",
+    "PREFEITO MUNICIPAL",
+    "PRES.ZONAL",
+    "PRESIDENTE DO CONSELHO DE SAÚDE",
+    "PRODUTOR(A) RURAL",
+    "PROJETO SOCIAL PROMAIS",
+    "PSDB",
+    "PSDB DF",
+    "PSDB/IZALCI",
+    "Pastor",
+    "Pastor evangélico",
+    "Pastora",
+    "Pastoral",
+    "Pec do Fundo - Educação",
+    "Pec do Fundo - Saúde",
+    "Pec do Fundo - Segurança",
+    "Pessoa com Deficiência",
+    "Política",
+    "Políticas Públicas",
+    "Políticas Públicas e Sociais",
+    "Prefeita comunitária",
+    "Prefeito comunitário",
+    "Prefeitura comunitária",
+    "Presidente",
+    "Presidente dê associação",
+    "Produtor Cultural",
+    "Professor",
+    "QUIOSQUES",
+    "Quadrilha Junina",
+    "Quadrilheiro",
+    "REGULARIZAÇÃO FUNDIÁRIA",
+    "REL.NEUSA-REC.",
+    "REPENSAR O DF",
+    "RESP. ALUNO",
+    "REUNIAO",
+    "Recondicionamento de computadores",
+    "Religioso",
+    "Rural",
+    "S. CURRICULAR",
+    "SAÚDE",
+    "SCAE",
+    "SEE-DF",
+    "SEGUE-ME",
+    "SEMANA JURIDICA",
+    "SEMINARIO SDT",
+    "SERV. ADM GUARA",
+    "SERV. SECRETARIA",
+    "SLU - SERVIÇO DE LIMPEZA URBANA",
+    "Segurança",
+    "Segurança Pública",
+    "Serviço social",
+    "Serviços sociais",
+    "Sindica",
+    "Social",
+    "Social e Cultural",
+    "SÍNDICO",
+    "TRABALHO SOCIAL",
+    "TURISMO",
+    "Terapias naturais",
+    "Terceiro setor",
+    "Trabalho",
+    "Umbandista",
+    "VEREADOR",
+    "Votabox",
+    "Vulnerabilidade social",
+    "comunitário",
+    "cultura e educação",
+    "movimento sindical",
+    "presidente de um projeto cultural",
+    "Área rural"
+  ],
+  "cidades": [
+    "Anápolis",
+    "Aracaju",
+    "Arniqueira",
+    "Barretos",
+    "Barueri",
+    "Brasília",
+    "Brazlândia",
+    "Candangolândia",
+    "Catalão",
+    "Ceilândia",
+    "Ceres",
+    "Cidade Ocidental",
+    "Cocalzinho de Goiás",
+    "Cristalina",
+    "Cruzeiro",
+    "Curitiba",
+    "CÉU AZUL",
+    "Entorno do DF",
+    "Fercal",
+    "Flores de Goiás",
+    "Formosa",
+    "Gama",
+    "Goiânia",
+    "Guará",
+    "Irecê",
+    "Itapoã",
+    "Jardim Botânico",
+    "Jardim Ingá",
+    "João Pessoa",
+    "Lago Norte",
+    "Lago Sul",
+    "Luziânia",
+    "Mauá",
+    "Navegantes",
+    "Nova Lima",
+    "Nova Xavantina",
+    "Novo Gama",
+    "Núcleo Bandeirante",
+    "Padre Bernardo",
+    "Palmas",
+    "Paranoá",
+    "Park Way",
+    "Planaltina",
+    "Planaltina Goiás",
+    "Plano Piloto",
+    "Porto Alegre",
+    "Recanto das Emas",
+    "Recife",
+    "Riachinho",
+    "Riacho Fundo",
+    "Riacho Fundo II",
+    "Ribeirão Preto",
+    "Rio de Janeiro",
+    "SCIA",
+    "SIA",
+    "Samambaia",
+    "Santa Maria",
+    "Santo Antônio do Descoberto",
+    "Sobradinho",
+    "Sobradinho II",
+    "Sol Nascente - Pôr do Sol",
+    "Sudoeste/Octogonal",
+    "São Jerônimo",
+    "São João D'Aliança",
+    "São Paulo",
+    "São Sebastião",
+    "Taguatinga",
+    "União da Vitória",
+    "Valparaíso de Goiás",
+    "Varjão",
+    "Vicente Pires",
+    "Vitória da Conquista",
+    "Água Fria de Goiás",
+    "Águas Claras",
+    "Águas Lindas de Goiás"
+  ],
+  "bairros": [
+    {
+      "nome": "Altiplano Cabo Branco",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Alto da Boa Vista (Sobradinho)",
+      "cidadeMae": "Sobradinho",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Arapoanga (Planaltina)",
+      "cidadeMae": "Planaltina",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Areal (Águas Claras)",
+      "cidadeMae": "Águas Claras",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Asa Norte",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Asa Sul",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Bacacheri",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Bela Vista (São Sebastião)",
+      "cidadeMae": "São Sebastião",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Boa Vista",
+      "cidadeMae": "Novo Gama",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Bonfim Paulista",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Bonsucesso (São Sebastião)",
+      "cidadeMae": "São Sebastião",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Bora Manso",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Brasilinha 17",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Brazlândia",
+      "cidadeMae": "Brazlândia",
+      "metodoResolucao": "substring"
+    },
+    {
+      "nome": "CEILANDIA OESTE",
+      "cidadeMae": "Ceilândia",
+      "metodoResolucao": "substring"
+    },
+    {
+      "nome": "COLÔNIA AGRÍCOLA BRASÍLIA",
+      "cidadeMae": "Brasília",
+      "metodoResolucao": "substring"
+    },
+    {
+      "nome": "Camping Clube",
+      "cidadeMae": "Águas Lindas de Goiás",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Candangolândia",
+      "cidadeMae": "Candangolândia",
+      "metodoResolucao": "substring"
+    },
+    {
+      "nome": "Ceilândia",
+      "cidadeMae": "Ceilândia",
+      "metodoResolucao": "substring"
+    },
+    {
+      "nome": "Ceilândia  norte",
+      "cidadeMae": "Ceilândia",
+      "metodoResolucao": "substring"
+    },
+    {
+      "nome": "Ceilândia Centro (Ceilândia)",
+      "cidadeMae": "Ceilândia",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Ceilândia Norte (Ceilândia)",
+      "cidadeMae": "Ceilândia",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Ceilândia Sul (Ceilândia)",
+      "cidadeMae": "Ceilândia",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Centro",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Centro (São Sebastião)",
+      "cidadeMae": "São Sebastião",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Chácaras Anhangüera",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Chácaras Coimbra",
+      "cidadeMae": "Águas Lindas de Goiás",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Chácaras Marco",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Chácaras Quedas do Descoberto",
+      "cidadeMae": "Águas Lindas de Goiás",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Chácaras Quedas do Descoberto II",
+      "cidadeMae": "Águas Lindas de Goiás",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Cidade Eclética",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Cidade Jardim",
+      "cidadeMae": "Águas Lindas de Goiás",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Cidade Nova (Gama)",
+      "cidadeMae": "Gama",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Cidade Nova (Santa Maria)",
+      "cidadeMae": "Santa Maria",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Cidade do Entorno",
+      "cidadeMae": "Águas Lindas de Goiás",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Cocalzinho",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Condomínio Bela Vista da Barragem I",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Condomínio Coohaplan - Itiquira (Planaltina)",
+      "cidadeMae": "Planaltina",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Condomínio Guirra (Planaltina)",
+      "cidadeMae": "Planaltina",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Condomínio Império dos Nobres (Sobradinho)",
+      "cidadeMae": "Sobradinho",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Condomínio Mestre D'Armas (Planaltina)",
+      "cidadeMae": "Planaltina",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Condomínio Parque Mônaco (Planaltina)",
+      "cidadeMae": "Planaltina",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Condomínio Prado (Planaltina)",
+      "cidadeMae": "Planaltina",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Condomínio Privê Lucena Roriz (Ceilândia)",
+      "cidadeMae": "Ceilândia",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Condomínio Residencial Embaixador",
+      "cidadeMae": "Águas Lindas de Goiás",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Condomínio Residencial Santa Maria (Santa Maria)",
+      "cidadeMae": "Santa Maria",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Condomínio Vale dos Pinheiros (Sobradinho)",
+      "cidadeMae": "Sobradinho",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Condomínio solar da Barragem",
+      "cidadeMae": "Águas Lindas de Goiás",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Cristalina",
+      "cidadeMae": "Cristalina",
+      "metodoResolucao": "substring"
+    },
+    {
+      "nome": "Crixá (São Sebastião)",
+      "cidadeMae": "São Sebastião",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Cruzeiro Novo",
+      "cidadeMae": "Cruzeiro",
+      "metodoResolucao": "substring"
+    },
+    {
+      "nome": "Cruzeiro Velho",
+      "cidadeMae": "Cruzeiro",
+      "metodoResolucao": "substring"
+    },
+    {
+      "nome": "Cruzeiro do Sul",
+      "cidadeMae": "Cruzeiro",
+      "metodoResolucao": "substring"
+    },
+    {
+      "nome": "Del Lago I (Itapoã)",
+      "cidadeMae": "Itapoã",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Del Lago II (Itapoã)",
+      "cidadeMae": "Itapoã",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Diogo Machado de Araújo",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Dom Bosco",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Engenho das Lages",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Ernani Sátiro",
+      "cidadeMae": "João Pessoa",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Estrutural",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Estância Mestre D'Armas I (Planaltina)",
+      "cidadeMae": "Planaltina",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Estância Mestre D'Armas II (Planaltina)",
+      "cidadeMae": "Planaltina",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Estância Mestre D'Armas III (Planaltina)",
+      "cidadeMae": "Planaltina",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Estância Mestre D'Armas IV (Planaltina)",
+      "cidadeMae": "Planaltina",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Estância Mestre D'Armas V (Planaltina)",
+      "cidadeMae": "Planaltina",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Estância Planaltina (Planaltina)",
+      "cidadeMae": "Planaltina",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Estâncias Vila Rica (Sobradinho)",
+      "cidadeMae": "Sobradinho",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Expansão do Jardim Barragem 02",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Fazenda Mestre D'Armas (Etapa I - Planaltina)",
+      "cidadeMae": "Planaltina",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Fazenda Mestre D'Armas (Etapa II - Planaltina)",
+      "cidadeMae": "Planaltina",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Fazenda Mestre D'Armas (Etapa III - Planaltina)",
+      "cidadeMae": "Planaltina",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Fazendinha (Itapoã)",
+      "cidadeMae": "Itapoã",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Formosa",
+      "cidadeMae": "Formosa",
+      "metodoResolucao": "substring"
+    },
+    {
+      "nome": "Formosinha",
+      "cidadeMae": "Formosa",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Gama",
+      "cidadeMae": "Gama",
+      "metodoResolucao": "substring"
+    },
+    {
+      "nome": "Girassol",
+      "cidadeMae": "Cocalzinho de Goiás",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Grande Colorado (Sobradinho)",
+      "cidadeMae": "Sobradinho",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Granja do Torto",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Guará",
+      "cidadeMae": "Guará",
+      "metodoResolucao": "substring"
+    },
+    {
+      "nome": "Guará I",
+      "cidadeMae": "Guará",
+      "metodoResolucao": "substring"
+    },
+    {
+      "nome": "Guará II",
+      "cidadeMae": "Guará",
+      "metodoResolucao": "substring"
+    },
+    {
+      "nome": "Incra 8 (Brazlândia)",
+      "cidadeMae": "Brazlândia",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Indianópolis",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Itapoã I",
+      "cidadeMae": "Itapoã",
+      "metodoResolucao": "substring"
+    },
+    {
+      "nome": "Itapoã II",
+      "cidadeMae": "Itapoã",
+      "metodoResolucao": "substring"
+    },
+    {
+      "nome": "Itapoã Parque (Itapoã)",
+      "cidadeMae": "Itapoã",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Itapuã I",
+      "cidadeMae": "Planaltina",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "JOÃO CÂNDIDO",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Jardim ABC",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Jardim Alexandre Balbo",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Jardim Alterosa",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Jardim América I",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Jardim América II",
+      "cidadeMae": "Águas Lindas de Goiás",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Jardim América III",
+      "cidadeMae": "Águas Lindas de Goiás",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Jardim América IV",
+      "cidadeMae": "Águas Lindas de Goiás",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Jardim América V",
+      "cidadeMae": "Águas Lindas de Goiás",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Jardim América VI",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Jardim Botânico",
+      "cidadeMae": "Jardim Botânico",
+      "metodoResolucao": "substring"
+    },
+    {
+      "nome": "Jardim Brasília",
+      "cidadeMae": "Brasília",
+      "metodoResolucao": "substring"
+    },
+    {
+      "nome": "Jardim Califórnia",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Jardim Céu Azul",
+      "cidadeMae": "CÉU AZUL",
+      "metodoResolucao": "substring"
+    },
+    {
+      "nome": "Jardim Goiás",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Jardim Guaíra I",
+      "cidadeMae": "Águas Lindas de Goiás",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Jardim Guaíra II",
+      "cidadeMae": "Águas Lindas de Goiás",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Jardim Lago Azul",
+      "cidadeMae": "Novo Gama",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Jardim Leopoldina",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Jardim Novo Mundo",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Jardim Oliveira",
+      "cidadeMae": "Formosa",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Jardim Oriente",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Jardim Paiva lunabel Novo Gama Goiás",
+      "cidadeMae": "Novo Gama",
+      "metodoResolucao": "substring"
+    },
+    {
+      "nome": "Jardim Paquetá I",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Jardim Paquetá II",
+      "cidadeMae": "Planaltina",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Jardim Planalto",
+      "cidadeMae": "Águas Lindas de Goiás",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Jardim Primavera",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Jardim Pérola da Barragem I",
+      "cidadeMae": "Águas Lindas de Goiás",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Jardim Pérola da Barragem II",
+      "cidadeMae": "Águas Lindas de Goiás",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Jardim Querência",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Jardim Recanto",
+      "cidadeMae": "Águas Lindas de Goiás",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Jardim Roriz (Planaltina)",
+      "cidadeMae": "Planaltina",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Jardim Santa Lúcia",
+      "cidadeMae": "Águas Lindas de Goiás",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Jardim Triângulo",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Jardim Umuarama Setor 2",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Jardim Umuarama Setor 5",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Jardim Vitória",
+      "cidadeMae": "Águas Lindas de Goiás",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Jardim da Barragem I",
+      "cidadeMae": "Águas Lindas de Goiás",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Jardim da Barragem II",
+      "cidadeMae": "Águas Lindas de Goiás",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Jardim da Barragem III",
+      "cidadeMae": "Águas Lindas de Goiás",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Jardim da Barragem IV",
+      "cidadeMae": "Águas Lindas de Goiás",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Jardim da Barragem V",
+      "cidadeMae": "Águas Lindas de Goiás",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Jardim da Barragem VI",
+      "cidadeMae": "Águas Lindas de Goiás",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Jardim das Américas",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Jardim das Laranjeiras I",
+      "cidadeMae": "Águas Lindas de Goiás",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Jardim das Palmeiras",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Jardim do Entorno I",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Jardim do Ingá",
+      "cidadeMae": "Luziânia",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Jardim dos Pinheiros",
+      "cidadeMae": "Águas Lindas de Goiás",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Jardim Águas Lindas II",
+      "cidadeMae": "Águas Lindas de Goiás",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Jardins Mangueiral (Jardim Botânico)",
+      "cidadeMae": "Jardim Botânico",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Jardins Mangueiral (São Sebastião)",
+      "cidadeMae": "São Sebastião",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Jardins Versailles",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "José Américo de Almeida",
+      "cidadeMae": "João Pessoa",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "LAGO SUL",
+      "cidadeMae": "Lago Sul",
+      "metodoResolucao": "substring"
+    },
+    {
+      "nome": "LEBLON",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "LUCIO COSTA",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "LUZIANIA",
+      "cidadeMae": "Luziânia",
+      "metodoResolucao": "substring"
+    },
+    {
+      "nome": "Lago Norte",
+      "cidadeMae": "Lago Norte",
+      "metodoResolucao": "substring"
+    },
+    {
+      "nome": "Laranjeiras II",
+      "cidadeMae": "Águas Lindas de Goiás",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Loteamento Lunabel 3",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Loteamento Lunabel 3C",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Loteamento Residencial Jardim Laranjeiras",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "M Norte",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Mangabeira",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Mansões Bittencourt",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Mansões Camargo",
+      "cidadeMae": "Águas Lindas de Goiás",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Mansões Ilha Bela",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Mansões Imperatriz",
+      "cidadeMae": "Águas Lindas de Goiás",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Mansões Itamaracá",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Mansões Odisséia",
+      "cidadeMae": "Águas Lindas de Goiás",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Mansões Olinda",
+      "cidadeMae": "Águas Lindas de Goiás",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Mansões Pôr do Sol",
+      "cidadeMae": "Águas Lindas de Goiás",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Mansões Recreio Estrela D'Alva III",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Mansões Village",
+      "cidadeMae": "Águas Lindas de Goiás",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Mansões Águas Lindas",
+      "cidadeMae": "Águas Lindas de Goiás",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Metropolitana (Núcleo Bandeirante)",
+      "cidadeMae": "Núcleo Bandeirante",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Morada Nobre",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Morro Azul (São Sebastião)",
+      "cidadeMae": "São Sebastião",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "NOROESTE",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "NOVO GAMA",
+      "cidadeMae": "Novo Gama",
+      "metodoResolucao": "substring"
+    },
+    {
+      "nome": "Norte (Águas Claras)",
+      "cidadeMae": "Águas Claras",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Nossa Senhora de Fátima (Planaltina)",
+      "cidadeMae": "Planaltina",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Nova Colina (Sobradinho)",
+      "cidadeMae": "Sobradinho",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Núcleo Bandeirante",
+      "cidadeMae": "Núcleo Bandeirante",
+      "metodoResolucao": "substring"
+    },
+    {
+      "nome": "Núcleo Habitacional Novo Gama",
+      "cidadeMae": "Novo Gama",
+      "metodoResolucao": "substring"
+    },
+    {
+      "nome": "Núcleo Rural Lago Oeste (Sobradinho)",
+      "cidadeMae": "Sobradinho",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Núcleo Rural Vargem Bonita (Park Way)",
+      "cidadeMae": "Park Way",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Ocidental Parque",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Padre Bernardo",
+      "cidadeMae": "Padre Bernardo",
+      "metodoResolucao": "substring"
+    },
+    {
+      "nome": "Paranoá",
+      "cidadeMae": "Paranoá",
+      "metodoResolucao": "substring"
+    },
+    {
+      "nome": "Paranoá Parque (Paranoá)",
+      "cidadeMae": "Paranoá",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Park Way",
+      "cidadeMae": "Park Way",
+      "metodoResolucao": "substring"
+    },
+    {
+      "nome": "Park das Águas Bonitas II",
+      "cidadeMae": "Águas Lindas de Goiás",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Parque Alvorada II",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Parque Araruama",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Parque Esplanada I",
+      "cidadeMae": "Valparaíso de Goiás",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Parque Esplanada V",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Parque Estrela Dalva II",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Parque Estrela Dalva IX",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Parque Estrela Dalva VI (Pedregal)",
+      "cidadeMae": "Novo Gama",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Parque Estrela Dalva VII",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Parque Estrela Dalva XI",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Parque Estrela Dalva XII",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Parque Estrela Dalva XIII",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Parque Estrela Dalva XIV",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Parque Estrela Dalva XVI",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Parque Industrial Mingone",
+      "cidadeMae": "Luziânia",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Parque Nova Friburgo A",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Parque Nova Friburgo B",
+      "cidadeMae": "Cidade Ocidental",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Parque Nápolis A",
+      "cidadeMae": "Cidade Ocidental",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Parque Rio Branco",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Parque Santo Antônio",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Parque da Barragem Setor 01",
+      "cidadeMae": "Águas Lindas de Goiás",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Parque da Barragem Setor 02",
+      "cidadeMae": "Águas Lindas de Goiás",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Parque da Barragem Setor 03",
+      "cidadeMae": "Águas Lindas de Goiás",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Parque da Barragem Setor 04",
+      "cidadeMae": "Águas Lindas de Goiás",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Parque da Barragem Setor 05",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Parque da Barragem Setor 06",
+      "cidadeMae": "Águas Lindas de Goiás",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Parque da Barragem Setor 07",
+      "cidadeMae": "Águas Lindas de Goiás",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Parque da Barragem Setor 08",
+      "cidadeMae": "Águas Lindas de Goiás",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Parque da Barragem Setor 09",
+      "cidadeMae": "Águas Lindas de Goiás",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Parque da Barragem Setor 10",
+      "cidadeMae": "Águas Lindas de Goiás",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Parque da Barragem Setor 11",
+      "cidadeMae": "Águas Lindas de Goiás",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Parque da Barragem Setor 12",
+      "cidadeMae": "Águas Lindas de Goiás",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Parque da Barragem Setor 13",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Parque da Colina I",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Parque das Laranjeiras",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Parque das Águas Bonitas I",
+      "cidadeMae": "Águas Lindas de Goiás",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Parque das Águas Bonitas I Etapa B",
+      "cidadeMae": "Águas Lindas de Goiás",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Pedregal",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Perdizes",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Planaltina",
+      "cidadeMae": "Planaltina",
+      "metodoResolucao": "substring"
+    },
+    {
+      "nome": "Ponte Alta Norte (Gama)",
+      "cidadeMae": "Gama",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Portal da Barragem",
+      "cidadeMae": "Águas Lindas de Goiás",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Portal do Amanhecer (Planaltina)",
+      "cidadeMae": "Planaltina",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Portal do Amanhecer III (Planaltina)",
+      "cidadeMae": "Planaltina",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Portal do Amanhecer V (Privê - Planaltina)",
+      "cidadeMae": "Planaltina",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Quadras Econômicas Lúcio Costa (Guará)",
+      "cidadeMae": "Guará",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Quintas do Amanhecer II (Planaltina)",
+      "cidadeMae": "Planaltina",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Quintas do Amanhecer III (Planaltina)",
+      "cidadeMae": "Planaltina",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Recanto da Barragem",
+      "cidadeMae": "Águas Lindas de Goiás",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Recanto das Emas",
+      "cidadeMae": "Recanto das Emas",
+      "metodoResolucao": "substring"
+    },
+    {
+      "nome": "Recreio da Barragem",
+      "cidadeMae": "Águas Lindas de Goiás",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Recreio das Águas Lindas II",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Recreio das Águas Lindas III",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Região dos Lagos (Sobradinho)",
+      "cidadeMae": "Sobradinho",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Residencial Bethel",
+      "cidadeMae": "Águas Lindas de Goiás",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Residencial Bica do DER (Gleba B - Planaltina)",
+      "cidadeMae": "Planaltina",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Residencial Cerejeiras",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Residencial Condomínio Marissol (Planaltina)",
+      "cidadeMae": "Planaltina",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Residencial Itaipu (São Sebastião)",
+      "cidadeMae": "São Sebastião",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Residencial Jardim Paraíso",
+      "cidadeMae": "Águas Lindas de Goiás",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Residencial Morro da Cruz (São Sebastião)",
+      "cidadeMae": "São Sebastião",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Residencial Nova Esperança (Planaltina)",
+      "cidadeMae": "Planaltina",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Residencial Nova Planaltina (Planaltina)",
+      "cidadeMae": "Planaltina",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Residencial Paiva I",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Residencial Santos Dumont (Santa Maria)",
+      "cidadeMae": "Santa Maria",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Residencial Sarandy (Planaltina)",
+      "cidadeMae": "Planaltina",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Residencial Sol Nascente I",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Residencial Sol Nascente II",
+      "cidadeMae": "Águas Lindas de Goiás",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Residencial São Francisco II (Planaltina)",
+      "cidadeMae": "Planaltina",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Residencial Vitória (São Sebastião)",
+      "cidadeMae": "São Sebastião",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Residencial do Bosque (São Sebastião)",
+      "cidadeMae": "São Sebastião",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Riacho Fundo I",
+      "cidadeMae": "Riacho Fundo",
+      "metodoResolucao": "substring"
+    },
+    {
+      "nome": "Riacho Fundo II",
+      "cidadeMae": "Riacho Fundo II",
+      "metodoResolucao": "substring"
+    },
+    {
+      "nome": "Royal Parque",
+      "cidadeMae": "Águas Lindas de Goiás",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "SAMAMBAIA- NORTE",
+      "cidadeMae": "Samambaia",
+      "metodoResolucao": "substring"
+    },
+    {
+      "nome": "SETOR INDUSTRIAL BERNARDO SAYÃO",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "SETOR PLACA DAS MERCEDES",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Samambaia Norte (Samambaia)",
+      "cidadeMae": "Samambaia",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Samambaia Sul",
+      "cidadeMae": "Samambaia",
+      "metodoResolucao": "substring"
+    },
+    {
+      "nome": "Samambaia Sul (Samambaia)",
+      "cidadeMae": "Samambaia",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Santa Genoveva",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Santa Maria",
+      "cidadeMae": "Santa Maria",
+      "metodoResolucao": "substring"
+    },
+    {
+      "nome": "Santa Rita",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Serra Azul (Sobradinho)",
+      "cidadeMae": "Sobradinho",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Setor Administrativo (Planaltina)",
+      "cidadeMae": "Planaltina",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Setor Aeroporto",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Setor Aeroporto (Barrolândia)",
+      "cidadeMae": "Planaltina Goiás",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Setor Bela Vista",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Setor Bosque II",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Setor Central (Gama)",
+      "cidadeMae": "Gama",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Setor Central (Vila Estrutural)",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Setor Comercial Central (Planaltina)",
+      "cidadeMae": "Planaltina",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Setor Econômico de Sobradinho (Sobradinho)",
+      "cidadeMae": "Sobradinho",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Setor Especial (Vila Estrutural)",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Setor Habitacional Arniqueira (Águas Claras)",
+      "cidadeMae": "Águas Claras",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Setor Habitacional Contagem (Sobradinho)",
+      "cidadeMae": "Sobradinho",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Setor Habitacional Fercal (Sobradinho)",
+      "cidadeMae": "Sobradinho",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Setor Habitacional Jardim Botânico",
+      "cidadeMae": "Jardim Botânico",
+      "metodoResolucao": "substring"
+    },
+    {
+      "nome": "Setor Habitacional Mestre D'Armas (Planaltina)",
+      "cidadeMae": "Planaltina",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Setor Habitacional Pôr do Sol (Ceilândia)",
+      "cidadeMae": "Ceilândia",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Setor Habitacional Ribeirão (Santa Maria)",
+      "cidadeMae": "Santa Maria",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Setor Habitacional Samambaia (Vicente Pires)",
+      "cidadeMae": "Vicente Pires",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Setor Habitacional Sol Nascente",
+      "cidadeMae": "Sol Nascente - Pôr do Sol",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Setor Habitacional Sol Nascente (Ceilândia)",
+      "cidadeMae": "Ceilândia",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Setor Habitacional Taquari (Lago Norte)",
+      "cidadeMae": "Lago Norte",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Setor Habitacional Tororó (Jardim Botânico)",
+      "cidadeMae": "Jardim Botânico",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Setor Habitacional Tororó (Santa Maria)",
+      "cidadeMae": "Santa Maria",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Setor Habitacional Vereda Grande (Taguatinga)",
+      "cidadeMae": "Taguatinga",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Setor Habitacional Vicente Pires",
+      "cidadeMae": "Vicente Pires",
+      "metodoResolucao": "substring"
+    },
+    {
+      "nome": "Setor Habitacional Vicente Pires - Trecho 1",
+      "cidadeMae": "Vicente Pires",
+      "metodoResolucao": "substring"
+    },
+    {
+      "nome": "Setor Habitacional Vicente Pires - Trecho 3",
+      "cidadeMae": "Vicente Pires",
+      "metodoResolucao": "substring"
+    },
+    {
+      "nome": "Setor Industrial (Ceilândia)",
+      "cidadeMae": "Ceilândia",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Setor Industrial (Gama)",
+      "cidadeMae": "Gama",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Setor Industrial (Sobradinho)",
+      "cidadeMae": "Sobradinho",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Setor Industrial (Taguatinga)",
+      "cidadeMae": "Taguatinga",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Setor Jaó",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Setor Leste",
+      "cidadeMae": "Planaltina",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Setor Leste (Gama)",
+      "cidadeMae": "Gama",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Setor Leste (Vila Estrutural)",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Setor M Norte Taguatinga",
+      "cidadeMae": "Taguatinga",
+      "metodoResolucao": "substring"
+    },
+    {
+      "nome": "Setor Mandu II",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Setor Mansões Itiquira (Planaltina)",
+      "cidadeMae": "Planaltina",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Setor Mansões Lago do Descoberto",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Setor Meireles (Santa Maria)",
+      "cidadeMae": "Santa Maria",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Setor Nordeste",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Setor Noroeste",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Setor Norte",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Setor Norte (Brazlândia)",
+      "cidadeMae": "Brazlândia",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Setor Norte (Gama)",
+      "cidadeMae": "Gama",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Setor Norte (Planaltina)",
+      "cidadeMae": "Planaltina",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Setor Norte (Vila Estrutural)",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Setor Oeste",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Setor Oeste (Gama)",
+      "cidadeMae": "Gama",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Setor Oeste (Sobradinho II)",
+      "cidadeMae": "Sobradinho II",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Setor Oeste (Vila Estrutural)",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Setor Placa da Mercedes (Núcleo Bandeirante)",
+      "cidadeMae": "Núcleo Bandeirante",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Setor Presidente Kennedy",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Setor Recreativo e Cultural (Planaltina)",
+      "cidadeMae": "Planaltina",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Setor Residencial Leste (Planaltina)",
+      "cidadeMae": "Planaltina",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Setor Residencial Mestre D'Armas (Planaltina)",
+      "cidadeMae": "Planaltina",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Setor Residencial Norte (Planaltina)",
+      "cidadeMae": "Planaltina",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Setor Residencial Oeste (Planaltina)",
+      "cidadeMae": "Planaltina",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Setor Residencial Oeste (São Sebastião)",
+      "cidadeMae": "São Sebastião",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Setor Sudoeste",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Setor Sul",
+      "cidadeMae": "Planaltina",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Setor Sul (Brazlândia)",
+      "cidadeMae": "Brazlândia",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Setor Sul (Gama)",
+      "cidadeMae": "Gama",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Setor Sul (Planaltina)",
+      "cidadeMae": "Planaltina",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Setor Tradicional (Brazlândia)",
+      "cidadeMae": "Brazlândia",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Setor Tradicional (Planaltina)",
+      "cidadeMae": "Planaltina",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Setor Tradicional (São Sebastião)",
+      "cidadeMae": "São Sebastião",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Setor Veredas",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Setor de Chácaras Anhangüera A",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Setor de Chácaras Anhangüera B",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Setor de Chácaras Anhangüera C",
+      "cidadeMae": "Valparaíso de Goiás",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Setor de Chácaras Sul",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Setor de Educação (Planaltina)",
+      "cidadeMae": "Planaltina",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Setor de Habitações Individuais Norte",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Setor de Habitações Individuais Sul",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Setor de Mansões Dom Bosco (Lago Sul)",
+      "cidadeMae": "Lago Sul",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Setor de Mansões Mestre D'armas (Planaltina)",
+      "cidadeMae": "Planaltina",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Setor de Mansões de Sobradinho",
+      "cidadeMae": "Sobradinho",
+      "metodoResolucao": "substring"
+    },
+    {
+      "nome": "Setor de Mansões do Lago Norte",
+      "cidadeMae": "Lago Norte",
+      "metodoResolucao": "substring"
+    },
+    {
+      "nome": "Setor de Oficinas",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Sobradinho",
+      "cidadeMae": "Sobradinho",
+      "metodoResolucao": "substring"
+    },
+    {
+      "nome": "Sul (Águas Claras)",
+      "cidadeMae": "Águas Claras",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "São Bartolomeu (São Sebastião)",
+      "cidadeMae": "São Sebastião",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "São Francisco (São Sebastião)",
+      "cidadeMae": "São Sebastião",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "São Gabriel (São Sebastião)",
+      "cidadeMae": "São Sebastião",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "São Jorge",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "São Paulo",
+      "cidadeMae": "São Paulo",
+      "metodoResolucao": "substring"
+    },
+    {
+      "nome": "São Sebastião",
+      "cidadeMae": "São Sebastião",
+      "metodoResolucao": "substring"
+    },
+    {
+      "nome": "TAGUATINGA SUL",
+      "cidadeMae": "Taguatinga",
+      "metodoResolucao": "substring"
+    },
+    {
+      "nome": "Taguatinga",
+      "cidadeMae": "Taguatinga",
+      "metodoResolucao": "substring"
+    },
+    {
+      "nome": "Taguatinga Centro (Taguatinga)",
+      "cidadeMae": "Taguatinga",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Taguatinga Norte (Taguatinga)",
+      "cidadeMae": "Taguatinga",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Taguatinga Sul (Taguatinga)",
+      "cidadeMae": "Taguatinga",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Taquara (Planaltina)",
+      "cidadeMae": "Planaltina",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Taquari",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Vale das Acácias (Sobradinho)",
+      "cidadeMae": "Sobradinho",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Vale do Amanhecer (Planaltina)",
+      "cidadeMae": "Planaltina",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Vale do Pedregal",
+      "cidadeMae": "Novo Gama",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Vale do Sereno",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Vale do Sol (Planaltina)",
+      "cidadeMae": "Planaltina",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Valparaiso I - Etapa A",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Valparaiso I - Etapa B",
+      "cidadeMae": "Valparaíso de Goiás",
+      "metodoResolucao": "coocorrencia"
+    },
+    {
+      "nome": "Valparaiso I - Etapa E",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Valparaiso II",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Valparaíso de Goiás",
+      "cidadeMae": "Valparaíso de Goiás",
+      "metodoResolucao": "substring"
+    },
+    {
+      "nome": "Varjão",
+      "cidadeMae": "Varjão",
+      "metodoResolucao": "substring"
+    },
+    {
+      "nome": "Vasco da Gama",
+      "cidadeMae": "Gama",
+      "metodoResolucao": "substring"
+    },
+    {
+      "nome": "Veredas (Brazlândia)",
+      "cidadeMae": "Brazlândia",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Vicente Pires",
+      "cidadeMae": "Vicente Pires",
+      "metodoResolucao": "substring"
+    },
+    {
+      "nome": "Vila Cauhy (Núcleo Bandeirante)",
+      "cidadeMae": "Núcleo Bandeirante",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Vila Cortes",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Vila Dimas (Planaltina)",
+      "cidadeMae": "Planaltina",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Vila Estrutural",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Vila Nossa Senhora de Fátima (Planaltina)",
+      "cidadeMae": "Planaltina",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Vila Nova (São Sebastião)",
+      "cidadeMae": "São Sebastião",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Vila Planalto",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Vila São José (Brazlândia)",
+      "cidadeMae": "Brazlândia",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Vila São José (São Sebastião)",
+      "cidadeMae": "São Sebastião",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Vila São José (Vicente Pires)",
+      "cidadeMae": "Vicente Pires",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Vila Telebrasília",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Vila Tibério",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Vila Vicentina (Planaltina)",
+      "cidadeMae": "Planaltina",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Vila da Telebrasília",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Vila do Boa (São Sebastião)",
+      "cidadeMae": "São Sebastião",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Ypiranga",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Zona Cívico-Administrativa",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Zona Industrial",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Zona Industrial (Guará)",
+      "cidadeMae": "Guará",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "sudoeste",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Água Fria de Goias",
+      "cidadeMae": "Água Fria de Goiás",
+      "metodoResolucao": "substring"
+    },
+    {
+      "nome": "Águas Claras",
+      "cidadeMae": "Águas Claras",
+      "metodoResolucao": "substring"
+    },
+    {
+      "nome": "Águas Lindas de Goiás",
+      "cidadeMae": "Águas Lindas de Goiás",
+      "metodoResolucao": "substring"
+    },
+    {
+      "nome": "Área Alfa (Santa Maria)",
+      "cidadeMae": "Santa Maria",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Área Octogonal",
+      "cidadeMae": null,
+      "metodoResolucao": null
+    },
+    {
+      "nome": "Área Rural de Brazlândia",
+      "cidadeMae": "Brazlândia",
+      "metodoResolucao": "substring"
+    },
+    {
+      "nome": "Área Rural de Planaltina",
+      "cidadeMae": "Planaltina",
+      "metodoResolucao": "substring"
+    },
+    {
+      "nome": "Área Rural de Samambaia",
+      "cidadeMae": "Samambaia",
+      "metodoResolucao": "substring"
+    },
+    {
+      "nome": "Área Rural de Santo Antônio do Descoberto",
+      "cidadeMae": "Santo Antônio do Descoberto",
+      "metodoResolucao": "substring"
+    },
+    {
+      "nome": "Área Rural de Sobradinho",
+      "cidadeMae": "Sobradinho",
+      "metodoResolucao": "substring"
+    },
+    {
+      "nome": "Área Rural de São Sebastião",
+      "cidadeMae": "São Sebastião",
+      "metodoResolucao": "substring"
+    },
+    {
+      "nome": "Área Rural do Jardim Botânico",
+      "cidadeMae": "Jardim Botânico",
+      "metodoResolucao": "substring"
+    },
+    {
+      "nome": "Área Rural do Paranoá",
+      "cidadeMae": "Paranoá",
+      "metodoResolucao": "substring"
+    },
+    {
+      "nome": "Área de Desenvolvimento Econômico (Ceilândia)",
+      "cidadeMae": "Ceilândia",
+      "metodoResolucao": "parenteses"
+    },
+    {
+      "nome": "Área de Desenvolvimento Econômico (Águas Claras)",
+      "cidadeMae": "Águas Claras",
+      "metodoResolucao": "parenteses"
+    }
+  ]
+}
