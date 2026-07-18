@@ -26,6 +26,8 @@ SEGMENT_MERGES = {
     "B. UNIVERSITARIA": "BOLSA UNIVERSITÁRIA",
     "CRC-DF": "CRC-DF - CONSELHO REGIONAL DE CONTABILIDADE",
     "TELECENTROS - DF DIGITAL": "DF DIGITAL",
+    "Acao social": "Ação social",
+    "Ação social .": "Ação social",
 }
 
 CITY_MERGES = {
