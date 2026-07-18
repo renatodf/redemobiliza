@@ -226,7 +226,9 @@ ALTER TABLE "BancoTalentosArea"    ENABLE ROW LEVEL SECURITY;
 -- docs/superpowers/specs/2026-07-18-importacao-izalci-fase1-fundacao-schema-design.md)
 -- ------------------------------------------------------------
 
--- TelefoneExtra: escopo direto por gabineteId (mesmo padrão de ObservacaoPessoa)
+-- TelefoneExtra: escopo direto por gabineteId (mesmo padrão de escopo direto
+-- por gabineteId das tabelas da seção 5, ex.: area_demanda_all/regiao_all —
+-- não o de ObservacaoPessoa, que usa select/write como duas policies separadas)
 CREATE POLICY "telefone_extra_all" ON "TelefoneExtra"
   FOR ALL TO authenticated
   USING ("gabineteId" = public.uid_gabinete())
