@@ -39,7 +39,13 @@ export async function alterarPrazoDemanda(formData: FormData): Promise<{ erro?: 
   if (!demanda) return { erro: 'Demanda não encontrada' }
 
   const prazoAnterior = demanda.prazoDesfecho.toISOString()
-  const prazoNovo = new Date(novoPrazo)
+  // novoPrazo vem de <input type="date"> como "YYYY-MM-DD" — new Date()
+  // direto interpreta isso como UTC meia-noite, o que pode exibir um dia a
+  // menos em timezone de Brasília (UTC-3) dependendo de onde é renderizado
+  // (achado 1.9 da auditoria de terceira ordem). Fixar meio-dia UTC evita
+  // que qualquer conversão de timezone razoável (até UTC-12/+14) cruze pra
+  // o dia anterior ou seguinte.
+  const prazoNovo = new Date(`${novoPrazo}T12:00:00Z`)
 
   await prisma.demanda.update({
     where: { id: demandaId, gabineteId: gabinete.id },
