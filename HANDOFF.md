@@ -249,6 +249,32 @@ Plano: `docs/superpowers/plans/2026-07-16-auditoria-fixes-p0.md` (7 tasks, execu
 - ~~`app-staging` com rollout de deploy travado~~ — **corrigido em 17/07** (seção 22): `deploy.zeroDowntime=true` fazia o EasyPanel nunca trocar o container em produção mesmo com build "Success", sem erro visível em lugar nenhum. Se voltar a acontecer (build "Success" mas comportamento antigo em staging), primeiro suspeito é esse — verificar `date -d @$(stat -c %Y /proc/1)` no console web do serviço antes de assumir que o código deployado é o do HEAD atual.
 - **`PromoverMobilizadorDialog.tsx` do mobilizador é código órfão** (seção 22) — não wireado em nenhuma página desde 09/07. Se alguém for mexer na promoção de mobilizador-por-mobilizador, checar primeiro se a feature deveria ser reativada na UI ou removida de vez.
 
+### Verificação de RLS (scripts/verificar-rls.mjs)
+
+Depois de qualquer migration que crie/altere tabela ou toque `scripts/setup-supabase.sql`,
+rodar manualmente:
+
+```bash
+set -a; source .env.staging; set +a && node scripts/verificar-rls.mjs
+set -a; source .env.local; set +a && node scripts/verificar-rls.mjs
+```
+
+Detecta tabelas com RLS habilitado (`pg_class.relrowsecurity`) e zero políticas
+(`pg_policies`) — o estado que ficou sem detecção por duas auditorias inteiras
+porque `scripts/setup-supabase.sql` era lido como fonte de verdade em vez do
+banco real (achado 1.1 da auditoria de terceira ordem, 2026-07-17, corrigido
+na mesma sessão, `5c5f740`). Não roda em CI — é um verificador de estado de banco, não
+um teste de unidade; o projeto não tem pipeline de CI com acesso a banco real.
+
+Rodado nesta sessão contra staging e produção: `OK — 19 tabelas com RLS habilitado,
+todas com ao menos 1 política (exceto: LogSuporte, _prisma_migrations, deny-all
+intencional).` em ambos. Nota: a função auxiliar usada pelas ~20 políticas é
+`public.uid_gabinete()` (não `auth.uid_gabinete()`) — o Supabase revoga `CREATE`
+no schema `auth` para o role usado pela conexão direta, então a função só pôde
+ser criada em `public` (ver `5c5f740`). O script não referencia a função
+diretamente (só confere `pg_class`/`pg_policies`), então isso não afeta a lógica
+de verificação, só é relevante para quem for investigar uma divergência.
+
 ---
 
 ## Deploy
