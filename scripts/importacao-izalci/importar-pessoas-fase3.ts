@@ -21,6 +21,7 @@ import {
   normalizarNome,
   registrarWhatsappUnico,
   resolverNomeCatalogo,
+  validarNascimento,
   type TelefoneMongo,
 } from './lib-pessoas-fase3'
 
@@ -196,7 +197,7 @@ function montarDadosPessoa(
     whatsapp: '', // preenchido depois de resolver telefone, no chamador
     email: typeof doc.email === 'string' && doc.email ? doc.email : null,
     cpf: typeof doc.cpf === 'string' && doc.cpf ? doc.cpf : null,
-    nascimento: doc.birth_date instanceof Date ? doc.birth_date : null,
+    nascimento: validarNascimento(doc.birth_date),
     cep: typeof doc.cep === 'string' && doc.cep ? doc.cep : null,
     logradouro: typeof doc.street_name === 'string' && doc.street_name ? doc.street_name : null,
     numero: typeof doc.address_number === 'string' && doc.address_number ? doc.address_number : null,

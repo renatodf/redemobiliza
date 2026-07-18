@@ -88,3 +88,11 @@ export function registrarWhatsappUnico(usados: Set<string>, numero: string): boo
 export function resolverNomeCatalogo(labelBruto: string, merges: Record<string, string>): string {
   return merges[labelBruto] ?? labelBruto
 }
+
+export function validarNascimento(v: unknown): Date | null {
+  if (!(v instanceof Date)) return null
+  const ano = v.getUTCFullYear()
+  const anoAtual = new Date().getUTCFullYear()
+  if (ano < 1900 || ano > anoAtual) return null
+  return v
+}

@@ -7,6 +7,7 @@ import {
   normalizarNome,
   registrarWhatsappUnico,
   resolverNomeCatalogo,
+  validarNascimento,
   type TelefoneMongo,
 } from './lib-pessoas-fase3'
 
@@ -146,5 +147,36 @@ describe('resolverNomeCatalogo', () => {
   })
   it('com fusão, retorna o nome canônico', () => {
     expect(resolverNomeCatalogo('Acao social', { 'Acao social': 'Ação social' })).toBe('Ação social')
+  })
+})
+
+describe('validarNascimento', () => {
+  it('data plausível passa direto', () => {
+    const data = new Date('1990-05-15')
+    expect(validarNascimento(data)).toBe(data)
+  })
+
+  it('ano 0000 (sentinela do sistema antigo) retorna null', () => {
+    // Date.UTC(0, ...) sofre o mapeamento legado de anos 0-99 pra 1900-1999,
+    // então pra representar ano 0000 de fato é preciso setUTCFullYear(0).
+    const data = new Date(Date.UTC(2000, 7, 29))
+    data.setUTCFullYear(0)
+    expect(validarNascimento(data)).toBeNull()
+  })
+
+  it('ano muito no futuro retorna null', () => {
+    const data = new Date(Date.UTC(2982, 0, 1))
+    expect(validarNascimento(data)).toBeNull()
+  })
+
+  it('ano exatamente 1900 é aceito (limite inclusivo)', () => {
+    const data = new Date(Date.UTC(1900, 0, 1))
+    expect(validarNascimento(data)).toBe(data)
+  })
+
+  it('não é Date retorna null', () => {
+    expect(validarNascimento('1990-05-15')).toBeNull()
+    expect(validarNascimento(null)).toBeNull()
+    expect(validarNascimento(undefined)).toBeNull()
   })
 })
