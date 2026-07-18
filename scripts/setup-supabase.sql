@@ -4,12 +4,18 @@
 -- ============================================================
 
 -- ------------------------------------------------------------
--- 1. Função auth.uid_gabinete()
+-- 1. Função public.uid_gabinete()
 -- Retorna o gabineteId do usuário autenticado via PostgREST.
--- SET search_path = '' previne injection via SECURITY DEFINER.
+-- Fica no schema public (não em auth): o Supabase revogou CREATE no
+-- schema auth do role postgres (usado pela conexão direta/service-role),
+-- então funções auxiliares de RLS devem viver em public — não altera o
+-- nível de segurança da função, que continua SECURITY DEFINER.
+-- SET search_path = '' previne injection via SECURITY DEFINER (garante
+-- que a função só resolve nomes de objeto pelos schemas qualificados
+-- explicitamente no corpo, nunca por um search_path manipulável).
 -- ORDER BY garante resultado determinístico (usuários têm 1 gabinete).
 -- ------------------------------------------------------------
-CREATE OR REPLACE FUNCTION auth.uid_gabinete()
+CREATE OR REPLACE FUNCTION public.uid_gabinete()
 RETURNS text LANGUAGE sql STABLE SECURITY DEFINER
 SET search_path = ''
 AS $$
@@ -45,7 +51,7 @@ ALTER TABLE "ObservacaoPessoa"   ENABLE ROW LEVEL SECURITY;
 -- Gabinete: membro autenticado lê apenas seu próprio gabinete
 CREATE POLICY "gabinete_select" ON "Gabinete"
   FOR SELECT TO authenticated
-  USING (id = auth.uid_gabinete());
+  USING (id = public.uid_gabinete());
 
 -- UsuarioGabinete: usuário vê apenas seus próprios vínculos
 CREATE POLICY "usuario_gabinete_select" ON "UsuarioGabinete"
@@ -55,55 +61,55 @@ CREATE POLICY "usuario_gabinete_select" ON "UsuarioGabinete"
 -- Pessoa: leitura e escrita restritas ao próprio gabinete
 CREATE POLICY "pessoa_select" ON "Pessoa"
   FOR SELECT TO authenticated
-  USING ("gabineteId" = auth.uid_gabinete());
+  USING ("gabineteId" = public.uid_gabinete());
 
 CREATE POLICY "pessoa_write" ON "Pessoa"
   FOR ALL TO authenticated
-  USING ("gabineteId" = auth.uid_gabinete())
-  WITH CHECK ("gabineteId" = auth.uid_gabinete());
+  USING ("gabineteId" = public.uid_gabinete())
+  WITH CHECK ("gabineteId" = public.uid_gabinete());
 
 -- Segmento
 CREATE POLICY "segmento_select" ON "Segmento"
   FOR SELECT TO authenticated
-  USING ("gabineteId" = auth.uid_gabinete());
+  USING ("gabineteId" = public.uid_gabinete());
 
 CREATE POLICY "segmento_write" ON "Segmento"
   FOR ALL TO authenticated
-  USING ("gabineteId" = auth.uid_gabinete())
-  WITH CHECK ("gabineteId" = auth.uid_gabinete());
+  USING ("gabineteId" = public.uid_gabinete())
+  WITH CHECK ("gabineteId" = public.uid_gabinete());
 
 -- Regiao
 CREATE POLICY "regiao_all" ON "Regiao"
   FOR ALL TO authenticated
-  USING ("gabineteId" = auth.uid_gabinete())
-  WITH CHECK ("gabineteId" = auth.uid_gabinete());
+  USING ("gabineteId" = public.uid_gabinete())
+  WITH CHECK ("gabineteId" = public.uid_gabinete());
 
 -- Profissao
 CREATE POLICY "profissao_all" ON "Profissao"
   FOR ALL TO authenticated
-  USING ("gabineteId" = auth.uid_gabinete())
-  WITH CHECK ("gabineteId" = auth.uid_gabinete());
+  USING ("gabineteId" = public.uid_gabinete())
+  WITH CHECK ("gabineteId" = public.uid_gabinete());
 
 -- VinculoRede
 CREATE POLICY "vinculo_rede_all" ON "VinculoRede"
   FOR ALL TO authenticated
-  USING ("gabineteId" = auth.uid_gabinete())
-  WITH CHECK ("gabineteId" = auth.uid_gabinete());
+  USING ("gabineteId" = public.uid_gabinete())
+  WITH CHECK ("gabineteId" = public.uid_gabinete());
 
 -- PessoaSegmento: sem gabineteId — join via Pessoa do mesmo gabinete
 CREATE POLICY "pessoa_segmento_all" ON "PessoaSegmento"
   FOR ALL TO authenticated
   USING (
     "pessoaId" IN (
-      SELECT id FROM "Pessoa" WHERE "gabineteId" = auth.uid_gabinete()
+      SELECT id FROM "Pessoa" WHERE "gabineteId" = public.uid_gabinete()
     )
   );
 
 -- LinkComposto
 CREATE POLICY "link_composto_all" ON "LinkComposto"
   FOR ALL TO authenticated
-  USING ("gabineteId" = auth.uid_gabinete())
-  WITH CHECK ("gabineteId" = auth.uid_gabinete());
+  USING ("gabineteId" = public.uid_gabinete())
+  WITH CHECK ("gabineteId" = public.uid_gabinete());
 
 -- LogSuporte: sem política para authenticated.
 -- Super-admin usa SUPABASE_SERVICE_ROLE_KEY (bypassa RLS).
@@ -112,12 +118,12 @@ CREATE POLICY "link_composto_all" ON "LinkComposto"
 -- ObservacaoPessoa: acesso restrito ao próprio gabinete
 CREATE POLICY "observacao_pessoa_select" ON "ObservacaoPessoa"
   FOR SELECT TO authenticated
-  USING ("gabineteId" = auth.uid_gabinete());
+  USING ("gabineteId" = public.uid_gabinete());
 
 CREATE POLICY "observacao_pessoa_write" ON "ObservacaoPessoa"
   FOR ALL TO authenticated
-  USING ("gabineteId" = auth.uid_gabinete())
-  WITH CHECK ("gabineteId" = auth.uid_gabinete());
+  USING ("gabineteId" = public.uid_gabinete())
+  WITH CHECK ("gabineteId" = public.uid_gabinete());
 
 -- ------------------------------------------------------------
 -- 4. Índices parciais para unicidade com soft delete
@@ -144,3 +150,71 @@ CREATE UNIQUE INDEX IF NOT EXISTS "Profissao_gabineteId_nome_ativo_idx"
 -- NULL != NULL em UNIQUE convencional — este índice resolve a race condition.
 CREATE UNIQUE INDEX IF NOT EXISTS "VinculoRede_gabineteId_pessoaId_sem_indicador_idx"
   ON "VinculoRede"("gabineteId", "pessoaId") WHERE "indicadoPorId" IS NULL;
+
+-- ------------------------------------------------------------
+-- 5. Políticas RLS para as 7 tabelas descobertas sem cobertura
+-- (achado 1.1 da auditoria de terceira ordem, 2026-07-17): RLS estava
+-- habilitado (ALTER TABLE ... ENABLE ROW LEVEL SECURITY já rodado, provável
+-- ação em massa do Security Advisor do Supabase) em produção e staging,
+-- mas nenhuma política — nem as das seções 2-3 acima, nem estas — existia
+-- de fato em nenhum dos dois bancos até esta migração ser aplicada.
+-- ------------------------------------------------------------
+
+-- AreaDemanda: escopo direto por gabineteId
+CREATE POLICY "area_demanda_all" ON "AreaDemanda"
+  FOR ALL TO authenticated
+  USING ("gabineteId" = public.uid_gabinete())
+  WITH CHECK ("gabineteId" = public.uid_gabinete());
+
+-- Demanda: escopo direto por gabineteId
+CREATE POLICY "demanda_all" ON "Demanda"
+  FOR ALL TO authenticated
+  USING ("gabineteId" = public.uid_gabinete())
+  WITH CHECK ("gabineteId" = public.uid_gabinete());
+
+-- MovimentacaoDemanda: sem gabineteId — join via Demanda do mesmo gabinete
+CREATE POLICY "movimentacao_demanda_all" ON "MovimentacaoDemanda"
+  FOR ALL TO authenticated
+  USING (
+    "demandaId" IN (
+      SELECT id FROM "Demanda" WHERE "gabineteId" = public.uid_gabinete()
+    )
+  );
+
+-- ConfiguracaoSistema: escopo direto por gabineteId (coluna única)
+CREATE POLICY "configuracao_sistema_all" ON "ConfiguracaoSistema"
+  FOR ALL TO authenticated
+  USING ("gabineteId" = public.uid_gabinete())
+  WITH CHECK ("gabineteId" = public.uid_gabinete());
+
+-- AreaColocacao: escopo direto por gabineteId
+CREATE POLICY "area_colocacao_all" ON "AreaColocacao"
+  FOR ALL TO authenticated
+  USING ("gabineteId" = public.uid_gabinete())
+  WITH CHECK ("gabineteId" = public.uid_gabinete());
+
+-- BancoTalentos: sem gabineteId — join via Pessoa do mesmo gabinete
+CREATE POLICY "banco_talentos_all" ON "BancoTalentos"
+  FOR ALL TO authenticated
+  USING (
+    "pessoaId" IN (
+      SELECT id FROM "Pessoa" WHERE "gabineteId" = public.uid_gabinete()
+    )
+  );
+
+-- BancoTalentosArea: sem gabineteId — join via AreaColocacao do mesmo gabinete
+CREATE POLICY "banco_talentos_area_all" ON "BancoTalentosArea"
+  FOR ALL TO authenticated
+  USING (
+    "areaColocacaoId" IN (
+      SELECT id FROM "AreaColocacao" WHERE "gabineteId" = public.uid_gabinete()
+    )
+  );
+
+ALTER TABLE "AreaDemanda"          ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "Demanda"              ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "MovimentacaoDemanda"  ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "ConfiguracaoSistema"  ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "AreaColocacao"        ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "BancoTalentos"        ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "BancoTalentosArea"    ENABLE ROW LEVEL SECURITY;
