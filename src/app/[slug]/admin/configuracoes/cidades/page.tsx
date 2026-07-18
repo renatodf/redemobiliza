@@ -2,9 +2,8 @@ import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import { getGabineteBySlug } from '@/lib/gabinete'
 import { corTextoContraste } from '@/lib/cor-contraste'
-import { criarRegiao } from '@/actions/admin/criar-regiao'
 import { desativarRegiao } from '@/actions/admin/desativar-regiao'
-import { ESTADOS_BR } from '@/lib/estados-br'
+import CriarRegiaoForm from '@/components/admin/CriarRegiaoForm'
 import EditarCidadeDialog from './EditarCidadeDialog'
 
 export default async function CidadesConfigPage({ params }: { params: { slug: string } }) {
@@ -21,28 +20,7 @@ export default async function CidadesConfigPage({ params }: { params: { slug: st
   return (
     <div className="bg-white rounded-lg shadow-sm p-6 space-y-4">
       <h2 className="text-base font-semibold">Cidades</h2>
-      <form action={criarRegiao} className="flex gap-2">
-        <input type="hidden" name="slug" value={params.slug} />
-        <input
-          name="nome"
-          required
-          placeholder="Nome da nova cidade"
-          className="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm"
-        />
-        <select name="uf" required defaultValue="" className="border border-gray-300 rounded-md px-3 py-2 text-sm">
-          <option value="" disabled>UF...</option>
-          {ESTADOS_BR.map((e) => (
-            <option key={e.sigla} value={e.sigla}>{e.sigla}</option>
-          ))}
-        </select>
-        <button
-          type="submit"
-          style={{ backgroundColor: gabinete.corPrimaria, color: corTexto }}
-          className="px-4 py-2 rounded-md text-sm font-medium"
-        >
-          Adicionar
-        </button>
-      </form>
+      <CriarRegiaoForm slug={params.slug} corPrimaria={gabinete.corPrimaria} corTexto={corTexto} />
       <ul className="divide-y divide-gray-200 border border-gray-200 rounded-md">
         {regioes.map((r) => {
           const temCoordenada = r.latitude != null && r.longitude != null
