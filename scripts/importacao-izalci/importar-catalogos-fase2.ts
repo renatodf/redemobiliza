@@ -196,7 +196,7 @@ async function main() {
 
   let bairrosProcessados = 0
   for (const bairro of catalogos.bairros) {
-    if (bairro.nome === bairro.cidadeMae) {
+    if (bairro.cidadeMae && bairro.nome.toLowerCase() === bairro.cidadeMae.toLowerCase()) {
       // Bairro homônimo da cidade-mãe (ex. "Sobradinho" bairro dentro de
       // "Sobradinho" cidade) — é a mesma Regiao já criada no loop de
       // cidades acima; processar de novo criaria regiaoPaiId apontando
