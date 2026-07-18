@@ -150,6 +150,7 @@ Investigação direta no backup (`tags.bson.gz`/`people.bson.gz`, tenant Izalci,
   - (nome canônico final de cada par — qual dos dois textos vira o `Segmento.nome` — fica pra Fase 2, sem impacto funcional na escolha.)
 - **`BANCO ANTIGO`** (66.511 pessoas — o segmento mais usado de todos, quase metade do tenant): investigação inicial suspeitou que fosse ruído técnico de migração. **Não é** — decisão do usuário (18/07): representa pessoas vindas de um sistema de campanha **anterior a este** (mais antigo que o sistema Legislapp, que por sua vez é mais antigo que o Rede Mobiliza). Mantém como `Segmento` normal, importado sem exclusão — o usuário quer poder filtrar quem vem desse sistema legado mais antigo.
 - Nenhuma outra tag de Segmento foi identificada como duplicata nesta revisão — as 207 menos os 4 pares acima entram uma a uma, sem fusão.
+- **Garantia de completude por pessoa** (decisão do usuário, 18/07): `PessoaSegmento` é uma relação sem limite de cardinalidade — na Fase 3, **todo** `tag_id` de uma pessoa que resolver para uma tag `type: "Segment"` vira uma linha em `PessoaSegmento`, sem exceção e sem corte em nenhum número fixo. Distribuição real confirmada no Mongo (coleção `people` inteira, 142.916 registros, todos os tenants): 65.277 sem nenhum, 10.782 com 1, 60.767 com 2, 6.085 com 3, 4 com 4, 1 com 5 — o máximo observado hoje é 5, mas isso é uma característica do dado atual, não um limite de design; se um registro tivesse mais, todos entrariam do mesmo jeito.
 
 ## Banco de Talentos (`curriculums` → `BancoTalentos`)
 
