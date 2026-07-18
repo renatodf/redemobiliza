@@ -220,3 +220,16 @@ ALTER TABLE "ConfiguracaoSistema"  ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "AreaColocacao"        ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "BancoTalentos"        ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "BancoTalentosArea"    ENABLE ROW LEVEL SECURITY;
+
+-- ------------------------------------------------------------
+-- 6. Política RLS para TelefoneExtra (Fase 1 da importação Izalci,
+-- docs/superpowers/specs/2026-07-18-importacao-izalci-fase1-fundacao-schema-design.md)
+-- ------------------------------------------------------------
+
+-- TelefoneExtra: escopo direto por gabineteId (mesmo padrão de ObservacaoPessoa)
+CREATE POLICY "telefone_extra_all" ON "TelefoneExtra"
+  FOR ALL TO authenticated
+  USING ("gabineteId" = public.uid_gabinete())
+  WITH CHECK ("gabineteId" = public.uid_gabinete());
+
+ALTER TABLE "TelefoneExtra" ENABLE ROW LEVEL SECURITY;
