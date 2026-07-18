@@ -482,3 +482,9 @@ Rodar a mesma query do Step 2, trocando o slug pra `izalci` e o ambiente pra `.e
 - [ ] **Step 5: Reportar ao usuário**
 
 Sem commit adicional (Task 3 só executa o script já commitado na Task 2). Confirmar ao usuário: contagem final de `BancoTalentos` criados em produção, quantos currículos não foram vinculados e por quê (resumo do relatório, não o arquivo inteiro), e que a Fase 4 está pronta — falta só a Fase 5 (rede de indicação) pra completar a importação inteira.
+
+## Nota pós-execução
+
+Executado com sucesso contra staging e produção, com resultado **idêntico** nos dois ambientes: `BancoTalentos` criados = 526 (de 548 currículos candidatos, 22 não vinculados: 5 sem whatsapp calculável, 6 sem `Pessoa` ativa correspondente, 11 barrados pela própria checagem de idempotência — duas pessoas do Mongo convergindo pro mesmo `whatsapp`/`Pessoa` da Fase 3); com pelo menos 1 `AreaColocacao` = 514; `isPcd = true` = 4; `colocado = true` = 2.
+
+**Diferente das Fases 2 e 3, nenhum bug real foi encontrado durante a execução ao vivo** — as duas classes de bug já vistas nas fases anteriores (violação de chave única por falta de dedup, problema de idempotência) foram tratadas preventivamente no design desta fase (checagem de `BancoTalentos.pessoaId` já existente antes de criar; `resolverAreaIdsUnicos` com dedup testado desde o início) e essa prevenção se confirmou na prática. A revisão final do branch (modelo `opus`) também não encontrou achados Critical/Important, só 2 Minor não-bloqueantes: ausência de transação entre `bancoTalentos.create` e `bancoTalentosArea.createMany` (confirmado, por análise do código e da execução real, que não causou dado inconsistente — os 12 `BancoTalentos` sem área são currículos sem `employment_role_ids` resolvível, não sintoma de falha parcial), e `findFirst` sem `orderBy` determinístico na religação por whatsapp (robustez preventiva, sem impacto no resultado real observado).

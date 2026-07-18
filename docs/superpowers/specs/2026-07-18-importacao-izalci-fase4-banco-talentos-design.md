@@ -52,3 +52,7 @@ Sem testes automatizados de integração com Mongo/Postgres real (padrão já es
 - `VinculoRede` (rede de indicação) — Fase 5.
 - Arquivo real do currículo (`curriculum_file_data`) — não recuperável, não entra.
 - Qualquer UI nova — a Fase 4 só popula dados que já têm UI de gestão (Central de Filtros → aba Banco de Talentos).
+
+## Nota pós-execução
+
+Executado com sucesso contra staging e produção, resultado idêntico nos dois ambientes: `BancoTalentos` = 526 (de 548 currículos candidatos), 22 não vinculados (5 sem whatsapp calculável, 6 sem `Pessoa` ativa correspondente, 11 barrados pela própria checagem de idempotência), com ≥1 `AreaColocacao` = 514, `isPcd = true` = 4, `colocado = true` = 2. Diferente das Fases 2 e 3, nenhum bug real foi encontrado na execução ao vivo — as classes de bug já vistas nas fases anteriores foram tratadas preventivamente no design e a prevenção se confirmou na prática. Detalhes completos: `docs/superpowers/plans/2026-07-18-importacao-izalci-fase4-banco-talentos.md`.
