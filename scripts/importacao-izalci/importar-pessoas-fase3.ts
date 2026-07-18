@@ -186,9 +186,11 @@ function montarDadosPessoa(
 
   const tagEscolaridade = primeiraTagDoTipo(tagIds, tags, 'Schooling')
 
-  const segmentoIds = todasTagsDoTipo(tagIds, tags, 'Segment')
-    .map((t) => segmentoPorNome.get(normalizarNome(resolverNomeCatalogo(t.label, SEGMENT_MERGES))))
-    .filter((id): id is string => !!id)
+  const segmentoIds = Array.from(new Set(
+    todasTagsDoTipo(tagIds, tags, 'Segment')
+      .map((t) => segmentoPorNome.get(normalizarNome(resolverNomeCatalogo(t.label, SEGMENT_MERGES))))
+      .filter((id): id is string => !!id)
+  ))
 
   const nome = `${String(doc.name ?? '').trim()} ${String(doc.surname ?? '').trim()}`.trim()
 
