@@ -794,6 +794,20 @@ EOF
 
 ---
 
+## Nota pós-execução (Task 3 já rodou de verdade)
+
+A Task 3 rodou contra staging e produção e encontrou 2 bugs reais que a revisão de código das Tasks 1-2 não pegou — nenhum dos dois estava previsto neste plano original:
+
+1. **`birth_date` sentinela** (ano 0000, usado no sistema legado pra "sem data de nascimento" — 84 pessoas do tenant com anos implausíveis) quebrava o `INSERT` inteiro no Postgres. Corrigido com `validarNascimento()` nova em `lib-pessoas-fase3.ts` (testada), commit `a2df5ce`.
+2. **`P2002` em `PessoaSegmento`** quando duas tags de Segmento de uma pessoa resolviam pro mesmo `segmentoId` pós-fusão da Fase 2 (ex. `ABEDUQ` + `ABEDUQ - CHEQUE-EDUCAÇÃO`). Corrigido deduplicando `segmentoIds`, commit `7b04b9d`.
+3. Achado da revisão final (não-bloqueante, corrigido como follow-up): `updated_at`→`deletedAt` tinha a mesma exposição a data sentinela do bug 1, sem nunca ter disparado no run real — corrigido preventivamente, commit `89715df`.
+
+Staging precisou de limpeza manual (`DELETE` de `Pessoa`/`PessoaSegmento`/`TelefoneExtra`/`ObservacaoPessoa` do gabinete de teste) entre as tentativas com bug e a execução final limpa — produção nunca rodou a versão com bug, só a já corrigida.
+
+**Resultado final (idêntico em staging e produção)**: `Pessoa`=122.725 (de 142.489 processadas, 19.764 puladas — dummies do Luar, sem telefone válido, ou whatsapp duplicado), com `regiaoId`=85.726, com `profissaoId`=8.406, com ≥1 `Segmento`=69.243, `ObservacaoPessoa`(role legado)=260, com ≥1 `TelefoneExtra`=4.470, soft-deletadas=121.
+
+---
+
 ### Task 3: Rollout — lote pequeno em staging, staging completo, produção
 
 **Files:**
