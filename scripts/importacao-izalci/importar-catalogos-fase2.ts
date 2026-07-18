@@ -96,6 +96,14 @@ function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
+function normalizarNome(s: string): string {
+  return s
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .trim()
+}
+
 async function geocodificarEAplicar(regiaoId: string, nome: string, uf: string) {
   const coordenada = await geocodificarRegiao(nome, uf)
   await sleep(1000)
@@ -196,11 +204,11 @@ async function main() {
 
   let bairrosProcessados = 0
   for (const bairro of catalogos.bairros) {
-    if (bairro.cidadeMae && bairro.nome.toLowerCase() === bairro.cidadeMae.toLowerCase()) {
+    if (bairro.cidadeMae && normalizarNome(bairro.nome) === normalizarNome(bairro.cidadeMae)) {
       // Bairro homônimo da cidade-mãe (ex. "Sobradinho" bairro dentro de
       // "Sobradinho" cidade) — é a mesma Regiao já criada no loop de
       // cidades acima; processar de novo criaria regiaoPaiId apontando
-      // pra si mesma (achado real da Task 3, confirmado em staging: 26
+      // pra si mesma (achado real da Task 3, confirmado em staging: 28
       // regiões reais do DF/entorno corrompidas dessa forma).
       continue
     }
