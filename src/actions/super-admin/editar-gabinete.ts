@@ -1,6 +1,7 @@
 'use server'
 
 import { redirect } from 'next/navigation'
+import { Prisma } from '@/generated/prisma/client'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { prisma } from '@/lib/prisma'
 import { toSlug } from '@/lib/slug'
@@ -31,10 +32,17 @@ export async function editarGabinete(id: string, formData: FormData) {
     redirect(`/super-admin/gabinetes/${id}/editar?erro=slug_duplicado`)
   }
 
-  await prisma.gabinete.update({
-    where: { id },
-    data: { nome, slug, corPrimaria, corSecundaria },
-  })
+  try {
+    await prisma.gabinete.update({
+      where: { id },
+      data: { nome, slug, corPrimaria, corSecundaria },
+    })
+  } catch (e) {
+    if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2002') {
+      redirect(`/super-admin/gabinetes/${id}/editar?erro=slug_duplicado`)
+    }
+    throw e
+  }
 
   redirect(`/super-admin/gabinetes/${id}`)
 }

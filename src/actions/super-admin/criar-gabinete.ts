@@ -1,6 +1,7 @@
 'use server'
 
 import { redirect } from 'next/navigation'
+import { Prisma } from '@/generated/prisma/client'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { prisma } from '@/lib/prisma'
 import { toSlug } from '@/lib/slug'
@@ -33,9 +34,17 @@ export async function criarGabinete(formData: FormData) {
     redirect('/super-admin/gabinetes/novo?erro=slug_duplicado')
   }
 
-  const gabinete = await prisma.gabinete.create({
-    data: { nome, slug, corPrimaria, corSecundaria },
-  })
+  let gabinete: { id: string }
+  try {
+    gabinete = await prisma.gabinete.create({
+      data: { nome, slug, corPrimaria, corSecundaria },
+    })
+  } catch (e) {
+    if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2002') {
+      redirect('/super-admin/gabinetes/novo?erro=slug_duplicado')
+    }
+    throw e
+  }
 
   await Promise.all([
     seedRegioes(gabinete.id),
