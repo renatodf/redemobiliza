@@ -93,4 +93,29 @@ describe('buildWhereBancoTalentos', () => {
     const where = buildWhereBancoTalentos('gab-1', { regiaoId: 'regiao-1' })
     expect(where.pessoa).toEqual({ gabineteId: 'gab-1', regiaoId: 'regiao-1', deletedAt: null })
   })
+
+  it('filtra por nome via relação pessoa, case-insensitive', () => {
+    const where = buildWhereBancoTalentos('gab-1', { nome: 'Maria' })
+    expect(where.pessoa.nome).toEqual({ contains: 'Maria', mode: 'insensitive' })
+  })
+
+  it('sem filtro de nome, não aplica', () => {
+    const where = buildWhereBancoTalentos('gab-1', {})
+    expect(where.pessoa.nome).toBeUndefined()
+  })
+
+  it('nome com só espaços em branco não aplica filtro', () => {
+    const where = buildWhereBancoTalentos('gab-1', { nome: '   ' })
+    expect(where.pessoa.nome).toBeUndefined()
+  })
+
+  it('combina nome com os outros filtros', () => {
+    const where = buildWhereBancoTalentos('gab-1', { nome: 'Ana', regiaoId: 'regiao-1' })
+    expect(where.pessoa).toEqual({
+      gabineteId: 'gab-1',
+      deletedAt: null,
+      regiaoId: 'regiao-1',
+      nome: { contains: 'Ana', mode: 'insensitive' },
+    })
+  })
 })
