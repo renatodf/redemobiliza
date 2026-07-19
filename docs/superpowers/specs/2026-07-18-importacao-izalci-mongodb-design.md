@@ -6,8 +6,8 @@ Trazer os dados reais do sistema antigo do senador Izalci Lucas (hoje em MongoDB
 
 ## Origem dos dados
 
-- **Cluster MongoDB Atlas**: `production.wj3pr.mongodb.net` (projeto Atlas do usuário)
-- **Credenciais**: usuário de banco `meubancodedados`, senha guardada apenas localmente pelo usuário (não reproduzida aqui — ver regra de nunca colocar segredo real em documento, `feedback_no_real_secrets_in_docs` na memória do projeto)
+- **Cluster MongoDB Atlas**: `<cluster>.mongodb.net` (projeto Atlas do usuário — nome real não reproduzido aqui, ver regra de nunca colocar segredo real em documento, `feedback_no_real_secrets_in_docs` na memória do projeto)
+- **Credenciais**: usuário/senha de banco guardados apenas localmente pelo usuário (não reproduzidos aqui)
 - **Banco relevante**: `meubancodedadosprod` (17GB brutos no Atlas; o backup comprimido excluindo lixo temporário ficou em ~20MB)
 - **Tenant do Izalci**: `_id` (ObjectId) `60b7934c0cc64a0004717e9d`, `name: "Izalci"`, `candidate_name: "Izalci Lucas"`, `political_party: "PL"`, `state: "DF"`. **Importante**: o campo `tenant_id` em `people` é do tipo `ObjectId`, não string — comparações precisam de `new ObjectId(...)`, não string crua (armadilha já encontrada 2x durante a investigação).
 - **Outro tenant no mesmo banco** (ignorar): `68482b879cac58651608247c`, "Gustavo Aires" (MDB, DF) — só 424 pessoas, não faz parte deste projeto.
