@@ -8,7 +8,7 @@ Fase adicional, não prevista na spec-mãe original (`docs/superpowers/specs/202
 
 O sistema antigo ("Legislapp", repositório `renatodf/gestao-gabinete`) usa Shrine + `shrine-gridfs` pra armazenar arquivos dentro do próprio MongoDB. Toda referência de arquivo no Mongo (`curriculum_file_data`, `photo_data`, e até `document_file_data` de uma feature não relacionada) aponta pro storage `"cache"` (prefixo GridFS `temp`, coleções `temp.files`/`temp.chunks`) — o storage `"store"` (permanente, prefixo `fs`) nunca foi usado pelo sistema, está vazio até hoje. O app sempre funcionou lendo direto do `"cache"`, por isso currículos e fotos funcionavam normalmente pro usuário até este ano.
 
-**O backup usado nas Fases 1-5 (`/Users/renato/Backups/mongodb-meubancodedadosprod-2026-07-18/`) não incluiu `temp.files`/`temp.chunks`** — só veio `fs.files`/`fs.chunks` (vazios). Confirmado por conexão direta ao cluster Atlas (`production.wj3pr.mongodb.net`, banco `meubancodedadosprod`): `temp.files` tem 85.379 documentos, `temp.chunks` tem 94.878 — e os ids batem exatamente (nome de arquivo, tamanho, tipo) com o que já tínhamos mapeado em `curriculum_file_data`/`photo_data` do tenant Izalci.
+**O backup usado nas Fases 1-5 (`/Users/renato/Backups/mongodb-meubancodedadosprod-2026-07-18/`) não incluiu `temp.files`/`temp.chunks`** — só veio `fs.files`/`fs.chunks` (vazios). Confirmado por conexão direta ao cluster Atlas (`<cluster>.mongodb.net`, banco `meubancodedadosprod`): `temp.files` tem 85.379 documentos, `temp.chunks` tem 94.878 — e os ids batem exatamente (nome de arquivo, tamanho, tipo) com o que já tínhamos mapeado em `curriculum_file_data`/`photo_data` do tenant Izalci.
 
 ## Dados confirmados na investigação (via conexão ao vivo)
 

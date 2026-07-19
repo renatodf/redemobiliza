@@ -23,7 +23,7 @@
 - Foto com tamanho original maior que `5 * 1024 * 1024` bytes é comprimida: redimensionar pro maior lado ter no máximo 1600px (`fit: 'inside', withoutEnlargement: true`), reencodar como JPEG qualidade 82. Currículos nunca são comprimidos.
 - Idempotência: pular `Pessoa`/`BancoTalentos` que já tenham `fotoUrl`/`curriculoUrl` preenchido.
 - Sem teste automatizado pra código que toca Mongo/Postgres/Supabase Storage real — mas as funções puras (montar caminho de storage, decidir compressão pelo tamanho) ganham teste Vitest de verdade (TDD).
-- **Passo final do rollout (Task 3), obrigatório**: revogar o acesso temporário ao Atlas (remover liberação de rede `0.0.0.0/0`, apagar ou trocar a senha do usuário `meubancodedados`).
+- **Passo final do rollout (Task 3), obrigatório**: revogar o acesso temporário ao Atlas (remover liberação de rede `0.0.0.0/0`, apagar ou trocar a senha do usuário `<usuário-temporário-do-atlas>`).
 
 ---
 
@@ -631,7 +631,7 @@ Rodar a mesma query do Step 3, trocando o slug pra `izalci` e o ambiente pra `.e
 
 No painel do Atlas:
 1. **Security → Network Access**: remover a entrada `0.0.0.0/0` adicionada pra essa tarefa.
-2. **Security → Database Access**: apagar o usuário `meubancodedados` (ou, no mínimo, trocar a senha).
+2. **Security → Database Access**: apagar o usuário `<usuário-temporário-do-atlas>` (ou, no mínimo, trocar a senha).
 
 Depois de revogado, remover a linha `MONGO_ATLAS_URI_LEGADO` de `.env.staging` e `.env.local` (não é mais necessária, e não deve ficar guardando uma credencial morta).
 
@@ -650,4 +650,4 @@ Ambos os bugs foram tratados como falha isolada por registro, sem corromper nenh
 
 **Resultado final, idêntico entre staging e produção** (a diferença de 1 em `fotoUrl` é um registro de teste pré-existente em staging, não relacionado à importação): `Pessoa.fotoUrl` preenchido = 696-697; `BancoTalentos.curriculoUrl` preenchido = 497; não resolvidos = 73 (25 fotos: 15 tipo de arquivo não suportado, 9 sem Pessoa correspondente, 1 falha de compressão; 48 currículos: 46 pessoa não-canônica, 2 sem Pessoa correspondente). Amostra de URLs reais verificada via `curl` — servindo `image/jpeg` e `application/pdf` corretamente, tamanhos plausíveis.
 
-`MONGO_ATLAS_URI_LEGADO` já removida de `.env.local`/`.env.staging` (arquivos locais, não commitados). Revogação do acesso no painel do Atlas (liberação de rede `0.0.0.0/0` e usuário `meubancodedados`) é uma ação manual do usuário no painel — confirmar separadamente que foi feita antes de considerar o acesso temporário totalmente encerrado.
+`MONGO_ATLAS_URI_LEGADO` já removida de `.env.local`/`.env.staging` (arquivos locais, não commitados). Revogação do acesso no painel do Atlas (liberação de rede `0.0.0.0/0` e usuário `<usuário-temporário-do-atlas>`) é uma ação manual do usuário no painel — confirmar separadamente que foi feita antes de considerar o acesso temporário totalmente encerrado.
