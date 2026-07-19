@@ -68,3 +68,7 @@ Sem testes automatizados de integração com Mongo/Postgres real (padrão já es
 - Qualquer UI nova — a árvore de rede já existe (`/[slug]/admin/pessoas`, `/[slug]/mobilizador/rede`) e lê `VinculoRede` normalmente, sem mudança de código de aplicação necessária.
 - `network_id`/coleção `user_networks` — confirmado no spec-mãe, não usados como fonte.
 - Reprocessar ou alterar `nivel`/`indicadoPorId` de `VinculoRede` já existentes fora desta importação (não deve haver nenhuma, já que IZALCI é um gabinete novo sem cadastro público ativo ainda).
+
+## Nota pós-execução
+
+Executado com sucesso contra staging e produção: 122.604 `VinculoRede` criados em ambos (staging teve 3 a mais, de vínculos de teste pré-existentes não relacionados à importação). Nível máximo realizado = 5. Zero inconsistências de raiz com nível diferente de zero. Um achado Important foi encontrado na revisão da Task 2 (não na execução ao vivo, diferente das Fases 2-3): `nivel` estava sendo calculado a partir do grafo bruto do Mongo, sem checar se o indicador tinha `Pessoa` ativa no Postgres — corrigido antes do rollout. Detalhes completos: `docs/superpowers/plans/2026-07-18-importacao-izalci-fase5-rede-indicacao.md`.
