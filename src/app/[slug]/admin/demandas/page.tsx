@@ -3,7 +3,9 @@ import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 import { getGabineteBySlug } from '@/lib/gabinete'
 import { corTextoContraste } from '@/lib/cor-contraste'
-import { GraficoDemandas } from '@/components/GraficoDemandas'
+import { GraficoPizza, type FatiaPizza } from '@/components/GraficoPizza'
+import { CORES_STATUS_DEMANDA, PALETA_CATEGORICA } from '@/lib/cores-graficos'
+import { toggleLista } from '@/lib/toggle-lista'
 import { IconeEditar } from '@/components/admin/TableIcons'
 import ExcluirDemandaButton from './ExcluirDemandaButton'
 import SortableHeader from '@/components/SortableHeader'
@@ -33,8 +35,8 @@ export default async function DemandasPage({
 }: {
   params: { slug: string }
   searchParams: {
-    status?: string
-    areaId?: string
+    statusIds?: string
+    areaIds?: string
     responsavelId?: string
     regiaoId?: string
     prazoAlterado?: string
@@ -49,41 +51,38 @@ export default async function DemandasPage({
   if (!gabinete) notFound()
   const corTexto = corTextoContraste(gabinete.corPrimaria)
 
-  const hoje = new Date()
-  const inicioMes = new Date(hoje.getFullYear(), hoje.getMonth(), 1)
-  const fimMes = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0, 23, 59, 59, 999)
-  const mesLabel = hoje.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })
-  const dataInicioStr = inicioMes.toISOString().slice(0, 10)
-  const dataFimStr = fimMes.toISOString().slice(0, 10)
+  const statusSelecionados = searchParams.statusIds ? searchParams.statusIds.split(',').filter(Boolean) : []
+  const areaSelecionadas = searchParams.areaIds ? searchParams.areaIds.split(',').filter(Boolean) : []
 
   const pagina = Math.max(1, Number(searchParams.pagina ?? 1))
 
-  // Período padrão: últimos 30 dias (apenas quando não há filtros)
-  const temFiltro = !!(searchParams.status || searchParams.areaId || searchParams.responsavelId || searchParams.regiaoId || searchParams.prazoAlterado || searchParams.dataInicio || searchParams.dataFim)
-  const dataInicioPadrao = new Date()
-  dataInicioPadrao.setDate(dataInicioPadrao.getDate() - 30)
-  dataInicioPadrao.setHours(0, 0, 0, 0)
-
+  const whereBase = { gabineteId: gabinete.id, deletedAt: null }
   const where = {
-    gabineteId: gabinete.id,
-    deletedAt: null,
-    ...(searchParams.status ? { status: searchParams.status } : {}),
-    ...(searchParams.areaId ? { areaId: searchParams.areaId } : {}),
+    ...whereBase,
+    ...(statusSelecionados.length > 0 ? { status: { in: statusSelecionados } } : {}),
+    ...(areaSelecionadas.length > 0 ? { areaId: { in: areaSelecionadas } } : {}),
     ...(searchParams.responsavelId ? { responsavelId: searchParams.responsavelId } : {}),
     ...(searchParams.regiaoId ? { solicitante: { regiaoId: searchParams.regiaoId } } : {}),
     ...(searchParams.prazoAlterado ? { prazoAlterado: searchParams.prazoAlterado === 'sim' } : {}),
-    ...(!temFiltro
-      ? { criadoEm: { gte: dataInicioPadrao } }
-      : {
+    ...(searchParams.dataInicio || searchParams.dataFim
+      ? {
           criadoEm: {
             ...(searchParams.dataInicio ? { gte: new Date(`${searchParams.dataInicio}T00:00:00`) } : {}),
             ...(searchParams.dataFim ? { lte: new Date(`${searchParams.dataFim}T23:59:59.999`) } : {}),
           },
-        }),
+        }
+      : {}),
+  }
+  const whereParaStatus = {
+    ...whereBase,
+    ...(areaSelecionadas.length > 0 ? { areaId: { in: areaSelecionadas } } : {}),
+  }
+  const whereParaArea = {
+    ...whereBase,
+    ...(statusSelecionados.length > 0 ? { status: { in: statusSelecionados } } : {}),
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- areas/colaboradores/regioes alimentam o formulario de filtros comentado (ocultado, nao removido)
-  const [demandas, total, contagens, areas, colaboradores, regioes, contagensMes] = await Promise.all([
+  const [demandas, total, contagensStatus, contagensArea, areas] = await Promise.all([
     prisma.demanda.findMany({
       where,
       orderBy: buildOrderBy(searchParams.sort, searchParams.order),
@@ -102,36 +101,56 @@ export default async function DemandasPage({
       },
     }),
     prisma.demanda.count({ where }),
-    prisma.demanda.groupBy({
-      by: ['status'],
-      where: { gabineteId: gabinete.id, deletedAt: null },
-      _count: { id: true },
-    }),
+    prisma.demanda.groupBy({ by: ['status'], where: whereParaStatus, _count: { id: true } }),
+    prisma.demanda.groupBy({ by: ['areaId'], where: whereParaArea, _count: { id: true } }),
     prisma.areaDemanda.findMany({ where: { gabineteId: gabinete.id }, orderBy: { nome: 'asc' }, select: { id: true, nome: true } }),
-    prisma.pessoa.findMany({ where: { gabineteId: gabinete.id, isMobilizador: true, isColaborador: true, deletedAt: null }, orderBy: { nome: 'asc' }, select: { id: true, nome: true } }),
-    prisma.regiao.findMany({ where: { gabineteId: gabinete.id, ativa: true }, orderBy: { nome: 'asc' }, select: { id: true, nome: true } }),
-    prisma.demanda.groupBy({
-      by: ['status'],
-      where: { gabineteId: gabinete.id, deletedAt: null, criadoEm: { gte: inicioMes, lte: fimMes } },
-      _count: { id: true },
-    }),
   ])
 
   const totalPaginas = Math.ceil(total / PAGE_SIZE)
 
-  const contagemPorStatus = Object.fromEntries(contagens.map((c) => [c.status, c._count.id]))
+  const baseHref = `/${params.slug}/admin/demandas`
+  function hrefComToggleStatus(chave: string): string {
+    const novaLista = toggleLista(statusSelecionados, chave)
+    const params2 = new URLSearchParams()
+    if (novaLista.length > 0) params2.set('statusIds', novaLista.join(','))
+    if (areaSelecionadas.length > 0) params2.set('areaIds', areaSelecionadas.join(','))
+    const qs = params2.toString()
+    return qs ? `${baseHref}?${qs}` : baseHref
+  }
+  function hrefComToggleArea(id: string): string {
+    const novaLista = toggleLista(areaSelecionadas, id)
+    const params2 = new URLSearchParams()
+    if (statusSelecionados.length > 0) params2.set('statusIds', statusSelecionados.join(','))
+    if (novaLista.length > 0) params2.set('areaIds', novaLista.join(','))
+    const qs = params2.toString()
+    return qs ? `${baseHref}?${qs}` : baseHref
+  }
 
-  const contagemMes = Object.fromEntries(contagensMes.map((c) => [c.status, c._count.id]))
-  const barrasDemandas = [
-    { status: 'aberta',       label: 'Em aberto',    bgClass: 'bg-yellow-400', count: contagemMes['aberta']       ?? 0 },
-    { status: 'expirada',     label: 'Expirada',     bgClass: 'bg-orange-400', count: contagemMes['expirada']     ?? 0 },
-    { status: 'atendida',     label: 'Atendida',     bgClass: 'bg-green-500',  count: contagemMes['atendida']     ?? 0 },
-    { status: 'nao_atendida', label: 'Não atendida', bgClass: 'bg-red-400',    count: contagemMes['nao_atendida'] ?? 0 },
-  ].map((b) => ({
-    ...b,
-    href: `/${params.slug}/admin/demandas?status=${b.status}&dataInicio=${dataInicioStr}&dataFim=${dataFimStr}`,
+  const mapaStatus = Object.fromEntries(contagensStatus.map((c) => [c.status, c._count.id]))
+  const STATUS_LABELS: { chave: string; label: string }[] = [
+    { chave: 'aberta', label: 'Em aberto' },
+    { chave: 'atendida', label: 'Atendida' },
+    { chave: 'nao_atendida', label: 'Não atendida' },
+    { chave: 'expirada', label: 'Expirada' },
+  ]
+  const fatiasStatus: FatiaPizza[] = STATUS_LABELS.map((s) => ({
+    chave: s.chave,
+    label: s.label,
+    valor: mapaStatus[s.chave] ?? 0,
+    cor: CORES_STATUS_DEMANDA[s.chave],
+    href: hrefComToggleStatus(s.chave),
   }))
-  const totalPrazoAlterado = await prisma.demanda.count({ where: { gabineteId: gabinete.id, deletedAt: null, prazoAlterado: true } })
+
+  const mapaArea = Object.fromEntries(contagensArea.map((c) => [c.areaId, c._count.id]))
+  const fatiasArea: FatiaPizza[] = areas.map((a, i) => ({
+    chave: a.id,
+    label: a.nome,
+    valor: mapaArea[a.id] ?? 0,
+    cor: PALETA_CATEGORICA[i % PALETA_CATEGORICA.length],
+    href: hrefComToggleArea(a.id),
+  }))
+
+  const temFiltroAtivo = statusSelecionados.length > 0 || areaSelecionadas.length > 0
 
   return (
     <div className="max-w-6xl mx-auto py-8 px-4 space-y-6">
@@ -146,25 +165,20 @@ export default async function DemandasPage({
         </Link>
       </div>
 
-      <GraficoDemandas barras={barrasDemandas} mesLabel={mesLabel} />
+      <div className="flex items-center justify-between">
+        <p className="text-sm text-gray-500">
+          {temFiltroAtivo ? 'Filtrado — clique numa fatia pra ajustar' : 'Clique numa fatia pra filtrar'}
+        </p>
+        {temFiltroAtivo && (
+          <Link href={`/${params.slug}/admin/demandas`} className="text-sm text-gray-500 underline hover:text-gray-700">
+            Limpar filtro
+          </Link>
+        )}
+      </div>
 
-      {/* Cards de resumo */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-        {[
-          { key: 'aberta', label: 'Em aberto', cor: 'text-yellow-600' },
-          { key: 'expirada', label: 'Expiradas', cor: 'text-orange-600' },
-          { key: 'atendida', label: 'Atendidas', cor: 'text-green-600' },
-          { key: 'nao_atendida', label: 'Não atendidas', cor: 'text-red-600' },
-        ].map(({ key, label, cor }) => (
-          <div key={key} className="bg-white rounded-xl shadow-sm p-4 text-center">
-            <p className="text-xs text-gray-500 font-medium">{label}</p>
-            <p className={`text-2xl font-bold mt-1 ${cor}`}>{contagemPorStatus[key] ?? 0}</p>
-          </div>
-        ))}
-        <div className="bg-white rounded-xl shadow-sm p-4 text-center">
-          <p className="text-xs text-gray-500 font-medium">Prazo alterado</p>
-          <p className="text-2xl font-bold mt-1 text-gray-700">{totalPrazoAlterado}</p>
-        </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <GraficoPizza titulo="Status" fatias={fatiasStatus} />
+        <GraficoPizza titulo="Área" fatias={fatiasArea} />
       </div>
 
       {/*

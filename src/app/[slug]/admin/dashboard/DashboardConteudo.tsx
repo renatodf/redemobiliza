@@ -119,14 +119,14 @@ export function DashboardConteudo({
     bgClass:
       s.chave === 'atendida' ? 'bg-green-500' : s.chave === 'nao_atendida' ? 'bg-red-400' : s.chave === 'expirada' ? 'bg-orange-400' : 'bg-yellow-400',
     count: mapaDemandas[s.chave] ?? 0,
-    href: `${demandasHref}?status=${s.chave}&dataInicio=${dataInicioStr}&dataFim=${dataFimStr}`,
+    href: `${demandasHref}?statusIds=${s.chave}&dataInicio=${dataInicioStr}&dataFim=${dataFimStr}`,
   }))
   const fatiasDemandas: FatiaPizza[] = DEMANDA_STATUS.map((s) => ({
     chave: s.chave,
     label: s.label,
     valor: mapaDemandas[s.chave] ?? 0,
     cor: CORES_STATUS_DEMANDA[s.chave],
-    href: `${demandasHref}?status=${s.chave}&dataInicio=${dataInicioStr}&dataFim=${dataFimStr}`,
+    href: `${demandasHref}?statusIds=${s.chave}&dataInicio=${dataInicioStr}&dataFim=${dataFimStr}`,
   }))
 
   // Sexo
