@@ -33,6 +33,7 @@ export function ComboBoxMultiplo({
   function selecionar(id: string) {
     onToggle(id)
     setBusca('')
+    setAberto(false)
   }
 
   return (
