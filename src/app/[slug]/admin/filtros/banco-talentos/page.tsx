@@ -23,6 +23,7 @@ export default async function AdminFiltrosBancoTalentosPage({
     prioridade: searchParams.prioridade,
     isPcd: searchParams.isPcd === 'sim' || searchParams.isPcd === 'nao' ? searchParams.isPcd : undefined,
     regiaoId: searchParams.regiaoId,
+    nome: searchParams.nome,
   }
 
   const where = buildWhereBancoTalentos(gabinete.id, filtros)

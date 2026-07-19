@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Pagination from '@/components/admin/Pagination'
 import { corTextoContraste } from '@/lib/cor-contraste'
+import { ComboBoxMultiplo } from '@/components/admin/ComboBoxMultiplo'
 
 type TalentoLinha = {
   pessoaId: string
@@ -81,23 +82,40 @@ export default function BancoTalentosFiltro({
         <input type="hidden" name="areaIds" value={Array.from(areasFiltro).join(',')} />
         <div>
           <p className="text-xs font-medium text-gray-600 mb-1">Área de interesse</p>
-          <div className="flex flex-wrap gap-1.5 max-w-md">
-            {areas.map((a) => {
-              const sel = areasFiltro.has(a.id)
-              return (
-                <button
-                  key={a.id}
-                  type="button"
-                  onClick={() => toggleAreaFiltro(a.id)}
-                  style={sel ? { backgroundColor: corPrimaria, color: corTexto } : undefined}
-                  className={`px-2.5 py-1 rounded text-xs font-medium ${sel ? '' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
-                >
-                  {a.nome}
-                </button>
-              )
-            })}
-            {areas.length === 0 && <p className="text-xs text-gray-500">Nenhuma área cadastrada.</p>}
-          </div>
+          <ComboBoxMultiplo
+            opcoes={areas.map((a) => ({ id: a.id, label: a.nome }))}
+            selecionados={areasFiltro}
+            onToggle={toggleAreaFiltro}
+            placeholder="Buscar área..."
+          />
+          {areasFiltro.size > 0 && (
+            <div className="flex flex-wrap gap-1.5 max-w-md mt-2">
+              {areas
+                .filter((a) => areasFiltro.has(a.id))
+                .map((a) => (
+                  <button
+                    key={a.id}
+                    type="button"
+                    onClick={() => toggleAreaFiltro(a.id)}
+                    style={{ backgroundColor: corPrimaria, color: corTexto }}
+                    className="px-2.5 py-1 rounded text-xs font-medium"
+                  >
+                    {a.nome}
+                  </button>
+                ))}
+            </div>
+          )}
+          {areas.length === 0 && <p className="text-xs text-gray-500 mt-1">Nenhuma área cadastrada.</p>}
+        </div>
+        <div>
+          <label className="block text-xs font-medium text-gray-600">Nome</label>
+          <input
+            type="text"
+            name="nome"
+            defaultValue={searchParams.nome ?? ''}
+            placeholder="Buscar por nome..."
+            className="mt-1 border border-gray-300 rounded-md px-2 py-1.5 text-sm"
+          />
         </div>
         <div>
           <label className="block text-xs font-medium text-gray-600">Prioridade</label>
