@@ -638,3 +638,16 @@ Depois de revogado, remover a linha `MONGO_ATLAS_URI_LEGADO` de `.env.staging` e
 - [ ] **Step 7: Reportar ao usuário**
 
 Sem commit adicional (Task 3 só executa o script já commitado na Task 2). Confirmar ao usuário: contagem final de fotos e currículos recuperados em produção, quantos não foram possíveis e por quê (resumo do relatório), e a confirmação de que o acesso temporário ao Atlas foi revogado.
+
+## Nota pós-execução
+
+Executado com sucesso contra staging e produção, com **dois bugs reais encontrados e corrigidos durante a execução ao vivo** (diferente da Fase 4/5, mais parecido com a Fase 3):
+
+1. **Falha de compressão sem `try/catch`** (commit `c4f1fad`): `sharp` lançou `VipsJpeg: Invalid SOS parameters for sequential JPEG` numa foto específica, corrompida na fonte — `processarFoto` não tinha tratamento de erro, derrubando o script inteiro após 500+ fotos já recuperadas em staging. Corrigido isolando a falha por registro (mesmo padrão já usado nos outros pontos do script), reportando em não-resolvidos e seguindo o lote.
+2. **Download do GridFS sem timeout** (commit `1b78ae4`): o rollout de produção travou ~20 minutos baixando um currículo específico cujos chunks do GridFS estavam incompletos/corrompidos — o stream nunca emitia `'end'` nem `'error'`, deixando a Promise pendurada e travando o processamento sequencial. Corrigido com timeout de 30s que destrói o stream e rejeita, caindo no `try/catch` já existente.
+
+Ambos os bugs foram tratados como falha isolada por registro, sem corromper nenhum estado — cada foto/currículo é salvo individualmente (idempotente), então a reexecução após cada fix retomou exatamente de onde parou, sem duplicar nem perder nada.
+
+**Resultado final, idêntico entre staging e produção** (a diferença de 1 em `fotoUrl` é um registro de teste pré-existente em staging, não relacionado à importação): `Pessoa.fotoUrl` preenchido = 696-697; `BancoTalentos.curriculoUrl` preenchido = 497; não resolvidos = 73 (25 fotos: 15 tipo de arquivo não suportado, 9 sem Pessoa correspondente, 1 falha de compressão; 48 currículos: 46 pessoa não-canônica, 2 sem Pessoa correspondente). Amostra de URLs reais verificada via `curl` — servindo `image/jpeg` e `application/pdf` corretamente, tamanhos plausíveis.
+
+`MONGO_ATLAS_URI_LEGADO` já removida de `.env.local`/`.env.staging` (arquivos locais, não commitados). Revogação do acesso no painel do Atlas (liberação de rede `0.0.0.0/0` e usuário `meubancodedados`) é uma ação manual do usuário no painel — confirmar separadamente que foi feita antes de considerar o acesso temporário totalmente encerrado.
