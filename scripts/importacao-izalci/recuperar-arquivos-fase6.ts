@@ -156,13 +156,27 @@ function carregarCurriculums(): Curriculo[] {
   return lista
 }
 
+const TIMEOUT_DOWNLOAD_GRIDFS_MS = 30_000
+
 function baixarArquivoGridFS(bucket: GridFSBucket, id: string): Promise<Buffer> {
   return new Promise((resolve, reject) => {
     const chunks: Buffer[] = []
     const stream = bucket.openDownloadStream(new ObjectId(id))
+
+    const timeout = setTimeout(() => {
+      stream.destroy()
+      reject(new Error(`timeout de ${TIMEOUT_DOWNLOAD_GRIDFS_MS}ms baixando arquivo do GridFS (chunks incompletos/corrompidos)`))
+    }, TIMEOUT_DOWNLOAD_GRIDFS_MS)
+
     stream.on('data', (chunk: Buffer) => chunks.push(chunk))
-    stream.on('error', reject)
-    stream.on('end', () => resolve(Buffer.concat(chunks)))
+    stream.on('error', (e) => {
+      clearTimeout(timeout)
+      reject(e)
+    })
+    stream.on('end', () => {
+      clearTimeout(timeout)
+      resolve(Buffer.concat(chunks))
+    })
   })
 }
 
