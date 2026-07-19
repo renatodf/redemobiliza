@@ -283,7 +283,13 @@ async function main() {
       continue
     }
 
-    const { buffer: bufferFinal, ext, contentType } = await processarFoto(bufferOriginal, extDetectada)
+    let bufferFinal: Buffer, ext: string, contentType: string
+    try {
+      ;({ buffer: bufferFinal, ext, contentType } = await processarFoto(bufferOriginal, extDetectada))
+    } catch (e) {
+      naoResolvidos.push({ tipo: 'foto', mongoId: c.mongoId, motivo: `falha ao processar/comprimir imagem: ${(e as Error).message}` })
+      continue
+    }
     const caminho = montarCaminhoFoto(gabineteId, pessoa.id, ext)
 
     const { error: erroUpload } = await getSupabaseAdmin().storage
