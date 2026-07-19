@@ -120,13 +120,12 @@ async function main() {
   console.log(`✓ ${canonicas.length} pessoas canônicas reconstruídas do backup (mesmo critério da Fase 3)`)
 
   const mongoIdsCanonicos = new Set(canonicas.map((c) => c.mongoId))
+  const whatsappPorMongoId = new Map(canonicas.map((c) => [c.mongoId, c.whatsapp]))
 
   const indicadorPorMongoId = new Map<string, string | null>()
   for (const c of canonicas) {
     indicadorPorMongoId.set(c.mongoId, resolverMongoIdIndicador(c.createdById, mongoIdsCanonicos))
   }
-
-  const niveis = calcularNiveis(indicadorPorMongoId)
 
   const pessoasPostgres = await prisma.pessoa.findMany({
     where: { gabineteId, deletedAt: null },
@@ -135,14 +134,32 @@ async function main() {
   const pessoaIdPorWhatsapp = new Map(pessoasPostgres.map((p) => [p.whatsapp, p.id]))
   console.log(`✓ ${pessoaIdPorWhatsapp.size} Pessoa carregadas do Postgres`)
 
+  // nivel precisa refletir a cadeia já resolvida no Postgres, não só o grafo
+  // cru do Mongo — um indicador canônico mas sem Pessoa ativa correspondente
+  // (ex: soft-deleted por colisão de whatsapp na Fase 3) não pode contar como
+  // pai real na hora de calcular nivel, senão um VinculoRede com
+  // indicadoPorId = null (raiz) sairia com nivel > 0, quebrando a invariante
+  // "raiz tem nivel = 0".
+  const indicadorRealizadoPorMongoId = new Map<string, string | null>()
+  for (const c of canonicas) {
+    const indicadorMongoId = indicadorPorMongoId.get(c.mongoId) ?? null
+    if (indicadorMongoId === null) {
+      indicadorRealizadoPorMongoId.set(c.mongoId, null)
+      continue
+    }
+    const whatsappIndicador = whatsappPorMongoId.get(indicadorMongoId)
+    const temPessoaAtiva = whatsappIndicador ? pessoaIdPorWhatsapp.has(whatsappIndicador) : false
+    indicadorRealizadoPorMongoId.set(c.mongoId, temPessoaAtiva ? indicadorMongoId : null)
+  }
+
+  const niveis = calcularNiveis(indicadorRealizadoPorMongoId)
+
   const vinculosExistentes = await prisma.vinculoRede.findMany({
     where: { gabineteId, deletedAt: null },
     select: { pessoaId: true },
   })
   const pessoaIdsComVinculo = new Set(vinculosExistentes.map((v) => v.pessoaId))
   console.log(`✓ ${pessoaIdsComVinculo.size} Pessoa já têm VinculoRede ativa (idempotência)`)
-
-  const whatsappPorMongoId = new Map(canonicas.map((c) => [c.mongoId, c.whatsapp]))
 
   type LinhaParaCriar = { gabineteId: string; pessoaId: string; indicadoPorId: string | null; nivel: number }
   const lote: LinhaParaCriar[] = []
