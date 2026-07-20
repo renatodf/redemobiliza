@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useFormState, useFormStatus } from 'react-dom'
 import { gerarLinkCadastro, type GerarLinkCadastroState } from '@/actions/admin/gerar-link-cadastro'
 import { corTextoContraste } from '@/lib/cor-contraste'
+import { ComboBoxMultiplo } from '@/components/admin/ComboBoxMultiplo'
 
 type Segmento = { id: string; nome: string }
 type Mobilizador = { id: string; nome: string }
@@ -66,27 +67,35 @@ export default function GerarLinkForm({
 
         <div>
           <p className="text-sm font-medium text-gray-700 mb-2">Segmentos para esse cadastro</p>
-          <div className="flex flex-wrap gap-2">
-            {segmentos.map((seg) => {
-              const selecionado = segmentosSelecionados.has(seg.id)
-              return (
-                <button
-                  key={seg.id}
-                  type="button"
-                  onClick={() => toggleSegmento(seg.id)}
-                  style={selecionado ? { backgroundColor: corPrimaria, color: corTexto } : undefined}
-                  className={`px-3 py-1.5 rounded-md text-xs font-medium ${
-                    selecionado ? '' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
-                >
-                  {seg.nome}
-                </button>
-              )
-            })}
-            {segmentos.length === 0 && (
-              <p className="text-xs text-gray-500">Nenhum segmento ativo cadastrado.</p>
-            )}
-          </div>
+          {segmentos.length === 0 ? (
+            <p className="text-xs text-gray-500">Nenhum segmento ativo cadastrado.</p>
+          ) : (
+            <>
+              <ComboBoxMultiplo
+                opcoes={segmentos.map((seg) => ({ id: seg.id, label: seg.nome }))}
+                selecionados={segmentosSelecionados}
+                onToggle={toggleSegmento}
+                placeholder="Buscar segmento..."
+              />
+              {segmentosSelecionados.size > 0 && (
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {segmentos
+                    .filter((seg) => segmentosSelecionados.has(seg.id))
+                    .map((seg) => (
+                      <button
+                        key={seg.id}
+                        type="button"
+                        onClick={() => toggleSegmento(seg.id)}
+                        style={{ backgroundColor: corPrimaria, color: corTexto }}
+                        className="px-3 py-1.5 rounded-md text-xs font-medium"
+                      >
+                        {seg.nome}
+                      </button>
+                    ))}
+                </div>
+              )}
+            </>
+          )}
         </div>
 
         <div>
