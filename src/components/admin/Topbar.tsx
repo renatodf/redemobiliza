@@ -6,25 +6,16 @@ export default function Topbar({
   usuarioNome,
   usuarioFotoUrl,
   perfilHref,
-  filtrosHref,
 }: {
   usuarioNome: string
   usuarioFotoUrl: string | null
   perfilHref?: string
-  filtrosHref?: string
 }) {
   const perfilBloco = (
     <div className="flex items-center gap-2">
       <Avatar fotoUrl={usuarioFotoUrl} nome={usuarioNome} size={28} />
       <span className="text-sm hidden sm:inline text-[#494949]">{usuarioNome}</span>
     </div>
-  )
-
-  const lupa = (
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden className="shrink-0">
-      <circle cx="8.5" cy="8.5" r="6" stroke="#979797" strokeWidth="1.8" />
-      <path d="M13.3 13.3 18 18" stroke="#979797" strokeWidth="1.8" strokeLinecap="round" />
-    </svg>
   )
 
   return (
@@ -38,13 +29,6 @@ export default function Topbar({
         </div>
       </div>
       <div className="flex items-center gap-4">
-        {filtrosHref ? (
-          <Link href={filtrosHref} aria-label="Abrir filtros" className="shrink-0 hover:opacity-70">
-            {lupa}
-          </Link>
-        ) : (
-          lupa
-        )}
         <span className="relative shrink-0" aria-hidden>
           <svg width="20" height="21" viewBox="0 0 20 21" fill="none">
             <path
