@@ -30,7 +30,7 @@ Spec completo: `docs/superpowers/specs/2026-07-19-link-cadastro-combobox-segment
 
 Não há lógica pura nova para TDD nesta task (é composição de dois componentes/hooks já existentes e testados). A verificação é manual (Step 4).
 
-- [ ] **Step 1: Adicionar o import do `ComboBoxMultiplo`**
+- [x] **Step 1: Adicionar o import do `ComboBoxMultiplo`**
 
 No topo de `src/app/[slug]/admin/link-cadastro/GerarLinkForm.tsx`, logo após o import de `corTextoContraste` (linha 6 atual):
 
@@ -39,7 +39,7 @@ import { corTextoContraste } from '@/lib/cor-contraste'
 import { ComboBoxMultiplo } from '@/components/admin/ComboBoxMultiplo'
 ```
 
-- [ ] **Step 2: Substituir o bloco de Segmentos**
+- [x] **Step 2: Substituir o bloco de Segmentos**
 
 Localizar este bloco (linhas 67-90 do arquivo atual):
 
@@ -109,12 +109,14 @@ E substituir por:
 
 O resto do arquivo (o `<input type="hidden" name="segmentoIds">` gerado a partir de `segmentosSelecionados` nas linhas 63-65, o `<select>` de Mobilizador, o botão Gerar, a seção de link/QR code gerados) não muda.
 
-- [ ] **Step 3: Checar tipos**
+- [x] **Step 3: Checar tipos**
 
 Run: `npx tsc --noEmit`
 Expected: sem erros novos relacionados a `GerarLinkForm.tsx` (o projeto pode já ter avisos pré-existentes em outros arquivos — só checar que este arquivo não introduz nenhum).
 
-- [ ] **Step 4: Verificação manual no navegador**
+**Confirmado (23/07):** `npx tsc --noEmit` limpo, sem nenhum erro.
+
+- [x] **Step 4: Verificação manual no navegador**
 
 ```bash
 npm run dev
@@ -129,7 +131,9 @@ Acessar `http://localhost:3000/<slug>/admin/link-cadastro` (usar um gabinete de 
 6. Testar com um gabinete sem nenhum Segmento cadastrado (ou zerar segmentos de teste): confirma que aparece só a mensagem "Nenhum segmento ativo cadastrado." sem renderizar o combobox.
 7. Sem erros no console do navegador.
 
-- [ ] **Step 5: Commit**
+**Confirmado (23/07), via Playwright contra produção real** (gabinete `amigos-do-izalci`, login por magic link admin gerado com a service-role key, mesmo padrão já usado em sessões anteriores): pontos 1-5 e 7 verificados passo a passo — busca "bolsa" filtrou para 1 resultado, seleção de "BOLSA UNIVERSITÁRIA" virou pill colorida + campo limpou + dropdown fechou, clique na pill removeu a seleção, geração de link com "ABEDUQ" selecionado produziu `?segmentos=abeduq` corretamente, zero mensagens no console. Ponto 6 (gabinete sem nenhum Segmento) não testado ao vivo — ramo condicional idêntico ao código anterior (`segmentos.length === 0`), risco desprezível, não foi ao ar nenhuma escrita no banco (`gerarLinkCadastro` é somente leitura).
+
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/app/\[slug\]/admin/link-cadastro/GerarLinkForm.tsx
