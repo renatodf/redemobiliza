@@ -6,6 +6,7 @@ import { corTextoContraste } from '@/lib/cor-contraste'
 
 type IconeTipo =
   | 'dados-gerais'
+  | 'filtros'
   | 'usuarios'
   | 'demandas'
   | 'tarefas'
@@ -20,6 +21,7 @@ type ItemMenu = { label: string; href?: string; emBreve?: boolean; icone: IconeT
 function buildItensAdmin(slug: string): ItemMenu[] {
   return [
     { label: 'Dados Gerais', href: `/${slug}/admin/dashboard`, icone: 'dados-gerais' },
+    { label: 'Filtros', href: `/${slug}/admin/filtros`, icone: 'filtros' },
     { label: 'Usuários', href: `/${slug}/admin/pessoas`, icone: 'usuarios' },
     { label: 'Demandas', href: `/${slug}/admin/demandas`, icone: 'demandas' },
     { label: 'Tarefas', emBreve: true, icone: 'tarefas' },
@@ -33,6 +35,7 @@ function buildItensAdmin(slug: string): ItemMenu[] {
 function buildItensMobilizador(slug: string): ItemMenu[] {
   return [
     { label: 'Dados Gerais', href: `/${slug}/mobilizador/dashboard`, icone: 'dados-gerais' },
+    { label: 'Filtros', href: `/${slug}/mobilizador/filtros`, icone: 'filtros' },
     { label: 'Início', href: `/${slug}/mobilizador/rede`, icone: 'inicio' },
     { label: 'Demandas', href: `/${slug}/mobilizador/demandas`, icone: 'demandas' },
     { label: 'Link de Cadastro', href: `/${slug}/mobilizador/link-cadastro`, icone: 'link-cadastro' },
@@ -46,6 +49,13 @@ function IconeMenu({ tipo }: { tipo: IconeTipo }) {
       return (
         <svg {...props}>
           <path d="M2 15V9.5M6.5 15V5M11 15V7M15.5 15V2.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+        </svg>
+      )
+    case 'filtros':
+      return (
+        <svg {...props}>
+          <circle cx="7.2" cy="7.2" r="5.1" stroke="currentColor" strokeWidth="1.5" />
+          <path d="M11.3 11.3 15.3 15.3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
         </svg>
       )
     case 'usuarios':
