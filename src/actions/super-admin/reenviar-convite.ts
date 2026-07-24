@@ -1,7 +1,7 @@
 'use server'
 
 import { createSupabaseServerClient } from '@/lib/supabase/server'
-import { getSupabaseAdmin } from '@/lib/supabase/admin'
+import { getSupabaseAdmin, gerarLinkComRetry } from '@/lib/supabase/admin'
 import { getAppUrl } from '@/lib/app-url'
 import { prisma } from '@/lib/prisma'
 import { enviarEmail, templateConviteAdmin } from '@/lib/email'
@@ -46,14 +46,13 @@ export async function reenviarConvite(
     }
   }
 
-  const { data: linkData, error: linkError } =
-    await getSupabaseAdmin().auth.admin.generateLink({
-      type: 'magiclink',
-      email,
-      options: {
-        redirectTo: `${getAppUrl()}/auth/confirm`,
-      },
-    })
+  const { data: linkData, error: linkError } = await gerarLinkComRetry({
+    type: 'magiclink',
+    email,
+    options: {
+      redirectTo: `${getAppUrl()}/auth/confirm`,
+    },
+  })
 
   if (linkError || !linkData.properties?.hashed_token) {
     return { erro: 'Não foi possível gerar o link. Tente novamente.' }

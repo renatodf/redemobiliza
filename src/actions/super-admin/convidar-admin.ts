@@ -2,7 +2,7 @@
 
 import { redirect } from 'next/navigation'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
-import { getSupabaseAdmin } from '@/lib/supabase/admin'
+import { getSupabaseAdmin, gerarLinkComRetry } from '@/lib/supabase/admin'
 import { getAppUrl } from '@/lib/app-url'
 import { prisma } from '@/lib/prisma'
 import { enviarEmail, templateConviteAdmin } from '@/lib/email'
@@ -23,12 +23,11 @@ export async function convidarAdmin(gabineteId: string, formData: FormData) {
     redirect(`/super-admin/gabinetes/${gabineteId}?erro=email_obrigatorio`)
   }
 
-  const { data: linkData, error: inviteError } =
-    await getSupabaseAdmin().auth.admin.generateLink({
-      type: 'invite',
-      email,
-      options: { redirectTo: `${getAppUrl()}/auth/confirm` },
-    })
+  const { data: linkData, error: inviteError } = await gerarLinkComRetry({
+    type: 'invite',
+    email,
+    options: { redirectTo: `${getAppUrl()}/auth/confirm` },
+  })
 
   if (inviteError) {
     const jaExiste =

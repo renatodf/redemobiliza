@@ -18,3 +18,28 @@ export function getSupabaseAdmin(): SupabaseClient {
   }
   return _admin
 }
+
+type ParametrosGenerateLink = Parameters<
+  ReturnType<typeof getSupabaseAdmin>['auth']['admin']['generateLink']
+>[0]
+
+/**
+ * generateLink falha de forma intermitente com "bad_jwt" (falha transitória
+ * de verificação de chave JWT no lado do Supabase, não relacionada aos
+ * parâmetros da chamada) — tentar de novo antes de propagar o erro.
+ */
+export async function gerarLinkComRetry(
+  params: ParametrosGenerateLink,
+  tentativas = 3
+) {
+  let resultado = await getSupabaseAdmin().auth.admin.generateLink(params)
+  for (
+    let tentativa = 1;
+    tentativa < tentativas && resultado.error?.code === 'bad_jwt';
+    tentativa++
+  ) {
+    await new Promise((resolve) => setTimeout(resolve, 300))
+    resultado = await getSupabaseAdmin().auth.admin.generateLink(params)
+  }
+  return resultado
+}
