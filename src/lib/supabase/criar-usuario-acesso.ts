@@ -15,7 +15,7 @@ async function buscarUsuarioPorEmail(supabaseAdmin: SupabaseClient, email: strin
 }
 
 /**
- * Cria um usuário no Supabase Auth para promoção a mobilizador. Se o e-mail já
+ * Cria um usuário no Supabase Auth para promoção a mobilizador ou administrador. Se o e-mail já
  * estiver cadastrado, diagnostica a causa mais comum (uma promoção anterior
  * que criou o usuário mas falhou antes de vincular ao Pessoa/UsuarioGabinete)
  * e retorna um erro específico e acionável — mas nunca reaproveita a conta
@@ -24,7 +24,7 @@ async function buscarUsuarioPorEmail(supabaseAdmin: SupabaseClient, email: strin
  * apontar o e-mail de qualquer Pessoa para o de outra pessoa real e assumir
  * a senha dela). A limpeza de contas órfãs exige ação humana explícita.
  */
-export async function criarOuReaproveitarUsuarioMobilizador(
+export async function criarOuReaproveitarUsuarioAcesso(
   supabaseAdmin: SupabaseClient,
   email: string,
   senha: string

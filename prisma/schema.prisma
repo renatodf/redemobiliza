@@ -135,6 +135,7 @@ model Pessoa {
   isColaborador    Boolean   @default(false)
   isMobilizador    Boolean   @default(false)
   tokenMobilizador String?
+  isAdmin          Boolean   @default(false)
   userId           String?
   zonaEleitoral    String?
   secaoEleitoral   String?
