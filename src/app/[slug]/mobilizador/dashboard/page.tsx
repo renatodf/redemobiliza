@@ -196,7 +196,7 @@ export default async function MobilizadorDashboardPage({
   ])
 
   const rankingMobilizadores = mobilizadoresAtivos
-    .map((m) => ({ nome: m.nome, contagem: m.redesComoIndicador.length }))
+    .map((m) => ({ id: m.id, nome: m.nome, contagem: m.redesComoIndicador.length }))
     .sort((a, b) => b.contagem - a.contagem)
 
   const labelPeriodo: Record<string, string> = {
@@ -208,6 +208,7 @@ export default async function MobilizadorDashboardPage({
   return (
     <DashboardConteudo
       slug={params.slug}
+      pessoaHrefBase={`/${params.slug}/mobilizador/pessoas`}
       dashboardHref={`/${params.slug}/mobilizador/dashboard`}
       filtrosHref={`/${params.slug}/mobilizador/filtros`}
       demandasHref={`/${params.slug}/mobilizador/demandas`}

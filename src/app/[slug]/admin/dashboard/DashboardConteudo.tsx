@@ -1,4 +1,5 @@
 // src/app/[slug]/admin/dashboard/DashboardConteudo.tsx
+import Link from 'next/link'
 import { GraficoDemandas } from '@/components/GraficoDemandas'
 import { GraficoPizza, type FatiaPizza } from '@/components/GraficoPizza'
 import MapaCadastros from '@/components/MapaCadastrosLoader'
@@ -46,8 +47,8 @@ function faixaParaQuery(faixa: string): Record<string, string> {
 }
 
 export function DashboardConteudo({
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- mantido na interface para paridade com a Task 5 (dashboard do mobilizador)
   slug,
+  pessoaHrefBase,
   dashboardHref,
   filtrosHref,
   demandasHref,
@@ -77,6 +78,7 @@ export function DashboardConteudo({
   areaAtiva,
 }: {
   slug: string
+  pessoaHrefBase: string
   dashboardHref: string
   filtrosHref: string
   demandasHref: string
@@ -88,7 +90,7 @@ export function DashboardConteudo({
   totalMobilizadores: number
   totalEquipe: number
   segmentosComContagem: { nome: string; tipo: string; contagem: number }[]
-  rankingMobilizadores: { nome: string; contagem: number }[]
+  rankingMobilizadores: { id: string; nome: string; contagem: number }[]
   pessoasPorOrigem: ContagemChave[]
   regioes: { id: string; nome: string; ativa: boolean; contagem: number; uf: string | null; latitude: number | null; longitude: number | null }[]
   contagemGenero: ContagemChave[]
@@ -389,10 +391,12 @@ export function DashboardConteudo({
               </thead>
               <tbody className="divide-y divide-gray-50">
                 {rankingMobilizadores.map((m, i) => (
-                  <tr key={m.nome}>
+                  <tr key={m.id}>
                     <td className="py-2 text-gray-800">
                       <span className="text-gray-400 mr-2 font-mono text-xs">{String(i + 1).padStart(2, '0')}</span>
-                      {m.nome}
+                      <Link href={`${pessoaHrefBase}/${m.id}`} className="hover:underline">
+                        {m.nome}
+                      </Link>
                     </td>
                     <td className="py-2 text-right font-medium text-gray-900">{m.contagem}</td>
                   </tr>
