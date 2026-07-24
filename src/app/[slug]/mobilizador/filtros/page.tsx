@@ -93,6 +93,7 @@ export default async function MobilizadorFiltrosPage({
       />
       <PessoasFiltro
         baseHref={`/${params.slug}/mobilizador/filtros`}
+        baseHrefPessoa={`/${params.slug}/mobilizador/pessoas`}
         dashboardHref={`/${params.slug}/mobilizador/dashboard`}
         exportarHref={`/api/${params.slug}/filtros/pessoas/exportar`}
         searchParams={searchParams}

@@ -92,6 +92,7 @@ export default async function AdminFiltrosPage({
       />
       <PessoasFiltro
         baseHref={`/${params.slug}/admin/filtros`}
+        baseHrefPessoa={`/${params.slug}/admin/pessoas`}
         dashboardHref={`/${params.slug}/admin/dashboard`}
         exportarHref={`/api/${params.slug}/filtros/pessoas/exportar`}
         searchParams={searchParams}

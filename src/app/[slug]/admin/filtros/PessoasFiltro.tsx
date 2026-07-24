@@ -1,4 +1,5 @@
 // src/app/[slug]/admin/filtros/PessoasFiltro.tsx
+import Link from 'next/link'
 import Pagination from '@/components/admin/Pagination'
 import VisualizarDadosGeraisButton from '@/components/admin/VisualizarDadosGeraisButton'
 import { LIMITE_EXPORT_SINCRONO } from '@/lib/filtros-pessoas'
@@ -16,6 +17,7 @@ type PessoaLinha = {
 
 export default function PessoasFiltro({
   baseHref,
+  baseHrefPessoa,
   dashboardHref,
   exportarHref,
   searchParams,
@@ -31,6 +33,7 @@ export default function PessoasFiltro({
   corPrimaria,
 }: {
   baseHref: string
+  baseHrefPessoa: string
   dashboardHref: string
   exportarHref: string
   searchParams: Record<string, string | undefined>
@@ -184,7 +187,11 @@ export default function PessoasFiltro({
           <tbody>
             {pessoas.map((p) => (
               <tr key={p.id} className="border-b border-gray-100">
-                <td className="py-2 pr-3">{p.nome}</td>
+                <td className="py-2 pr-3">
+                  <Link href={`${baseHrefPessoa}/${p.id}`} className="hover:underline">
+                    {p.nome}
+                  </Link>
+                </td>
                 <td className="py-2 pr-3">{p.whatsapp}</td>
                 <td className="py-2 pr-3">{p.regiao?.nome ?? '—'}</td>
                 <td className="py-2 pr-3">{p.profissao?.nome ?? '—'}</td>
