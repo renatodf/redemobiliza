@@ -82,7 +82,7 @@ export default async function GabineteDetalhePage({ params, searchParams }: Prop
 
   const convidarAction = convidarAdmin.bind(null, gabinete.id)
   const toggleAction = toggleGabinete.bind(null, gabinete.id)
-  const entrarAction = entrarModoSuporte.bind(null, gabinete.id) as any
+  const entrarAction = entrarModoSuporte.bind(null, gabinete.id, undefined)
 
   return (
     <div className="space-y-8 max-w-2xl">
@@ -150,7 +150,7 @@ export default async function GabineteDetalhePage({ params, searchParams }: Prop
                         null,
                         gabinete.id,
                         `/${gabinete.slug}/admin/pessoas/${a.pessoa.id}`
-                      ) as any}
+                      )}
                     >
                       <button type="submit" aria-label={`Editar ${a.pessoa.nome}`}>
                         <IconeEditar />
@@ -165,7 +165,7 @@ export default async function GabineteDetalhePage({ params, searchParams }: Prop
                       iconOnly
                     />
                   ) : (
-                    <form action={removerAdminLegado.bind(null, gabinete.id, a.userId) as any}>
+                    <form action={removerAdminLegado.bind(null, gabinete.id, a.userId)}>
                       <button
                         type="submit"
                         aria-label={`Remover admin ${a.email ?? a.userId}`}
