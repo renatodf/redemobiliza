@@ -2,12 +2,14 @@ import { type EmailOtpType } from '@supabase/supabase-js'
 import { type NextRequest, NextResponse } from 'next/server'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { prisma } from '@/lib/prisma'
+import { getAppUrl } from '@/lib/app-url'
 
 export async function GET(request: NextRequest) {
-  const { searchParams, origin } = request.nextUrl
+  const { searchParams } = request.nextUrl
   const code = searchParams.get('code')
   const token_hash = searchParams.get('token_hash')
   const type = searchParams.get('type') as EmailOtpType | null
+  const appUrl = getAppUrl()
 
   const supabase = createSupabaseServerClient()
 
@@ -18,7 +20,7 @@ export async function GET(request: NextRequest) {
     const { data, error } = await supabase.auth.exchangeCodeForSession(code)
     if (error || !data.user) {
       return NextResponse.redirect(
-        new URL('/login?erro=invite_invalid', origin)
+        new URL('/login?erro=invite_invalid', appUrl)
       )
     }
     user = data.user
@@ -26,17 +28,17 @@ export async function GET(request: NextRequest) {
     const { data, error } = await supabase.auth.verifyOtp({ token_hash, type })
     if (error || !data.user) {
       return NextResponse.redirect(
-        new URL('/login?erro=invite_invalid', origin)
+        new URL('/login?erro=invite_invalid', appUrl)
       )
     }
     user = data.user
   } else {
-    return NextResponse.redirect(new URL('/login?erro=invite_invalid', origin))
+    return NextResponse.redirect(new URL('/login?erro=invite_invalid', appUrl))
   }
 
   // Fluxo de recuperação de senha — não exige gabineteId
   if (type === 'recovery') {
-    return NextResponse.redirect(new URL('/login/nova-senha', origin))
+    return NextResponse.redirect(new URL('/login/nova-senha', appUrl))
   }
 
   // Verificar app_metadata.gabineteId — race condition ou acesso não autorizado
@@ -45,7 +47,7 @@ export async function GET(request: NextRequest) {
   if (!gabineteId) {
     await supabase.auth.signOut()
     return NextResponse.redirect(
-      new URL('/login?erro=invite_invalid', origin)
+      new URL('/login?erro=invite_invalid', appUrl)
     )
   }
 
@@ -58,7 +60,7 @@ export async function GET(request: NextRequest) {
   if (!gabinete || !gabinete.ativo) {
     await supabase.auth.signOut()
     return NextResponse.redirect(
-      new URL('/login?erro=gabinete_not_found', origin)
+      new URL('/login?erro=gabinete_not_found', appUrl)
     )
   }
 
@@ -72,6 +74,6 @@ export async function GET(request: NextRequest) {
   })
 
   return NextResponse.redirect(
-    new URL(`/${gabinete.slug}/admin/`, origin)
+    new URL(`/${gabinete.slug}/admin/`, appUrl)
   )
 }
