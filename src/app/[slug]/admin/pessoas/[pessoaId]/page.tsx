@@ -14,6 +14,8 @@ import { getAppUrl } from '@/lib/app-url'
 import FotoPerfilAvatar from './FotoPerfilAvatar'
 import PromoverMobilizadorDialog from './PromoverMobilizadorDialog'
 import RevogarMobilizadorTopButton from './RevogarMobilizadorTopButton'
+import PromoverAdminDialog from './PromoverAdminDialog'
+import RemoverAdminButton from './RemoverAdminButton'
 import ExcluirPessoaButton from './ExcluirPessoaButton'
 import Avatar from '@/components/admin/Avatar'
 import SegmentPills from '@/components/admin/SegmentPills'
@@ -159,7 +161,7 @@ export default async function FichaPessoaPage({
             Último Acesso<br />
             <span className="text-[#757575]">{ultimoAcesso ?? '—'}</span>
           </p>
-          <div className="flex flex-col items-end gap-2">
+          <div className="grid grid-cols-2 gap-2">
             <form action={toggleColaborador}>
               <input type="hidden" name="slug" value={params.slug} />
               <input type="hidden" name="pessoaId" value={pessoa.id} />
@@ -173,7 +175,7 @@ export default async function FichaPessoaPage({
                 }
                 className="text-[11px] px-2.5 py-1 rounded-md hover:opacity-90 font-medium"
               >
-                {pessoa.isColaborador ? 'Remover como colaborador' : 'Marcar como colaborador'}
+                {pessoa.isColaborador ? 'Remover colaborador' : '+ Colaborador'}
               </button>
             </form>
             {isAdmin && (
@@ -186,6 +188,23 @@ export default async function FichaPessoaPage({
                 />
               ) : (
                 <PromoverMobilizadorDialog
+                  slug={params.slug}
+                  pessoaId={pessoa.id}
+                  nomeAbreviado={pessoa.nome.split(' ')[0]}
+                  corPrimaria={gabinete.corPrimaria}
+                />
+              )
+            )}
+            {isAdmin && (
+              pessoa.isAdmin ? (
+                <RemoverAdminButton
+                  slug={params.slug}
+                  pessoaId={pessoa.id}
+                  nome={pessoa.nome}
+                  corPrimaria={gabinete.corPrimaria}
+                />
+              ) : (
+                <PromoverAdminDialog
                   slug={params.slug}
                   pessoaId={pessoa.id}
                   nomeAbreviado={pessoa.nome.split(' ')[0]}
