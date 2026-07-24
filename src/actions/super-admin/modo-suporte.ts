@@ -9,7 +9,7 @@ function gerarSessaoId(): string {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`
 }
 
-export async function entrarModoSuporte(gabineteId: string) {
+export async function entrarModoSuporte(gabineteId: string, redirectPath?: string) {
   const supabase = createSupabaseServerClient()
   const {
     data: { user },
@@ -42,7 +42,7 @@ export async function entrarModoSuporte(gabineteId: string) {
     select: { slug: true },
   })
 
-  redirect(`/${gabinete?.slug ?? ''}/admin/`)
+  redirect(redirectPath ?? `/${gabinete?.slug ?? ''}/admin/`)
 }
 
 export async function sairModoSuporte(gabineteId: string, sessaoId: string) {

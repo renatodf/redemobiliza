@@ -5,6 +5,10 @@ import { convidarAdmin } from '@/actions/super-admin/convidar-admin'
 import { reenviarConvite } from '@/actions/super-admin/reenviar-convite'
 import { toggleGabinete } from '@/actions/super-admin/toggle-gabinete'
 import { entrarModoSuporte } from '@/actions/super-admin/modo-suporte'
+import { removerAdminLegado } from '@/actions/super-admin/remover-admin-legado'
+import { getSupabaseAdmin } from '@/lib/supabase/admin'
+import RemoverAdminButton from '@/app/[slug]/admin/pessoas/[pessoaId]/RemoverAdminButton'
+import { IconeEditar } from '@/components/admin/TableIcons'
 
 interface Props {
   params: { id: string }
@@ -52,13 +56,33 @@ export default async function GabineteDetalhePage({ params, searchParams }: Prop
     orderBy: { criadoEm: 'asc' },
   })
 
+  const pessoasVinculadas = await prisma.pessoa.findMany({
+    where: {
+      gabineteId: gabinete.id,
+      isAdmin: true,
+      deletedAt: null,
+      userId: { in: admins.map((a) => a.userId) },
+    },
+    select: { id: true, nome: true, userId: true },
+  })
+  const pessoaPorUserId = new Map(pessoasVinculadas.map((p) => [p.userId, p]))
+
+  const adminsComRotulo = await Promise.all(
+    admins.map(async (a) => {
+      const pessoa = pessoaPorUserId.get(a.userId)
+      if (pessoa) return { ...a, pessoa, email: null as string | null }
+      const { data } = await getSupabaseAdmin().auth.admin.getUserById(a.userId)
+      return { ...a, pessoa: null, email: data.user?.email ?? null }
+    })
+  )
+
   const sucesso = searchParams.sucesso ? mensagensSucesso[searchParams.sucesso] : null
   const erro = searchParams.erro ? mensagensErro[searchParams.erro] : null
   const emailReenvio = searchParams.email
 
   const convidarAction = convidarAdmin.bind(null, gabinete.id)
   const toggleAction = toggleGabinete.bind(null, gabinete.id)
-  const entrarAction = entrarModoSuporte.bind(null, gabinete.id)
+  const entrarAction = entrarModoSuporte.bind(null, gabinete.id) as any
 
   return (
     <div className="space-y-8 max-w-2xl">
@@ -104,19 +128,54 @@ export default async function GabineteDetalhePage({ params, searchParams }: Prop
 
       <div className="space-y-3">
         <h2 className="text-base font-semibold text-gray-900">Administradores</h2>
-        {admins.length === 0 ? (
+        {adminsComRotulo.length === 0 ? (
           <p className="text-sm text-gray-400">Nenhum admin cadastrado ainda.</p>
         ) : (
           <ul className="space-y-2">
-            {admins.map((a) => (
+            {adminsComRotulo.map((a) => (
               <li
                 key={a.id}
-                className="rounded-md border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700"
+                className="flex items-center justify-between rounded-md border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700"
               >
-                <span className="font-mono text-xs text-gray-500">{a.userId}</span>
-                <span className="ml-3 text-gray-400 text-xs">
-                  desde {new Date(a.criadoEm).toLocaleDateString('pt-BR')}
-                </span>
+                <div>
+                  <span>{a.pessoa ? a.pessoa.nome : (a.email ?? a.userId)}</span>
+                  <span className="ml-3 text-gray-400 text-xs">
+                    desde {new Date(a.criadoEm).toLocaleDateString('pt-BR')}
+                  </span>
+                </div>
+                <div className="flex items-center gap-3">
+                  {a.pessoa && (
+                    <form
+                      action={entrarModoSuporte.bind(
+                        null,
+                        gabinete.id,
+                        `/${gabinete.slug}/admin/pessoas/${a.pessoa.id}`
+                      ) as any}
+                    >
+                      <button type="submit" aria-label={`Editar ${a.pessoa.nome}`}>
+                        <IconeEditar />
+                      </button>
+                    </form>
+                  )}
+                  {a.pessoa ? (
+                    <RemoverAdminButton
+                      slug={gabinete.slug}
+                      pessoaId={a.pessoa.id}
+                      nome={a.pessoa.nome}
+                      iconOnly
+                    />
+                  ) : (
+                    <form action={removerAdminLegado.bind(null, gabinete.id, a.userId) as any}>
+                      <button
+                        type="submit"
+                        aria-label={`Remover admin ${a.email ?? a.userId}`}
+                        className="text-red-600 hover:opacity-70"
+                      >
+                        Remover
+                      </button>
+                    </form>
+                  )}
+                </div>
               </li>
             ))}
           </ul>
