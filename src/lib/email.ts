@@ -108,3 +108,17 @@ export function templateExportacaoPronta({
     <p>Esse link expira em ${expiraEm.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}.</p>
   `
 }
+
+export function templateConviteAdmin({
+  nomeGabinete,
+  urlConvite,
+}: {
+  nomeGabinete: string
+  urlConvite: string
+}): string {
+  return `
+    <p>Olá!</p>
+    <p>Você foi convidado(a) para ser administrador(a) do gabinete <strong>${escapeHtml(nomeGabinete)}</strong> na Rede Mobiliza.</p>
+    <p><a href="${escapeHtml(urlConvite)}">Aceitar convite →</a></p>
+  `
+}

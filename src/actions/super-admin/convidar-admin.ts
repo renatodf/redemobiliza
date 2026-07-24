@@ -5,6 +5,7 @@ import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { getSupabaseAdmin } from '@/lib/supabase/admin'
 import { getAppUrl } from '@/lib/app-url'
 import { prisma } from '@/lib/prisma'
+import { enviarEmail, templateConviteAdmin } from '@/lib/email'
 
 async function assertSuperAdmin() {
   const supabase = createSupabaseServerClient()
@@ -22,9 +23,11 @@ export async function convidarAdmin(gabineteId: string, formData: FormData) {
     redirect(`/super-admin/gabinetes/${gabineteId}?erro=email_obrigatorio`)
   }
 
-  const { data: invite, error: inviteError } =
-    await getSupabaseAdmin().auth.admin.inviteUserByEmail(email, {
-      redirectTo: `${getAppUrl()}/auth/confirm`,
+  const { data: linkData, error: inviteError } =
+    await getSupabaseAdmin().auth.admin.generateLink({
+      type: 'invite',
+      email,
+      options: { redirectTo: `${getAppUrl()}/auth/confirm` },
     })
 
   if (inviteError) {
@@ -54,7 +57,7 @@ export async function convidarAdmin(gabineteId: string, formData: FormData) {
     redirect(`/super-admin/gabinetes/${gabineteId}?erro=convite_falhou`)
   }
 
-  const userId = invite.user.id
+  const userId = linkData.user.id
 
   const { error: updateError } =
     await getSupabaseAdmin().auth.admin.updateUserById(userId, {
@@ -63,6 +66,19 @@ export async function convidarAdmin(gabineteId: string, formData: FormData) {
 
   if (updateError) {
     redirect(`/super-admin/gabinetes/${gabineteId}?erro=metadata_falhou&userId=${userId}`)
+  }
+
+  const gabinete = await prisma.gabinete.findUnique({ where: { id: gabineteId }, select: { nome: true } })
+  const urlConvite = `${getAppUrl()}/auth/confirm?token_hash=${linkData.properties.hashed_token}&type=invite`
+
+  try {
+    await enviarEmail({
+      para: email,
+      assunto: `Convite para administrar ${gabinete?.nome ?? 'o gabinete'}`,
+      html: templateConviteAdmin({ nomeGabinete: gabinete?.nome ?? 'o gabinete', urlConvite }),
+    })
+  } catch {
+    redirect(`/super-admin/gabinetes/${gabineteId}?erro=email_falhou`)
   }
 
   redirect(`/super-admin/gabinetes/${gabineteId}?sucesso=convite_enviado`)

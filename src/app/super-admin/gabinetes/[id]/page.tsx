@@ -31,6 +31,8 @@ const mensagensErro: Record<string, string> = {
   convite_falhou: 'Erro ao enviar convite. Tente novamente.',
   metadata_falhou:
     'Convite enviado, mas houve erro ao gravar permissões. Use "Reenviar convite" para corrigir.',
+  email_falhou:
+    'Convite criado, mas houve erro ao enviar o e-mail. Use "Reenviar convite" para tentar de novo.',
 }
 
 export default async function GabineteDetalhePage({ params, searchParams }: Props) {
