@@ -686,7 +686,9 @@ EOF
 - Consumes: `RemoverAdminButton` (Task 3, com `iconOnly={true}`), `entrarModoSuporte` (modificado nesta task).
 - Produces: `entrarModoSuporte(gabineteId: string, redirectPath?: string)` — assinatura estendida, retrocompatível (o único outro call site, o próprio botão "Entrar em modo suporte" já existente nesta mesma página, continua passando só `gabineteId` via `.bind(null, gabinete.id)` e cai no padrão `/${slug}/admin/`). `removerAdminLegado(gabineteId: string, userId: string): Promise<void>` — restrito a super-admin, sem tocar em `Pessoa` (não existe pra esses admins).
 
-- [ ] **Step 1: `entrarModoSuporte` ganha `redirectPath` opcional**
+**Achado de segurança pós-implementação (revisão automática, corrigido pelo controller antes da revisão de task)**: `redirectPath` sendo passado direto pra `redirect()` sem sanitização é um open-redirect em potencial (`MEDIUM`) — mesmo o valor sendo hoje sempre montado no servidor a partir de `gabinete.slug`/`pessoa.id` (nunca de input direto de usuário), Server Actions podem ser invocadas fora do fluxo normal da UI. Corrigido reaproveitando `caminhoRelativoSeguro` — extraída de `submeter-cadastro.ts` (onde já existia, local àquele arquivo) pra `src/lib/caminho-relativo-seguro.ts`, compartilhada pelos dois usos agora. Mesma defesa em profundidade já documentada no HANDOFF ("Decisões técnicas importantes").
+
+- [x] **Step 1: `entrarModoSuporte` ganha `redirectPath` opcional**
 
 Em `src/actions/super-admin/modo-suporte.ts`, localizar (linhas 12-42 atuais):
 

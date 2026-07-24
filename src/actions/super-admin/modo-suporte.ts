@@ -4,6 +4,7 @@ import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { prisma } from '@/lib/prisma'
+import { caminhoRelativoSeguro } from '@/lib/caminho-relativo-seguro'
 
 function gerarSessaoId(): string {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`
@@ -42,7 +43,13 @@ export async function entrarModoSuporte(gabineteId: string, redirectPath?: strin
     select: { slug: true },
   })
 
-  redirect(redirectPath ?? `/${gabinete?.slug ?? ''}/admin/`)
+  const destinoPadrao = `/${gabinete?.slug ?? ''}/admin/`
+  // redirectPath é passado como argumento pré-vinculado (.bind) a partir de
+  // dado já resolvido no servidor (gabinete.slug + pessoa.id), nunca de input
+  // direto de usuário — mas sanitiza mesmo assim, mesma defesa em profundidade
+  // já usada em submeterCadastro (Server Actions podem ser invocadas
+  // diretamente, fora do fluxo normal da UI).
+  redirect(redirectPath ? caminhoRelativoSeguro(redirectPath, destinoPadrao) : destinoPadrao)
 }
 
 export async function sairModoSuporte(gabineteId: string, sessaoId: string) {
