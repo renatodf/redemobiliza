@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 import { corTextoContraste } from '@/lib/cor-contraste'
 import { assertMobilizadorAccess } from '@/lib/assert-mobilizador-access'
+import { coletarSubRedeIds } from '@/lib/rede'
 
 const STATUS_CONFIG = {
   aberta: { label: 'Em aberto', cor: 'bg-yellow-100 text-yellow-800' },
@@ -48,10 +49,14 @@ export default async function MobilizadorDemandasPage({
       status: true,
       prazoDesfecho: true,
       prazoAlterado: true,
-      solicitante: { select: { nome: true } },
+      solicitante: { select: { id: true, nome: true } },
       area: { select: { nome: true } },
     },
   })
+
+  // coletarSubRedeIds exclui o próprio pessoa.id do resultado — inclui aqui
+  // pra que uma demanda cujo solicitante é o próprio mobilizador também vire link.
+  const idsRedeSolicitante = new Set([pessoa.id, ...(await coletarSubRedeIds(pessoa.id, gabinete.id))])
 
   return (
     <div className="space-y-6">
@@ -101,7 +106,15 @@ export default async function MobilizadorDemandasPage({
                       {d.prazoAlterado && <span className="ml-1 text-xs text-orange-500">⚑</span>}
                     </Link>
                   </td>
-                  <td className="px-4 py-3 text-gray-600">{d.solicitante.nome}</td>
+                  <td className="px-4 py-3 text-gray-600">
+                    {idsRedeSolicitante.has(d.solicitante.id) ? (
+                      <Link href={`/${params.slug}/mobilizador/pessoas/${d.solicitante.id}`} className="hover:underline">
+                        {d.solicitante.nome}
+                      </Link>
+                    ) : (
+                      d.solicitante.nome
+                    )}
+                  </td>
                   <td className="px-4 py-3 text-gray-600">{d.area.nome}</td>
                   <td className="px-4 py-3 text-gray-600 text-xs">
                     {d.prazoDesfecho.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}

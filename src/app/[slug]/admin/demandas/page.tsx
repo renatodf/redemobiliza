@@ -95,8 +95,8 @@ export default async function DemandasPage({
         prazoDesfecho: true,
         prazoAlterado: true,
         criadoEm: true,
-        solicitante: { select: { nome: true } },
-        responsavel: { select: { nome: true } },
+        solicitante: { select: { id: true, nome: true } },
+        responsavel: { select: { id: true, nome: true } },
         area: { select: { nome: true } },
       },
     }),
@@ -275,8 +275,16 @@ export default async function DemandasPage({
                       {d.prazoAlterado && <span className="ml-1 text-xs text-orange-500">⚑</span>}
                     </Link>
                   </td>
-                  <td className="px-4 py-3 text-gray-600">{d.solicitante.nome}</td>
-                  <td className="px-4 py-3 text-gray-600">{d.responsavel.nome}</td>
+                  <td className="px-4 py-3 text-gray-600">
+                    <Link href={`/${params.slug}/admin/pessoas/${d.solicitante.id}`} className="hover:underline">
+                      {d.solicitante.nome}
+                    </Link>
+                  </td>
+                  <td className="px-4 py-3 text-gray-600">
+                    <Link href={`/${params.slug}/admin/pessoas/${d.responsavel.id}`} className="hover:underline">
+                      {d.responsavel.nome}
+                    </Link>
+                  </td>
                   <td className="px-4 py-3 text-gray-600">{d.area.nome}</td>
                   <td className="px-4 py-3 text-gray-600 text-xs">
                     {d.prazoDesfecho.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
