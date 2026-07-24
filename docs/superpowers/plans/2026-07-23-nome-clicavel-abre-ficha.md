@@ -873,10 +873,11 @@ export function DashboardConteudo({
   dashboardHref,
 ```
 
-Substituir por (`slug` passa a ser usado de verdade — remove o eslint-disable):
+Substituir por (`slug` continua sem uso real no corpo do componente — quem os cards de ranking usam é `pessoaHrefBase` — então o `eslint-disable` continua necessário, só o comentário é atualizado pra não referenciar mais "Task 5" por dentro de si mesma):
 
 ```tsx
 export function DashboardConteudo({
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- mantido na interface por paridade entre admin/mobilizador (pessoaHrefBase, não slug, é o que os cards de ranking usam)
   slug,
   pessoaHrefBase,
   dashboardHref,

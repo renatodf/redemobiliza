@@ -47,6 +47,7 @@ function faixaParaQuery(faixa: string): Record<string, string> {
 }
 
 export function DashboardConteudo({
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- mantido na interface por paridade entre admin/mobilizador (pessoaHrefBase, não slug, é o que os cards de ranking usam)
   slug,
   pessoaHrefBase,
   dashboardHref,
