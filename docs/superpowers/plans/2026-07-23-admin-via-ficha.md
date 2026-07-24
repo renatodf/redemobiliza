@@ -79,7 +79,9 @@ Ler o conteúdo atual de `src/lib/supabase/criar-usuario-mobilizador.ts` e criar
 
 Depois de criar o arquivo novo, apagar `src/lib/supabase/criar-usuario-mobilizador.ts`.
 
-- [ ] **Step 5: Atualizar o único call site existente**
+- [x] **Step 5: Atualizar os call sites existentes**
+
+**Correção pós-implementação (aplicada pelo controller, commit `a71fd9d`)**: o plano original dizia "único call site" — na verdade existem **dois**. `npx tsc --noEmit` pegou o segundo (`src/actions/mobilizador/promover-mobilizador.ts`, a action `promoverMobilizadorPorMobilizador`) que o levantamento original não tinha achado. Corrigido com o mesmo par de substituições abaixo, nos dois arquivos.
 
 Em `src/actions/admin/promover-mobilizador.ts`, localizar (linha 6 atual):
 
@@ -101,6 +103,24 @@ Localizar (linha 33 atual):
 
 Substituir por:
 
+```ts
+    const resultado = await criarOuReaproveitarUsuarioAcesso(getSupabaseAdmin(), pessoa.email, senha)
+```
+
+Em `src/actions/mobilizador/promover-mobilizador.ts` (a action `promoverMobilizadorPorMobilizador`, mobilizador promovendo alguém da própria rede direta a mobilizador), o mesmo par de substituições (linhas 7 e 44 atuais):
+
+```ts
+import { criarOuReaproveitarUsuarioMobilizador } from '@/lib/supabase/criar-usuario-mobilizador'
+```
+→
+```ts
+import { criarOuReaproveitarUsuarioAcesso } from '@/lib/supabase/criar-usuario-acesso'
+```
+
+```ts
+    const resultado = await criarOuReaproveitarUsuarioMobilizador(getSupabaseAdmin(), pessoa.email, senha)
+```
+→
 ```ts
     const resultado = await criarOuReaproveitarUsuarioAcesso(getSupabaseAdmin(), pessoa.email, senha)
 ```

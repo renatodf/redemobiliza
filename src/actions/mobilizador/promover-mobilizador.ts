@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { prisma } from '@/lib/prisma'
 import { assertMobilizadorAccess } from '@/lib/assert-mobilizador-access'
 import { getSupabaseAdmin } from '@/lib/supabase/admin'
-import { criarOuReaproveitarUsuarioMobilizador } from '@/lib/supabase/criar-usuario-mobilizador'
+import { criarOuReaproveitarUsuarioAcesso } from '@/lib/supabase/criar-usuario-acesso'
 import { enviarEmail, escapeHtml } from '@/lib/email'
 
 export async function promoverMobilizadorPorMobilizador(
@@ -41,7 +41,7 @@ export async function promoverMobilizadorPorMobilizador(
     if (!pessoa.email) return { erro: 'Pessoa não tem e-mail cadastrado.' }
     if (pessoa.isMobilizador) return { erro: 'Pessoa já é mobilizadora.' }
 
-    const resultado = await criarOuReaproveitarUsuarioMobilizador(getSupabaseAdmin(), pessoa.email, senha)
+    const resultado = await criarOuReaproveitarUsuarioAcesso(getSupabaseAdmin(), pessoa.email, senha)
     if ('erro' in resultado) return { erro: resultado.erro }
     const { userId } = resultado
 
