@@ -44,8 +44,8 @@ export default async function AdminFiltrosDemandasPage({
         status: true,
         prazoDesfecho: true,
         area: { select: { nome: true } },
-        solicitante: { select: { nome: true } },
-        responsavel: { select: { nome: true } },
+        solicitante: { select: { id: true, nome: true } },
+        responsavel: { select: { id: true, nome: true } },
       },
     }),
     prisma.demanda.count({ where }),
@@ -71,6 +71,7 @@ export default async function AdminFiltrosDemandasPage({
       />
       <DemandasFiltro
         baseHref={`/${params.slug}/admin/filtros/demandas`}
+        baseHrefPessoa={`/${params.slug}/admin/pessoas`}
         dashboardHref={`/${params.slug}/admin/dashboard`}
         exportarHref={`/api/${params.slug}/filtros/demandas/exportar`}
         searchParams={searchParams}

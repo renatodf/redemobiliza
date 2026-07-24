@@ -1,4 +1,5 @@
 // src/app/[slug]/admin/filtros/DemandasFiltro.tsx
+import Link from 'next/link'
 import Pagination from '@/components/admin/Pagination'
 import VisualizarDadosGeraisDemandasButton from '@/components/admin/VisualizarDadosGeraisDemandasButton'
 import { statusDemandaPill } from '@/lib/status-demanda'
@@ -9,12 +10,13 @@ type DemandaLinha = {
   status: string
   prazoDesfecho: Date
   area: { nome: string }
-  solicitante: { nome: string }
-  responsavel: { nome: string }
+  solicitante: { id: string; nome: string }
+  responsavel: { id: string; nome: string }
 }
 
 export default function DemandasFiltro({
   baseHref,
+  baseHrefPessoa,
   dashboardHref,
   exportarHref,
   searchParams,
@@ -25,8 +27,10 @@ export default function DemandasFiltro({
   areas,
   regioes,
   corPrimaria,
+  idsRedeSolicitante,
 }: {
   baseHref: string
+  baseHrefPessoa: string
   dashboardHref: string
   exportarHref: string
   searchParams: Record<string, string | undefined>
@@ -37,6 +41,7 @@ export default function DemandasFiltro({
   areas: { id: string; nome: string }[]
   regioes: { id: string; nome: string }[]
   corPrimaria: string
+  idsRedeSolicitante?: Set<string>
 }) {
   const qs = new URLSearchParams()
   for (const [k, v] of Object.entries(searchParams)) {
@@ -141,8 +146,20 @@ export default function DemandasFiltro({
                   <td className="py-2 pr-3">
                     <span className={`px-2 py-0.5 rounded text-xs font-medium ${pill.corClasse}`}>{pill.label}</span>
                   </td>
-                  <td className="py-2 pr-3">{d.solicitante.nome}</td>
-                  <td className="py-2 pr-3">{d.responsavel.nome}</td>
+                  <td className="py-2 pr-3">
+                    {!idsRedeSolicitante || idsRedeSolicitante.has(d.solicitante.id) ? (
+                      <Link href={`${baseHrefPessoa}/${d.solicitante.id}`} className="hover:underline">
+                        {d.solicitante.nome}
+                      </Link>
+                    ) : (
+                      d.solicitante.nome
+                    )}
+                  </td>
+                  <td className="py-2 pr-3">
+                    <Link href={`${baseHrefPessoa}/${d.responsavel.id}`} className="hover:underline">
+                      {d.responsavel.nome}
+                    </Link>
+                  </td>
                   <td className="py-2 pr-3">{d.prazoDesfecho.toLocaleDateString('pt-BR')}</td>
                 </tr>
               )
