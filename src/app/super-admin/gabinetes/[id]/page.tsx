@@ -257,14 +257,8 @@ async function ReenviarConviteSection({
   }
 
   return (
-    <div className="rounded-md bg-blue-50 border border-blue-200 p-3 space-y-2">
-      <p className="text-sm font-medium text-blue-800">Link gerado — envie manualmente ao admin:</p>
-      <p className="text-xs font-mono text-blue-700 break-all select-all bg-white rounded p-2 border border-blue-200">
-        {resultado.link}
-      </p>
-      <p className="text-xs text-blue-600">
-        Este link é de uso único. O Supabase não enviará e-mail automaticamente.
-      </p>
+    <div className="rounded-md bg-blue-50 border border-blue-200 p-3">
+      <p className="text-sm text-blue-800">Convite reenviado por e-mail com sucesso.</p>
     </div>
   )
 }

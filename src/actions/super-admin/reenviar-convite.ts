@@ -3,9 +3,11 @@
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { getSupabaseAdmin } from '@/lib/supabase/admin'
 import { getAppUrl } from '@/lib/app-url'
+import { prisma } from '@/lib/prisma'
+import { enviarEmail, templateConviteAdmin } from '@/lib/email'
 
 interface ReenviarResult {
-  link?: string
+  enviado?: boolean
   erro?: string
 }
 
@@ -53,9 +55,22 @@ export async function reenviarConvite(
       },
     })
 
-  if (linkError || !linkData.properties?.action_link) {
+  if (linkError || !linkData.properties?.hashed_token) {
     return { erro: 'Não foi possível gerar o link. Tente novamente.' }
   }
 
-  return { link: linkData.properties.action_link }
+  const gabinete = await prisma.gabinete.findUnique({ where: { id: gabineteId }, select: { nome: true } })
+  const urlConvite = `${getAppUrl()}/auth/confirm?token_hash=${linkData.properties.hashed_token}&type=magiclink`
+
+  try {
+    await enviarEmail({
+      para: email,
+      assunto: `Convite para administrar ${gabinete?.nome ?? 'o gabinete'}`,
+      html: templateConviteAdmin({ nomeGabinete: gabinete?.nome ?? 'o gabinete', urlConvite }),
+    })
+  } catch {
+    return { erro: 'Não foi possível enviar o e-mail. Tente novamente.' }
+  }
+
+  return { enviado: true }
 }
