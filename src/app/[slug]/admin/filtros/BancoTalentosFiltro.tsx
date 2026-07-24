@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import Pagination from '@/components/admin/Pagination'
 import { corTextoContraste } from '@/lib/cor-contraste'
 import { ComboBoxMultiplo } from '@/components/admin/ComboBoxMultiplo'
@@ -18,6 +19,7 @@ type Mobilizador = { id: string; nome: string }
 
 export default function BancoTalentosFiltro({
   baseHref,
+  baseHrefPessoa,
   exportarHref,
   searchParams,
   talentos,
@@ -30,6 +32,7 @@ export default function BancoTalentosFiltro({
   corPrimaria,
 }: {
   baseHref: string
+  baseHrefPessoa: string
   exportarHref: string
   searchParams: Record<string, string | undefined>
   talentos: TalentoLinha[]
@@ -199,7 +202,11 @@ export default function BancoTalentosFiltro({
                     aria-label={`Selecionar ${t.pessoa.nome}`}
                   />
                 </td>
-                <td className="py-2 pr-3">{t.pessoa.nome}</td>
+                <td className="py-2 pr-3">
+                  <Link href={`${baseHrefPessoa}/${t.pessoaId}`} className="hover:underline">
+                    {t.pessoa.nome}
+                  </Link>
+                </td>
                 <td className="py-2 pr-3">{t.pessoa.regiao?.nome ?? '—'}</td>
                 <td className="py-2 pr-3">{t.areas.map((a) => a.area.nome).join(', ') || '—'}</td>
                 <td className="py-2 pr-3">{t.prioridade}</td>

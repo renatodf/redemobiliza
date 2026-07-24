@@ -75,6 +75,7 @@ export default async function AdminFiltrosBancoTalentosPage({
       />
       <BancoTalentosFiltro
         baseHref={`/${params.slug}/admin/filtros/banco-talentos`}
+        baseHrefPessoa={`/${params.slug}/admin/pessoas`}
         exportarHref={`/api/${params.slug}/filtros/banco-talentos/exportar`}
         searchParams={searchParams}
         talentos={talentosPagina}
