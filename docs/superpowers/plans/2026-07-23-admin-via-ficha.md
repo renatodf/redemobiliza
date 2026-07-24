@@ -81,7 +81,7 @@ Depois de criar o arquivo novo, apagar `src/lib/supabase/criar-usuario-mobilizad
 
 - [x] **Step 5: Atualizar os call sites existentes**
 
-**Correção pós-implementação (aplicada pelo controller, commit `a71fd9d`)**: o plano original dizia "único call site" — na verdade existem **dois**. `npx tsc --noEmit` pegou o segundo (`src/actions/mobilizador/promover-mobilizador.ts`, a action `promoverMobilizadorPorMobilizador`) que o levantamento original não tinha achado. Corrigido com o mesmo par de substituições abaixo, nos dois arquivos.
+**Correção pós-implementação (aplicada pelo controller, commit `6654b81`)**: o plano original dizia "único call site" — na verdade existem **dois**. `npx tsc --noEmit` pegou o segundo (`src/actions/mobilizador/promover-mobilizador.ts`, a action `promoverMobilizadorPorMobilizador`) que o levantamento original não tinha achado. Corrigido com o mesmo par de substituições abaixo, nos dois arquivos.
 
 Em `src/actions/admin/promover-mobilizador.ts`, localizar (linha 6 atual):
 
